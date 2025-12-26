@@ -1,131 +1,218 @@
 # AEGIS Signal Taxonomy Acceptance Test Report
 
-**Generated:** 2025-12-26 16:15:22
-**Total Tests:** 40
+**Generated:** 2025-12-26 16:51:17
+**Total Tests:** 38
+**Horizons Tested:** 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024
 
 ---
 
-## Summary Statistics
+## Executive Summary
 
-| Metric | Value |
-|--------|-------|
-| Mean MAE | 1.7679 |
-| Mean RMSE | 2.3011 |
-| Mean Coverage | 96.57% |
-| Dominant Group Match Rate | 9/40 (22.5%) |
-| Total Runtime | 10.95s |
+### Performance by Horizon
+
+| Horizon | Mean MAE | Mean RMSE | Mean Coverage | MAE Ratio (vs h=1) |
+|---------|----------|-----------|---------------|-------------------|
+| 1 | nan | nan | 74.7% | 0.00x |
+| 2 | nan | nan | 78.3% | 0.00x |
+| 4 | nan | nan | 81.8% | 0.00x |
+| 8 | nan | nan | 85.3% | 0.00x |
+| 16 | nan | nan | 84.8% | 0.00x |
+| 32 | nan | nan | 84.7% | 0.00x |
+| 64 | nan | nan | 87.9% | 0.00x |
+| 128 | nan | nan | 87.5% | 0.00x |
+| 256 | nan | nan | 87.4% | 0.00x |
+| 512 | 13.2253 | 15.1970 | 85.9% | 0.00x |
+| 1024 | 23.2756 | 25.7759 | 84.8% | 0.00x |
+
+**Total Runtime:** 431.00s
+
+---
+
+## Horizon Scaling Analysis
+
+How prediction error grows with forecast horizon:
+
+| Signal | h=1 | h=4 | h=16 | h=64 | h=256 | h=1024 |
+|--------|-----|-----|------|------|-------|--------|
+| Constant Value | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| Linear Trend | 1.56 | 1.26 | 0.15 | 4.74 | 23.94 | 100.77 |
+| Sinusoidal | 0.28 | 0.62 | 1.91 | 0.18 | 0.18 | 0.19 |
+| Square Wave | 0.27 | 0.45 | 1.21 | 0.21 | 0.20 | 0.21 |
+| Polynomial Trend | nan | nan | nan | nan | nan | 377.48 |
+| White Noise | 1.13 | 1.17 | 1.16 | 1.13 | 1.15 | 1.15 |
+| Random Walk | 4.79 | 4.88 | 5.42 | 8.36 | 16.13 | 25.18 |
+| AR(1) phi=0.8 | 0.86 | 0.93 | 1.04 | 1.01 | 1.01 | 0.99 |
+| AR(1) phi=0.99 | 2.21 | 2.29 | 2.54 | 3.74 | 6.38 | 5.27 |
+| MA(1) | 1.59 | 1.30 | 1.32 | 1.29 | 1.34 | 1.36 |
+| ARMA(1,1) | 2.05 | 2.30 | 2.27 | 2.28 | 2.30 | 2.41 |
+| Ornstein-Uhlenbeck | 1.14 | 1.36 | 1.62 | 1.63 | 1.72 | 1.73 |
+| Trend + Noise | 1.32 | 1.30 | 1.10 | 2.31 | 11.86 | 50.31 |
+| Sine + Noise | 0.86 | 0.82 | 1.37 | 0.87 | 0.87 | 0.85 |
+| Trend + Seasonality + Noi | 1.16 | 1.17 | 1.94 | 1.24 | 4.77 | 20.20 |
+| Mean-Reversion + Oscillat | 1.16 | 1.23 | 1.78 | 1.07 | 1.09 | 1.49 |
+| Random Walk with Drift | 4.78 | 4.97 | 5.70 | 8.21 | 12.19 | 36.17 |
+| Variance Switching | 2.52 | 2.62 | 2.61 | 2.75 | 2.86 | 3.18 |
+| Mean Switching | 1.82 | 1.87 | 2.17 | 3.29 | 4.03 | 6.00 |
+| Threshold AR | 0.85 | 0.92 | 0.98 | 1.00 | 0.99 | 1.05 |
+| Structural Break | 1.13 | 1.17 | 1.16 | 1.22 | 1.56 | 3.57 |
+| Gradual Drift | 1.09 | 1.13 | 1.12 | 1.14 | 1.51 | 5.07 |
+| Student-t (df=4) | 2.29 | 2.47 | 2.58 | 2.50 | 2.92 | 4.72 |
+| Student-t (df=3) | 2.84 | 3.18 | 3.20 | 3.45 | 4.66 | 13.16 |
+| Occasional Jumps | 3.32 | 3.45 | 4.00 | 6.53 | 10.98 | 22.53 |
+| Power-Law Tails (alpha=2. | 5.47 | 5.69 | 6.59 | 9.83 | 19.09 | 34.86 |
+| fBM Persistent (H=0.7) | 2.84 | 2.80 | 3.09 | 5.29 | 9.93 | 18.34 |
+| fBM Antipersistent (H=0.3 | 4.32 | 4.43 | 5.03 | 7.01 | 13.54 | 40.05 |
+| Multi-Timescale Mean-Reve | 0.83 | 0.81 | 0.89 | 1.08 | 1.24 | 1.33 |
+| Trend + Momentum + Revers | 0.71 | 0.68 | 0.69 | 0.91 | 2.42 | 10.05 |
+| GARCH-like Volatility | 1.08 | 1.12 | 1.13 | 1.14 | 1.14 | 1.17 |
+| Perfectly Correlated | 4.63 | 4.81 | 5.60 | 7.89 | 12.59 | 23.92 |
+| Contemporaneous Relations | 3.51 | 3.64 | 4.30 | 6.22 | 8.86 | 19.71 |
+| Lead-Lag | 4.31 | 4.44 | 5.03 | 6.86 | 11.83 | 21.57 |
+| Cointegrated Pair | 5.22 | 5.31 | 6.02 | 9.21 | 13.01 | 23.82 |
+| Impulse | 0.01 | 0.01 | 0.01 | 0.01 | 0.02 | 0.07 |
+| Step Function | 0.29 | 0.31 | 0.40 | 0.80 | 2.52 | 2.29 |
+| Contaminated Data | 1.42 | 1.64 | 1.81 | 1.86 | 1.90 | 2.27 |
+
+---
+
+## Coverage by Horizon
+
+95% prediction interval coverage across horizons:
+
+| Signal | h=1 | h=4 | h=16 | h=64 | h=256 | h=1024 |
+|--------|-----|-----|------|------|-------|--------|
+| Constant Value | 100% | 100% | 100% | 100% | 100% | 100% |
+| Linear Trend | 100% | 100% | 100% | 10% | 0% | 0% |
+| Sinusoidal | 25% | 17% | 4% | 42% | 40% | 37% |
+| Square Wave | 94% | 84% | 47% | 97% | 97% | 100% |
+| Polynomial Trend | 89% | 89% | 2% | 0% | 0% | 0% |
+| White Noise | 89% | 93% | 99% | 100% | 100% | 100% |
+| Random Walk | 59% | 73% | 85% | 88% | 85% | 98% |
+| AR(1) phi=0.8 | 75% | 86% | 96% | 100% | 100% | 100% |
+| AR(1) phi=0.99 | 58% | 71% | 84% | 89% | 91% | 100% |
+| MA(1) | 77% | 94% | 99% | 100% | 100% | 100% |
+| ARMA(1,1) | 72% | 80% | 94% | 99% | 100% | 100% |
+| Ornstein-Uhlenbeck | 74% | 81% | 90% | 99% | 100% | 100% |
+| Trend + Noise | 93% | 96% | 100% | 100% | 95% | 33% |
+| Sine + Noise | 97% | 98% | 92% | 100% | 100% | 100% |
+| Trend + Seasonality + Noi | 90% | 96% | 93% | 100% | 93% | 39% |
+| Mean-Reversion + Oscillat | 52% | 72% | 81% | 100% | 100% | 100% |
+| Random Walk with Drift | 59% | 70% | 84% | 87% | 87% | 88% |
+| Variance Switching | 85% | 89% | 93% | 93% | 97% | 100% |
+| Mean Switching | 77% | 83% | 87% | 92% | 97% | 100% |
+| Threshold AR | 76% | 87% | 97% | 100% | 100% | 100% |
+| Structural Break | 86% | 89% | 97% | 99% | 100% | 100% |
+| Gradual Drift | 90% | 94% | 99% | 100% | 100% | 100% |
+| Student-t (df=4) | 69% | 78% | 87% | 97% | 100% | 100% |
+| Student-t (df=3) | 62% | 69% | 81% | 91% | 99% | 100% |
+| Occasional Jumps | 52% | 60% | 72% | 77% | 82% | 99% |
+| Power-Law Tails (alpha=2. | 50% | 62% | 74% | 80% | 77% | 88% |
+| fBM Persistent (H=0.7) | 57% | 66% | 75% | 68% | 68% | 75% |
+| fBM Antipersistent (H=0.3 | 58% | 70% | 82% | 88% | 83% | 60% |
+| Multi-Timescale Mean-Reve | 77% | 90% | 98% | 100% | 100% | 100% |
+| Trend + Momentum + Revers | 82% | 94% | 99% | 100% | 100% | 98% |
+| GARCH-like Volatility | 88% | 92% | 98% | 100% | 100% | 100% |
+| Perfectly Correlated | 60% | 72% | 83% | 89% | 96% | 99% |
+| Contemporaneous Relations | 63% | 75% | 85% | 89% | 94% | 92% |
+| Lead-Lag | 67% | 79% | 88% | 94% | 95% | 100% |
+| Cointegrated Pair | 53% | 68% | 83% | 85% | 94% | 99% |
+| Impulse | 100% | 100% | 100% | 100% | 100% | 100% |
+| Step Function | 97% | 97% | 97% | 88% | 49% | 22% |
+| Contaminated Data | 88% | 91% | 96% | 98% | 100% | 100% |
 
 ---
 
 ## Composite
 
-| Signal | MAE | RMSE | Coverage | Dominant | Expected | Match | Time |
-|--------|-----|------|----------|----------|----------|-------|------|
-| Trend + Noise | 4.5582 | 4.8331 | 100.0% | dynamic (74.9%) | trend | **No** | 0.14s |
-| Sine + Noise | 1.8961 | 2.2010 | 100.0% | reversion (34.0%) | periodic | **No** | 0.11s |
-| Trend + Seasonality + Noise | 1.9562 | 2.1657 | 100.0% | periodic (100.0%) | trend | **No** | 0.22s |
-| Mean-Reversion + Oscillation | 0.7317 | 0.8945 | 94.4% | reversion (51.5%) | periodic | **No** | 0.17s |
-
-**Category Summary:** MAE=2.2856, RMSE=2.5236, Coverage=98.6%, Matches=0/4
+| Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
+|--------|-----------|------------|--------------|----------------|----------|
+| Trend + Noise | 1.3194 | 2.3135 | 50.3073 | 92.7% | dynamic (42%) |
+| Sine + Noise | 0.8630 | 0.8670 | 0.8473 | 97.0% | periodic (67%) |
+| Trend + Seasonality + Noise | 1.1647 | 1.2427 | 20.1953 | 90.1% | periodic (51%) |
+| Mean-Reversion + Oscillation | 1.1567 | 1.0728 | 1.4859 | 52.3% | reversion (49%) |
 
 ---
 
 ## Deterministic
 
-| Signal | MAE | RMSE | Coverage | Dominant | Expected | Match | Time |
-|--------|-----|------|----------|----------|----------|-------|------|
-| Constant Value | 0.0000 | 0.0000 | 100.0% | reversion (37.5%) | persistence | **No** | 0.13s |
-| Linear Trend | 1.6998 | 1.6999 | 100.0% | reversion (25.2%) | trend | **No** | 0.14s |
-| Sinusoidal | 0.6410 | 0.7353 | 99.3% | reversion (49.6%) | periodic | **No** | 0.10s |
-| Square Wave | 1.1357 | 1.3615 | 100.0% | periodic (100.0%) | periodic | Yes | 0.15s |
-| Polynomial Trend | 1.1867 | 1.2050 | 100.0% | trend (100.0%) | trend | Yes | 0.14s |
-
-**Category Summary:** MAE=0.9327, RMSE=1.0003, Coverage=99.9%, Matches=2/5
+| Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
+|--------|-----------|------------|--------------|----------------|----------|
+| Constant Value | 0.0000 | 0.0000 | 0.0000 | 100.0% | persistence (40%) |
+| Linear Trend | 1.5632 | 4.7380 | 100.7664 | 100.0% | periodic (98%) |
+| Sinusoidal | 0.2798 | 0.1781 | 0.1946 | 25.0% | periodic (86%) |
+| Square Wave | 0.2665 | 0.2060 | 0.2096 | 93.8% | reversion (38%) |
+| Polynomial Trend | nan | nan | 377.4819 | 88.7% | persistence (nan%) |
 
 ---
 
 ## Edge Case
 
-| Signal | MAE | RMSE | Coverage | Dominant | Expected | Match | Time |
-|--------|-----|------|----------|----------|----------|-------|------|
-| Impulse | 0.3156 | 1.8196 | 98.7% | periodic (49.4%) | persistence | **No** | 0.06s |
-| Step Function | 1.0441 | 1.6840 | 97.6% | variance (100.0%) | persistence | **No** | 0.22s |
-| Contaminated Data | 1.8081 | 4.0758 | 96.4% | special (40.9%) | reversion | **No** | 0.23s |
-| Very Short Series (n=30) | 0.9045 | 1.1098 | 100.0% | reversion (27.9%) | persistence | **No** | 0.01s |
-| Very Long Series (n=2000) | 0.7776 | 0.9803 | 94.4% | reversion (54.7%) | reversion | Yes | 1.61s |
-
-**Category Summary:** MAE=0.9700, RMSE=1.9339, Coverage=97.4%, Matches=1/5
+| Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
+|--------|-----------|------------|--------------|----------------|----------|
+| Impulse | 0.0121 | 0.0142 | 0.0675 | 100.0% | persistence (75%) |
+| Step Function | 0.2886 | 0.7964 | 2.2921 | 97.2% | variance (86%) |
+| Contaminated Data | 1.4160 | 1.8585 | 2.2732 | 88.1% | variance (100%) |
 
 ---
 
 ## Heavy-Tailed
 
-| Signal | MAE | RMSE | Coverage | Dominant | Expected | Match | Time |
-|--------|-----|------|----------|----------|----------|-------|------|
-| Student-t (df=4) | 1.8009 | 2.5441 | 96.8% | reversion (66.4%) | reversion | Yes | 0.23s |
-| Student-t (df=3) | 1.7574 | 2.3118 | 97.6% | dynamic (45.5%) | reversion | **No** | 0.23s |
-| Occasional Jumps | 2.3227 | 3.4271 | 91.6% | special (30.6%) | persistence | **No** | 0.23s |
-| Power-Law Tails (alpha=2.5) | 3.4490 | 4.2659 | 98.0% | reversion (38.4%) | persistence | **No** | 0.23s |
-
-**Category Summary:** MAE=2.3325, RMSE=3.1372, Coverage=96.0%, Matches=1/4
+| Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
+|--------|-----------|------------|--------------|----------------|----------|
+| Student-t (df=4) | 2.2893 | 2.5030 | 4.7173 | 68.9% | dynamic (36%) |
+| Student-t (df=3) | 2.8416 | 3.4451 | 13.1571 | 62.1% | dynamic (44%) |
+| Occasional Jumps | 3.3198 | 6.5275 | 22.5341 | 51.6% | reversion (38%) |
+| Power-Law Tails (alpha=2.5) | 5.4666 | 9.8305 | 34.8638 | 50.4% | variance (46%) |
 
 ---
 
 ## Multi-Scale
 
-| Signal | MAE | RMSE | Coverage | Dominant | Expected | Match | Time |
-|--------|-----|------|----------|----------|----------|-------|------|
-| fBM Persistent (H=0.7) | 1.2725 | 1.5726 | 89.1% | special (34.6%) | persistence | **No** | 0.39s |
-| fBM Antipersistent (H=0.3) | 4.7231 | 6.1016 | 90.0% | reversion (39.5%) | persistence | **No** | 0.40s |
-| Multi-Timescale Mean-Reversion | 0.6746 | 0.8616 | 93.5% | dynamic (63.2%) | reversion | **No** | 0.40s |
-| Trend + Momentum + Reversion | 1.0988 | 1.2989 | 98.9% | dynamic (54.0%) | trend | **No** | 0.41s |
-| GARCH-like Volatility | 0.9840 | 1.2499 | 96.0% | periodic (58.0%) | persistence | **No** | 0.40s |
-
-**Category Summary:** MAE=1.7506, RMSE=2.2169, Coverage=93.5%, Matches=0/5
+| Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
+|--------|-----------|------------|--------------|----------------|----------|
+| fBM Persistent (H=0.7) | 2.8351 | 5.2885 | 18.3379 | 56.9% | reversion (37%) |
+| fBM Antipersistent (H=0.3) | 4.3203 | 7.0056 | 40.0503 | 57.9% | reversion (34%) |
+| Multi-Timescale Mean-Reversion | 0.8273 | 1.0796 | 1.3288 | 77.1% | dynamic (67%) |
+| Trend + Momentum + Reversion | 0.7127 | 0.9068 | 10.0501 | 81.8% | dynamic (62%) |
+| GARCH-like Volatility | 1.0776 | 1.1424 | 1.1700 | 88.5% | periodic (52%) |
 
 ---
 
 ## Multi-Stream
 
-| Signal | MAE | RMSE | Coverage | Dominant | Expected | Match | Time |
-|--------|-----|------|----------|----------|----------|-------|------|
-| Perfectly Correlated | 3.2470 | 4.1878 | 99.3% | reversion (28.0%) | persistence | **No** | 0.33s |
-| Contemporaneous Relationship | 2.7290 | 3.4072 | 98.7% | reversion (39.7%) | persistence | **No** | 0.32s |
-| Lead-Lag | 2.5224 | 3.1353 | 99.2% | reversion (30.1%) | persistence | **No** | 0.51s |
-| Cointegrated Pair | 4.3900 | 5.6888 | 93.2% | reversion (37.8%) | persistence | **No** | 0.51s |
-
-**Category Summary:** MAE=3.2221, RMSE=4.1048, Coverage=97.6%, Matches=0/4
+| Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
+|--------|-----------|------------|--------------|----------------|----------|
+| Perfectly Correlated | 4.6280 | 7.8861 | 23.9244 | 59.7% | reversion (33%) |
+| Contemporaneous Relationship | 3.5132 | 6.2220 | 19.7103 | 63.0% | reversion (50%) |
+| Lead-Lag | 4.3063 | 6.8597 | 21.5729 | 66.9% | reversion (45%) |
+| Cointegrated Pair | 5.2208 | 9.2139 | 23.8171 | 53.3% | reversion (36%) |
 
 ---
 
 ## Non-Stationary
 
-| Signal | MAE | RMSE | Coverage | Dominant | Expected | Match | Time |
-|--------|-----|------|----------|----------|----------|-------|------|
-| Random Walk with Drift | 3.8302 | 4.6046 | 98.7% | reversion (27.2%) | trend | **No** | 0.14s |
-| Variance Switching | 2.5964 | 3.8481 | 96.0% | periodic (75.3%) | persistence | **No** | 0.23s |
-| Mean Switching | 1.5769 | 2.1089 | 96.8% | reversion (43.8%) | persistence | **No** | 0.22s |
-| Threshold AR | 0.7593 | 1.0189 | 94.4% | reversion (49.2%) | reversion | Yes | 0.23s |
-| Structural Break | 1.3017 | 1.6944 | 96.8% | dynamic (33.5%) | persistence | **No** | 0.22s |
-| Gradual Drift | 1.1160 | 1.3999 | 96.9% | dynamic (45.3%) | trend | **No** | 0.39s |
-
-**Category Summary:** MAE=1.8634, RMSE=2.4458, Coverage=96.6%, Matches=1/6
+| Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
+|--------|-----------|------------|--------------|----------------|----------|
+| Random Walk with Drift | 4.7752 | 8.2110 | 36.1673 | 58.8% | reversion (33%) |
+| Variance Switching | 2.5173 | 2.7527 | 3.1786 | 85.0% | periodic (47%) |
+| Mean Switching | 1.8225 | 3.2915 | 5.9994 | 76.6% | periodic (31%) |
+| Threshold AR | 0.8501 | 1.0047 | 1.0499 | 76.3% | dynamic (57%) |
+| Structural Break | 1.1346 | 1.2165 | 3.5653 | 86.0% | periodic (54%) |
+| Gradual Drift | 1.0861 | 1.1378 | 5.0730 | 90.2% | periodic (59%) |
 
 ---
 
 ## Stochastic
 
-| Signal | MAE | RMSE | Coverage | Dominant | Expected | Match | Time |
-|--------|-----|------|----------|----------|----------|-------|------|
-| White Noise | 0.9913 | 1.2231 | 95.3% | periodic (55.0%) | persistence | **No** | 0.14s |
-| Random Walk | 2.4602 | 3.2412 | 98.0% | reversion (44.9%) | persistence | **No** | 0.14s |
-| AR(1) phi=0.8 | 0.7996 | 1.0212 | 91.6% | reversion (38.7%) | reversion | Yes | 0.22s |
-| AR(1) phi=0.99 | 1.7120 | 2.1405 | 87.1% | reversion (39.2%) | persistence | **No** | 0.39s |
-| MA(1) | 1.3369 | 1.6638 | 97.3% | dynamic (96.7%) | dynamic | Yes | 0.14s |
-| ARMA(1,1) | 1.7004 | 2.1098 | 98.0% | dynamic (45.7%) | dynamic | Yes | 0.22s |
-| Ornstein-Uhlenbeck | 0.9075 | 1.1515 | 93.6% | reversion (55.8%) | reversion | Yes | 0.22s |
-
-**Category Summary:** MAE=1.4154, RMSE=1.7930, Coverage=94.4%, Matches=4/7
+| Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
+|--------|-----------|------------|--------------|----------------|----------|
+| White Noise | 1.1346 | 1.1288 | 1.1493 | 88.7% | periodic (52%) |
+| Random Walk | 4.7872 | 8.3586 | 25.1782 | 58.7% | reversion (30%) |
+| AR(1) phi=0.8 | 0.8563 | 1.0077 | 0.9916 | 74.7% | dynamic (48%) |
+| AR(1) phi=0.99 | 2.2090 | 3.7383 | 5.2697 | 58.3% | reversion (44%) |
+| MA(1) | 1.5886 | 1.2947 | 1.3596 | 76.9% | dynamic (99%) |
+| ARMA(1,1) | 2.0452 | 2.2776 | 2.4113 | 72.4% | reversion (49%) |
+| Ornstein-Uhlenbeck | 1.1411 | 1.6328 | 1.7256 | 73.9% | reversion (44%) |
 
 ---
 
@@ -171,74 +258,26 @@
 | Impulse | LocalLevel tracks then decays |
 | Step Function | Break detection may trigger at jumps |
 | Contaminated Data | JumpDiffusion absorbs some outliers |
-| Very Short Series (n=30) | Incomplete convergence expected |
-| Very Long Series (n=2000) | Parameters should fully converge |
 
 ---
 
-## Coverage Analysis
+## Key Findings
 
-The target coverage is 95%. Tests with coverage significantly below this may indicate calibration issues.
+### Error Growth Patterns
 
-| Signal | Coverage | Status |
-|--------|----------|--------|
-| Constant Value | 100.0% | Good |
-| Linear Trend | 100.0% | Good |
-| Sinusoidal | 99.3% | Good |
-| Square Wave | 100.0% | Good |
-| Polynomial Trend | 100.0% | Good |
-| White Noise | 95.3% | Good |
-| Random Walk | 98.0% | Good |
-| AR(1) phi=0.8 | 91.6% | Good |
-| AR(1) phi=0.99 | 87.1% | Acceptable |
-| MA(1) | 97.3% | Good |
-| ARMA(1,1) | 98.0% | Good |
-| Ornstein-Uhlenbeck | 93.6% | Good |
-| Trend + Noise | 100.0% | Good |
-| Sine + Noise | 100.0% | Good |
-| Trend + Seasonality + Noise | 100.0% | Good |
-| Mean-Reversion + Oscillation | 94.4% | Good |
-| Random Walk with Drift | 98.7% | Good |
-| Variance Switching | 96.0% | Good |
-| Mean Switching | 96.8% | Good |
-| Threshold AR | 94.4% | Good |
-| Structural Break | 96.8% | Good |
-| Gradual Drift | 96.9% | Good |
-| Student-t (df=4) | 96.8% | Good |
-| Student-t (df=3) | 97.6% | Good |
-| Occasional Jumps | 91.6% | Good |
-| Power-Law Tails (alpha=2.5) | 98.0% | Good |
-| fBM Persistent (H=0.7) | 89.1% | Acceptable |
-| fBM Antipersistent (H=0.3) | 90.0% | Acceptable |
-| Multi-Timescale Mean-Reversion | 93.5% | Good |
-| Trend + Momentum + Reversion | 98.9% | Good |
-| GARCH-like Volatility | 96.0% | Good |
-| Perfectly Correlated | 99.3% | Good |
-| Contemporaneous Relationship | 98.7% | Good |
-| Lead-Lag | 99.2% | Good |
-| Cointegrated Pair | 93.2% | Good |
-| Impulse | 98.7% | Good |
-| Step Function | 97.6% | Good |
-| Contaminated Data | 96.4% | Good |
-| Very Short Series (n=30) | 100.0% | Good |
-| Very Long Series (n=2000) | 94.4% | Good |
+**Slowest Error Growth (best long-horizon performance):**
+- Constant Value (Deterministic): 0.0x increase from h=1 to h=1024
+- Sinusoidal (Deterministic): 0.7x increase from h=1 to h=1024
+- Square Wave (Deterministic): 0.8x increase from h=1 to h=1024
+- MA(1) (Stochastic): 0.9x increase from h=1 to h=1024
+- Sine + Noise (Composite): 1.0x increase from h=1 to h=1024
 
----
-
-## Performance Rating Summary
-
-Based on Appendix D rating scale:
-- **Excellent**: MAE < 0.5 and Coverage > 90%
-- **Good**: MAE < 1.0 and Coverage > 80%
-- **Moderate**: MAE < 2.0 and Coverage > 70%
-- **Poor**: Otherwise
-
-| Rating | Count | Signals |
-|--------|-------|---------|
-| Excellent | 2 | Constant Value, Impulse |
-| Good | 10 | Sinusoidal, White Noise, AR(1) phi=0.8, Ornstein-Uhlenbeck, Mean-Reversion + Oscillation (+5 more) |
-| Moderate | 17 | Linear Trend, Square Wave, Polynomial Trend, AR(1) phi=0.99, MA(1) (+12 more) |
-| Poor | 11 | Random Walk, Trend + Noise, Random Walk with Drift, Variance Switching, Occasional Jumps (+6 more) |
+**Fastest Error Growth (challenging for long-horizon):**
+- Trend + Momentum + Reversion (Multi-Scale): 14.1x increase from h=1 to h=1024
+- Trend + Seasonality + Noise (Composite): 17.3x increase from h=1 to h=1024
+- Trend + Noise (Composite): 38.1x increase from h=1 to h=1024
+- Linear Trend (Deterministic): 64.5x increase from h=1 to h=1024
+- Polynomial Trend (Deterministic): 377481.9x increase from h=1 to h=1024
 
 ---
 
