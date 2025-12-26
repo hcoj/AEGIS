@@ -217,3 +217,40 @@ class TestLocalLevelModel:
         pred_10 = model.predict(horizon=10)
 
         assert pred_10.variance > pred_1.variance
+
+
+class TestNumericalStabilityPersistence:
+    """Tests for numerical stability with extreme values in persistence models."""
+
+    def test_random_walk_handles_polynomial_growth(self) -> None:
+        """RandomWalkModel should handle polynomial growth without NaN."""
+        model = RandomWalkModel()
+
+        for i in range(500):
+            y = 0.01 * i**2
+            model.update(y, t=i)
+            pred = model.predict(horizon=1)
+            assert np.isfinite(pred.mean), f"Non-finite mean at t={i}"
+            assert np.isfinite(pred.variance), f"Non-finite variance at t={i}"
+
+    def test_local_level_handles_polynomial_growth(self) -> None:
+        """LocalLevelModel should handle polynomial growth without NaN."""
+        model = LocalLevelModel()
+
+        for i in range(500):
+            y = 0.01 * i**2
+            model.update(y, t=i)
+            pred = model.predict(horizon=1)
+            assert np.isfinite(pred.mean), f"Non-finite mean at t={i}"
+            assert np.isfinite(pred.variance), f"Non-finite variance at t={i}"
+
+    def test_random_walk_handles_large_jumps(self) -> None:
+        """RandomWalkModel should handle large jumps without overflow."""
+        model = RandomWalkModel()
+
+        for i in range(100):
+            y = 1e8 if i % 2 == 0 else -1e8
+            model.update(y, t=i)
+            pred = model.predict(horizon=1)
+            assert np.isfinite(pred.variance), f"Non-finite variance at t={i}"
+            assert pred.variance < 1e20, f"Variance too large at t={i}"

@@ -358,3 +358,69 @@ class TestLinearTrendModel:
         # At t=199, predict t=209: y ≈ 1.5*209 + 20 = 333.5
         expected = 1.5 * 209 + 20.0
         assert pred.mean == pytest.approx(expected, rel=0.1)
+
+
+class TestNumericalStability:
+    """Tests for numerical stability with extreme values."""
+
+    def test_local_trend_handles_polynomial_growth(self) -> None:
+        """LocalTrendModel should not produce NaN for polynomial growth."""
+        model = LocalTrendModel()
+
+        # Simulate polynomial trend (quadratic growth)
+        for i in range(500):
+            y = 0.01 * i**2
+            model.update(y, t=i)
+            pred = model.predict(horizon=1)
+            assert not np.isnan(pred.mean), f"NaN mean at t={i}"
+            assert not np.isnan(pred.variance), f"NaN variance at t={i}"
+            assert not np.isinf(pred.variance), f"Inf variance at t={i}"
+
+    def test_local_trend_handles_large_values(self) -> None:
+        """LocalTrendModel should handle large values gracefully."""
+        model = LocalTrendModel()
+
+        # Large values that might cause overflow
+        for i in range(100):
+            y = 1e6 + i * 1e4
+            model.update(y, t=i)
+            pred = model.predict(horizon=1)
+            assert np.isfinite(pred.mean), f"Non-finite mean at t={i}"
+            assert np.isfinite(pred.variance), f"Non-finite variance at t={i}"
+            ll = model.log_likelihood(y)
+            assert np.isfinite(ll), f"Non-finite log-likelihood at t={i}"
+
+    def test_damped_trend_handles_polynomial_growth(self) -> None:
+        """DampedTrendModel should not produce NaN for polynomial growth."""
+        model = DampedTrendModel()
+
+        for i in range(500):
+            y = 0.01 * i**2
+            model.update(y, t=i)
+            pred = model.predict(horizon=1)
+            assert not np.isnan(pred.mean), f"NaN mean at t={i}"
+            assert not np.isnan(pred.variance), f"NaN variance at t={i}"
+
+    def test_linear_trend_handles_polynomial_growth(self) -> None:
+        """LinearTrendModel should not produce NaN for polynomial growth."""
+        model = LinearTrendModel()
+
+        for i in range(500):
+            y = 0.01 * i**2
+            model.update(y, t=i)
+            pred = model.predict(horizon=1)
+            assert not np.isnan(pred.mean), f"NaN mean at t={i}"
+            assert not np.isnan(pred.variance), f"NaN variance at t={i}"
+
+    def test_models_handle_extreme_variance(self) -> None:
+        """Models should cap variance to prevent overflow."""
+        model = LocalTrendModel()
+
+        # Feed data that might cause extreme variance
+        for i in range(100):
+            # Alternating large jumps
+            y = 1e8 if i % 2 == 0 else -1e8
+            model.update(y, t=i)
+            pred = model.predict(horizon=1)
+            assert np.isfinite(pred.variance), f"Non-finite variance at t={i}"
+            assert pred.variance < 1e20, f"Variance too large at t={i}: {pred.variance}"
