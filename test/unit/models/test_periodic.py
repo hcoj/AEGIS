@@ -107,6 +107,27 @@ class TestOscillatorBankModel:
         pred = model.predict(horizon=1)
         assert isinstance(pred, Prediction)
 
+    def test_oscillator_variance_grows_with_horizon(self, sine_wave_signal) -> None:
+        """Test that variance grows with horizon due to phase uncertainty.
+
+        Periodic models should have higher variance at longer horizons
+        because phase uncertainty accumulates over time.
+        """
+        signal = sine_wave_signal(n=200, period=16)
+        model = OscillatorBankModel(periods=[16])
+
+        for t, y in enumerate(signal):
+            model.update(y, t)
+
+        pred_1 = model.predict(horizon=1)
+        pred_64 = model.predict(horizon=64)
+
+        # Variance should grow with horizon
+        assert pred_64.variance > pred_1.variance, (
+            f"Variance should grow with horizon: h=1 var={pred_1.variance:.4f}, "
+            f"h=64 var={pred_64.variance:.4f}"
+        )
+
 
 class TestSeasonalDummyModel:
     """Tests for SeasonalDummyModel."""
@@ -205,3 +226,18 @@ class TestSeasonalDummyModel:
         pred_5 = model.predict(horizon=5)
 
         assert pred_1.mean == pred_5.mean
+
+    def test_seasonal_dummy_variance_grows_with_horizon(self, seasonal_signal) -> None:
+        """Test that variance grows with horizon due to phase uncertainty."""
+        pattern = [1, 2, 3, 4]
+        signal = seasonal_signal(n=200, period=4, pattern=pattern)
+        model = SeasonalDummyModel(period=4)
+
+        for t, y in enumerate(signal):
+            model.update(y, t)
+
+        pred_1 = model.predict(horizon=1)
+        pred_64 = model.predict(horizon=64)
+
+        # Variance should grow with horizon
+        assert pred_64.variance > pred_1.variance

@@ -96,11 +96,16 @@ class OscillatorBankModel(TemporalModel):
             horizon: Steps ahead
 
         Returns:
-            Prediction with oscillator extrapolation
+            Prediction with oscillator extrapolation.
+            Variance grows with horizon due to phase uncertainty.
         """
         future_t = self.t + horizon
         mean = self._compute_prediction(future_t)
-        return Prediction(mean=mean, variance=self.sigma_sq)
+        # Phase uncertainty grows linearly with horizon
+        # The 0.01 factor ensures gradual growth without exploding
+        phase_uncertainty = 0.01 * horizon
+        variance = self.sigma_sq * (1 + phase_uncertainty)
+        return Prediction(mean=mean, variance=max(variance, 1e-10))
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.
@@ -206,10 +211,14 @@ class SeasonalDummyModel(TemporalModel):
             horizon: Steps ahead
 
         Returns:
-            Prediction with seasonal mean
+            Prediction with seasonal mean.
+            Variance grows with horizon due to phase uncertainty.
         """
         s = (self.t + horizon) % self.period
-        return Prediction(mean=self.means[s], variance=self.sigma_sq)
+        # Phase uncertainty grows linearly with horizon
+        phase_uncertainty = 0.01 * horizon
+        variance = self.sigma_sq * (1 + phase_uncertainty)
+        return Prediction(mean=self.means[s], variance=max(variance, 1e-10))
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.
