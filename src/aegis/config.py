@@ -44,6 +44,7 @@ class AEGISConfig:
 
     cross_stream_lags: int = 5
     include_lag_zero: bool = False
+    cross_stream_forget: float = 0.99
     n_factors: int = 3
 
     break_threshold: float = 3.0

@@ -3,7 +3,6 @@
 Implements online quantile estimation for conformal-style calibration.
 """
 
-
 import numpy as np
 from scipy import stats
 

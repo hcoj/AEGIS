@@ -4,7 +4,6 @@ Implements Expected Free Energy (EFE) based model weighting
 using softmax over cumulative log-likelihood scores.
 """
 
-
 import numpy as np
 
 from aegis.config import AEGISConfig
