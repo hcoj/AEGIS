@@ -1,6 +1,5 @@
 """Unit tests for model factory."""
 
-
 from aegis.config import AEGISConfig
 from aegis.models import create_model_bank
 from aegis.models.base import TemporalModel
