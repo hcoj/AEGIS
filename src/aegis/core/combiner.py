@@ -74,6 +74,15 @@ class EFEModelCombiner:
 
         scores = pragmatic + self.config.epistemic_weight * epistemic
 
+        # Apply BIC-like complexity penalty: penalize models with more parameters
+        if self.config.complexity_penalty_weight > 0:
+            n_params = np.array([m.n_parameters for m in models])
+            # Penalty: -0.5 * k * log(n) / n, where k = n_parameters, n = observations
+            # This is the per-observation BIC penalty
+            n_effective = max(self._n_obs, 10)  # Avoid log(0)
+            penalty = -0.5 * n_params * np.log(n_effective) / n_effective
+            scores += self.config.complexity_penalty_weight * penalty
+
         self.cumulative_scores = self.config.likelihood_forget * self.cumulative_scores + scores
 
         for m in models:

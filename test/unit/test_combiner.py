@@ -6,6 +6,7 @@ from aegis.config import AEGISConfig
 from aegis.core.combiner import EFEModelCombiner
 from aegis.core.prediction import Prediction
 from aegis.models.persistence import LocalLevelModel, RandomWalkModel
+from aegis.models.reversion import MeanReversionModel
 from aegis.models.trend import LocalTrendModel
 
 
@@ -159,3 +160,69 @@ class TestEFEModelCombiner:
 
         assert len(combiner.last_pragmatic) == 2
         assert combiner.cumulative_scores is not None
+
+    def test_combiner_complexity_penalty_favors_simpler_models(self) -> None:
+        """Simpler models should get bonus when equally accurate.
+
+        RandomWalkModel has 2 parameters, MeanReversionModel has 4.
+        For a true random walk signal, both make similar predictions
+        but the complexity penalty should favor RandomWalk.
+        """
+        config = AEGISConfig(complexity_penalty_weight=0.1)
+        combiner = EFEModelCombiner(n_models=2, config=config)
+
+        # Use models with different complexity
+        models = [RandomWalkModel(), MeanReversionModel()]
+
+        # Feed random walk (cumulative sum) data - both should predict well
+        rng = np.random.default_rng(42)
+        value = 0.0
+        for t in range(200):
+            value += rng.normal(0, 1)
+            combiner.update(models, value, t)
+
+        weights = combiner.get_weights()
+        # RandomWalk (simpler, 2 params) should get higher weight than
+        # MeanReversion (4 params) due to complexity penalty
+        assert weights[0] > weights[1], (
+            f"Simpler model should have higher weight: RW={weights[0]:.3f}, MR={weights[1]:.3f}"
+        )
+
+    def test_combiner_complexity_penalty_default_zero(self) -> None:
+        """Default complexity penalty weight should be 0 (backward compatible)."""
+        config = AEGISConfig()
+        assert config.complexity_penalty_weight == 0.0
+
+    def test_combiner_complexity_penalty_affects_cumulative_scores(self) -> None:
+        """Complexity penalty should affect cumulative scores."""
+        config_no_penalty = AEGISConfig(complexity_penalty_weight=0.0)
+        config_with_penalty = AEGISConfig(complexity_penalty_weight=1.0)
+
+        combiner_no = EFEModelCombiner(n_models=2, config=config_no_penalty)
+        combiner_with = EFEModelCombiner(n_models=2, config=config_with_penalty)
+
+        # Use models with different complexity on same data
+        models_no = [RandomWalkModel(), MeanReversionModel()]
+        models_with = [RandomWalkModel(), MeanReversionModel()]
+
+        # Feed random walk data where both models are competitive
+        rng = np.random.default_rng(123)
+        value = 0.0
+        for t in range(50):
+            value += rng.normal(0, 1)
+            combiner_no.update(models_no, value, t)
+            combiner_with.update(models_with, value, t)
+
+        scores_no = combiner_no.cumulative_scores.copy()
+        scores_with = combiner_with.cumulative_scores.copy()
+
+        # With penalty, simpler model (RandomWalk) should have relatively
+        # higher score compared to MeanReversion
+        # Score difference: (score[0] - score[1]) should be higher with penalty
+        diff_no = scores_no[0] - scores_no[1]
+        diff_with = scores_with[0] - scores_with[1]
+
+        assert diff_with > diff_no, (
+            f"Complexity penalty should favor simpler model: "
+            f"diff_no={diff_no:.3f}, diff_with={diff_with:.3f}"
+        )
