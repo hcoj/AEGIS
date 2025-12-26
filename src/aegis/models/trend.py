@@ -20,7 +20,8 @@ class LocalTrendModel(TemporalModel):
     State:
         level: Current smoothed level
         slope: Current smoothed trend (slope)
-        sigma_sq: Estimated prediction error variance
+        sigma_sq: Estimated prediction error variance (level component)
+        slope_var: Estimated slope uncertainty variance
     """
 
     def __init__(
@@ -49,6 +50,9 @@ class LocalTrendModel(TemporalModel):
         self.decay: float = decay
         self._initialized: bool = False
         self._n_obs: int = 0
+        self.slope_var: float = 0.01
+        self.prior_slope_var: float = 0.01
+        self._prev_slope: float = 0.0
 
     def update(self, y: float, t: int) -> None:
         """Update model with new observation.
@@ -66,7 +70,13 @@ class LocalTrendModel(TemporalModel):
             self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
 
             new_level = self.alpha * y + (1 - self.alpha) * (self.level + self.slope)
-            self.slope = self.beta * (new_level - self.level) + (1 - self.beta) * self.slope
+            new_slope = self.beta * (new_level - self.level) + (1 - self.beta) * self.slope
+
+            slope_change = new_slope - self._prev_slope
+            self.slope_var = self.decay * self.slope_var + (1 - self.decay) * slope_change**2
+
+            self._prev_slope = self.slope
+            self.slope = new_slope
             self.level = new_level
 
         self._n_obs += 1
@@ -79,10 +89,12 @@ class LocalTrendModel(TemporalModel):
 
         Returns:
             Prediction with mean = level + slope * horizon
+            Variance grows quadratically with horizon due to slope uncertainty.
         """
         mean = self.level + self.slope * horizon
-        variance = self.sigma_sq * (1 + (horizon - 1) * (self.alpha**2 + self.beta**2))
-        return Prediction(mean=mean, variance=variance)
+        slope_uncertainty = max(self.slope_var, self.sigma_sq * self.beta**2)
+        variance = self.sigma_sq + (horizon**2) * slope_uncertainty
+        return Prediction(mean=mean, variance=max(variance, 1e-10))
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.
@@ -105,11 +117,12 @@ class LocalTrendModel(TemporalModel):
         self.level = partial * self.prior_level + (1 - partial) * self.level
         self.slope = partial * self.prior_slope + (1 - partial) * self.slope
         self.sigma_sq = partial * self.prior_sigma_sq + (1 - partial) * self.sigma_sq
+        self.slope_var = partial * self.prior_slope_var + (1 - partial) * self.slope_var
 
     @property
     def n_parameters(self) -> int:
         """Number of learnable parameters."""
-        return 3
+        return 4
 
     @property
     def group(self) -> str:
@@ -127,7 +140,8 @@ class DampedTrendModel(TemporalModel):
         level: Current smoothed level
         slope: Current smoothed trend (decays with phi)
         phi: Damping parameter (0 = no trend, 1 = full trend)
-        sigma_sq: Estimated prediction error variance
+        sigma_sq: Estimated prediction error variance (level component)
+        slope_var: Estimated slope uncertainty variance
     """
 
     def __init__(
@@ -159,6 +173,9 @@ class DampedTrendModel(TemporalModel):
         self.decay: float = decay
         self._initialized: bool = False
         self._n_obs: int = 0
+        self.slope_var: float = 0.01
+        self.prior_slope_var: float = 0.01
+        self._prev_slope: float = 0.0
 
     def update(self, y: float, t: int) -> None:
         """Update model with new observation.
@@ -176,9 +193,15 @@ class DampedTrendModel(TemporalModel):
             self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
 
             new_level = self.alpha * y + (1 - self.alpha) * (self.level + self.phi * self.slope)
-            self.slope = (
+            new_slope = (
                 self.beta * (new_level - self.level) + (1 - self.beta) * self.phi * self.slope
             )
+
+            slope_change = new_slope - self._prev_slope
+            self.slope_var = self.decay * self.slope_var + (1 - self.decay) * slope_change**2
+
+            self._prev_slope = self.slope
+            self.slope = new_slope
             self.level = new_level
 
         self._n_obs += 1
@@ -205,11 +228,13 @@ class DampedTrendModel(TemporalModel):
             horizon: Steps ahead
 
         Returns:
-            Prediction with damped trend extrapolation
+            Prediction with damped trend extrapolation.
+            Variance grows quadratically with horizon due to slope uncertainty.
         """
         mean = self.level + self.slope * self._damped_sum(horizon)
-        variance = self.sigma_sq * (1 + (horizon - 1) * (self.alpha**2 + self.beta**2))
-        return Prediction(mean=mean, variance=variance)
+        slope_uncertainty = max(self.slope_var, self.sigma_sq * self.beta**2)
+        variance = self.sigma_sq + (horizon**2) * slope_uncertainty
+        return Prediction(mean=mean, variance=max(variance, 1e-10))
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.
@@ -232,11 +257,12 @@ class DampedTrendModel(TemporalModel):
         self.level = partial * self.prior_level + (1 - partial) * self.level
         self.slope = partial * self.prior_slope + (1 - partial) * self.slope
         self.sigma_sq = partial * self.prior_sigma_sq + (1 - partial) * self.sigma_sq
+        self.slope_var = partial * self.prior_slope_var + (1 - partial) * self.slope_var
 
     @property
     def n_parameters(self) -> int:
         """Number of learnable parameters."""
-        return 4
+        return 5
 
     @property
     def group(self) -> str:

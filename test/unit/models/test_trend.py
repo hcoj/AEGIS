@@ -51,9 +51,9 @@ class TestLocalTrendModel:
         assert model.group == "trend"
 
     def test_local_trend_n_parameters(self) -> None:
-        """Test model has 3 parameters (level, slope, variance)."""
+        """Test model has 4 parameters (level, slope, sigma_sq, slope_var)."""
         model = LocalTrendModel()
-        assert model.n_parameters == 3
+        assert model.n_parameters == 4
 
     def test_local_trend_name(self) -> None:
         """Test model name."""
@@ -102,6 +102,37 @@ class TestLocalTrendModel:
         pred = model.predict(horizon=1)
         assert isinstance(pred, Prediction)
 
+    def test_local_trend_variance_grows_quadratically(self) -> None:
+        """Variance should grow with h² for slope uncertainty.
+
+        For trend extrapolation, prediction error scales as h * slope_error,
+        so variance should scale as h². The ratio var(h=100)/var(h=10) should
+        be significantly larger than 10 (linear) and approach 100 (quadratic).
+
+        With a baseline offset from sigma_sq, the ratio won't reach exactly 100,
+        but should be substantially larger than linear growth would give.
+        """
+        model = LocalTrendModel()
+        for i in range(100):
+            model.update(0.1 * i, t=i)  # Linear trend
+
+        var_h10 = model.predict(horizon=10).variance
+        var_h100 = model.predict(horizon=100).variance
+        var_h1000 = model.predict(horizon=1000).variance
+
+        # Quadratic: var(h=100)/var(h=10) should be ~100x in limit, but with
+        # baseline offset we expect >20x (linear would be ~10x)
+        ratio_10_to_100 = var_h100 / var_h10
+        assert ratio_10_to_100 > 20, (
+            f"Expected faster-than-linear growth, got ratio {ratio_10_to_100}"
+        )
+
+        # At longer horizons, quadratic term dominates more
+        ratio_100_to_1000 = var_h1000 / var_h100
+        assert ratio_100_to_1000 > 50, (
+            f"Expected near-quadratic growth at long horizons, got ratio {ratio_100_to_1000}"
+        )
+
 
 class TestDampedTrendModel:
     """Tests for DampedTrendModel."""
@@ -147,9 +178,9 @@ class TestDampedTrendModel:
         assert model.group == "trend"
 
     def test_damped_trend_n_parameters(self) -> None:
-        """Test model has 4 parameters (level, slope, phi, variance)."""
+        """Test model has 5 parameters (level, slope, phi, sigma_sq, slope_var)."""
         model = DampedTrendModel()
-        assert model.n_parameters == 4
+        assert model.n_parameters == 5
 
     def test_damped_trend_name(self) -> None:
         """Test model name."""
@@ -205,3 +236,20 @@ class TestDampedTrendModel:
         model.update(1.0, t=0)
         pred = model.predict(horizon=1)
         assert isinstance(pred, Prediction)
+
+    def test_damped_trend_variance_grows_quadratically(self) -> None:
+        """Variance should grow with h² for slope uncertainty.
+
+        Even with damped trend, the uncertainty in slope estimation
+        should cause variance to grow quadratically with horizon.
+        """
+        model = DampedTrendModel(phi=0.9)
+        for i in range(100):
+            model.update(0.1 * i, t=i)  # Linear trend
+
+        var_h10 = model.predict(horizon=10).variance
+        var_h100 = model.predict(horizon=100).variance
+
+        # Quadratic: var(h=100)/var(h=10) should be ~100x, not ~10x
+        ratio_10_to_100 = var_h100 / var_h10
+        assert ratio_10_to_100 > 50, f"Expected quadratic growth, got ratio {ratio_10_to_100}"

@@ -1345,7 +1345,9 @@ def generate_report(results: list[SignalMetrics]) -> str:
     for r in results:
         if len(r.horizon_metrics) >= 2:
             h1_mae = r.horizon_metrics[0].mae if r.horizon_metrics[0].mae > 0 else 0.001
-            h1024_mae = r.horizon_metrics[-1].mae if r.horizon_metrics[-1].n_predictions > 0 else h1_mae
+            h1024_mae = (
+                r.horizon_metrics[-1].mae if r.horizon_metrics[-1].n_predictions > 0 else h1_mae
+            )
             ratio = h1024_mae / h1_mae
             growth_patterns.append((r.signal_name, ratio, r.signal_category))
 
