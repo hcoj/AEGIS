@@ -55,9 +55,9 @@ class TestOscillatorBankModel:
         assert model.n_parameters == 2 * 2 + 1
 
     def test_oscillator_name(self) -> None:
-        """Test model name."""
-        model = OscillatorBankModel()
-        assert model.name == "OscillatorBankModel"
+        """Test model name includes periods."""
+        model = OscillatorBankModel(periods=[10])
+        assert model.name == "OscillatorBankModel_p10"
 
     def test_oscillator_log_likelihood(self, sine_wave_signal) -> None:
         """Test log-likelihood computation."""
@@ -148,9 +148,9 @@ class TestSeasonalDummyModel:
         assert model.n_parameters == 7 + 1
 
     def test_seasonal_dummy_name(self) -> None:
-        """Test model name."""
+        """Test model name includes period."""
         model = SeasonalDummyModel(period=7)
-        assert model.name == "SeasonalDummyModel"
+        assert model.name == "SeasonalDummyModel_p7"
 
     def test_seasonal_dummy_custom_period(self) -> None:
         """Test custom period value."""

@@ -134,6 +134,13 @@ class OscillatorBankModel(TemporalModel):
         """Model group."""
         return "periodic"
 
+    @property
+    def name(self) -> str:
+        """Model name including periods."""
+        if len(self.periods) == 1:
+            return f"OscillatorBankModel_p{self.periods[0]}"
+        return f"OscillatorBankModel_p{'_'.join(str(p) for p in self.periods)}"
+
 
 class SeasonalDummyModel(TemporalModel):
     """Seasonal dummy model.
@@ -236,3 +243,8 @@ class SeasonalDummyModel(TemporalModel):
     def group(self) -> str:
         """Model group."""
         return "periodic"
+
+    @property
+    def name(self) -> str:
+        """Model name including period."""
+        return f"SeasonalDummyModel_p{self.period}"
