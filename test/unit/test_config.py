@@ -131,3 +131,24 @@ class TestAEGISConfig:
         config2 = AEGISConfig()
         config1.scales.append(128)
         assert 128 not in config2.scales
+
+    def test_config_temperature_for_diversity(self) -> None:
+        """Higher temperature promotes ensemble diversity.
+
+        temperature=1.0 is the default for standard softmax.
+        temperature=1.5-2.0 gives more uniform weights, reducing winner-take-all.
+        temperature<1.0 makes weights more concentrated (winner-take-all).
+        """
+        # Default temperature is 1.0
+        config = AEGISConfig()
+        assert config.temperature == 1.0
+
+        # Higher temperature is valid
+        config_high = AEGISConfig(temperature=2.0)
+        assert config_high.temperature == 2.0
+        config_high.validate()  # Should pass
+
+        # Lower temperature is valid
+        config_low = AEGISConfig(temperature=0.5)
+        assert config_low.temperature == 0.5
+        config_low.validate()  # Should pass

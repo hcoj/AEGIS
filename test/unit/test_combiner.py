@@ -226,3 +226,43 @@ class TestEFEModelCombiner:
             f"Complexity penalty should favor simpler model: "
             f"diff_no={diff_no:.3f}, diff_with={diff_with:.3f}"
         )
+
+    def test_combiner_high_temperature_promotes_diversity(self) -> None:
+        """Higher temperature gives more uniform (diverse) weights.
+
+        This helps prevent winner-take-all behavior in ensemble weighting.
+        Use temperature >= 1.5 for more diverse ensembles.
+        """
+        config_low = AEGISConfig(temperature=0.5)
+        config_default = AEGISConfig(temperature=1.0)
+        config_high = AEGISConfig(temperature=2.0)
+
+        combiner_low = EFEModelCombiner(n_models=3, config=config_low)
+        combiner_default = EFEModelCombiner(n_models=3, config=config_default)
+        combiner_high = EFEModelCombiner(n_models=3, config=config_high)
+
+        models_low = [RandomWalkModel(), LocalLevelModel(), LocalTrendModel()]
+        models_default = [RandomWalkModel(), LocalLevelModel(), LocalTrendModel()]
+        models_high = [RandomWalkModel(), LocalLevelModel(), LocalTrendModel()]
+
+        # Feed trending data that will favor trend model
+        for t in range(100):
+            y = float(t) * 0.5
+            combiner_low.update(models_low, y, t)
+            combiner_default.update(models_default, y, t)
+            combiner_high.update(models_high, y, t)
+
+        weights_low = combiner_low.get_weights()
+        weights_default = combiner_default.get_weights()
+        weights_high = combiner_high.get_weights()
+
+        # Measure concentration using max weight
+        # Higher temperature should give lower max weight (more distributed)
+        max_low = np.max(weights_low)
+        max_default = np.max(weights_default)
+        max_high = np.max(weights_high)
+
+        assert max_high < max_default < max_low, (
+            f"Higher temperature should reduce concentration: "
+            f"max_low={max_low:.3f}, max_default={max_default:.3f}, max_high={max_high:.3f}"
+        )
