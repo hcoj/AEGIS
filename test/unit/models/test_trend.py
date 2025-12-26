@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from aegis.core.prediction import Prediction
-from aegis.models.trend import DampedTrendModel, LocalTrendModel
+from aegis.models.trend import DampedTrendModel, LinearTrendModel, LocalTrendModel
 
 
 class TestLocalTrendModel:
@@ -253,3 +253,108 @@ class TestDampedTrendModel:
         # Quadratic: var(h=100)/var(h=10) should be ~100x, not ~10x
         ratio_10_to_100 = var_h100 / var_h10
         assert ratio_10_to_100 > 50, f"Expected quadratic growth, got ratio {ratio_10_to_100}"
+
+
+class TestLinearTrendModel:
+    """Tests for LinearTrendModel (pure regression-based)."""
+
+    def test_linear_trend_captures_slope(self) -> None:
+        """Test that model captures linear slope from regression."""
+        model = LinearTrendModel()
+        for i in range(100):
+            model.update(2.0 * i + 5.0, t=i)  # y = 2x + 5
+
+        pred = model.predict(horizon=10)
+        # At t=99, predict t=109: y = 2*109 + 5 = 223
+        expected = 2.0 * 109 + 5.0
+        assert pred.mean == pytest.approx(expected, rel=0.05)
+
+    def test_linear_trend_captures_intercept(self) -> None:
+        """Test that model captures intercept."""
+        model = LinearTrendModel()
+        for i in range(100):
+            model.update(0.5 * i + 10.0, t=i)  # y = 0.5x + 10
+
+        # At t=99, predict horizon=1 (t=100): y = 0.5*100 + 10 = 60
+        pred = model.predict(horizon=1)
+        expected = 0.5 * 100 + 10.0
+        assert pred.mean == pytest.approx(expected, rel=0.05)
+
+    def test_linear_trend_group_is_trend(self) -> None:
+        """Test model group is 'trend'."""
+        model = LinearTrendModel()
+        assert model.group == "trend"
+
+    def test_linear_trend_name(self) -> None:
+        """Test model name."""
+        model = LinearTrendModel()
+        assert model.name == "LinearTrendModel"
+
+    def test_linear_trend_n_parameters(self) -> None:
+        """Test model has 4 parameters (intercept, slope, sigma_sq, slope_var)."""
+        model = LinearTrendModel()
+        assert model.n_parameters == 4
+
+    def test_linear_trend_variance_quadratic(self) -> None:
+        """Test that variance grows quadratically with horizon."""
+        np.random.seed(42)
+        model = LinearTrendModel()
+        for i in range(100):
+            model.update(0.5 * i + np.random.normal(0, 0.1), t=i)
+
+        var_h10 = model.predict(horizon=10).variance
+        var_h100 = model.predict(horizon=100).variance
+
+        ratio = var_h100 / var_h10
+        # Quadratic growth: ratio should be ~100x
+        assert ratio > 50, f"Expected quadratic growth, got ratio {ratio}"
+
+    def test_linear_trend_returns_prediction_type(self) -> None:
+        """Test that predict returns Prediction instance."""
+        model = LinearTrendModel()
+        model.update(1.0, t=0)
+        pred = model.predict(horizon=1)
+        assert isinstance(pred, Prediction)
+
+    def test_linear_trend_log_likelihood(self) -> None:
+        """Test log-likelihood computation."""
+        model = LinearTrendModel()
+        for t in range(50):
+            model.update(float(t), t)
+
+        pred = model.predict(horizon=1)
+        ll_at_pred = model.log_likelihood(pred.mean)
+        ll_far = model.log_likelihood(pred.mean + 100)
+
+        assert ll_at_pred > ll_far
+
+    def test_linear_trend_reset(self) -> None:
+        """Test reset restores toward priors."""
+        model = LinearTrendModel()
+        for t in range(100):
+            model.update(float(t), t)
+
+        initial_slope = model.slope
+        model.reset(partial=1.0)
+        assert model.slope != initial_slope
+
+    def test_linear_trend_first_observation(self) -> None:
+        """Test first observation initializes model."""
+        model = LinearTrendModel()
+        model.update(10.0, t=0)
+        pred = model.predict(horizon=1)
+        # With one point, predict same value
+        assert pred.mean == pytest.approx(10.0, abs=1.0)
+
+    def test_linear_trend_with_noise(self) -> None:
+        """Test model handles noisy linear data."""
+        np.random.seed(123)
+        model = LinearTrendModel()
+        for i in range(200):
+            y = 1.5 * i + 20.0 + np.random.normal(0, 2.0)
+            model.update(y, t=i)
+
+        pred = model.predict(horizon=10)
+        # At t=199, predict t=209: y ≈ 1.5*209 + 20 = 333.5
+        expected = 1.5 * 209 + 20.0
+        assert pred.mean == pytest.approx(expected, rel=0.1)

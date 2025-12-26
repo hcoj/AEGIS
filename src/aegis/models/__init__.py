@@ -15,13 +15,14 @@ from aegis.models.reversion import (
     ThresholdARModel,
 )
 from aegis.models.special import ChangePointModel, JumpDiffusionModel
-from aegis.models.trend import DampedTrendModel, LocalTrendModel
+from aegis.models.trend import DampedTrendModel, LinearTrendModel, LocalTrendModel
 from aegis.models.variance import LevelDependentVolModel, VolatilityTrackerModel
 
 __all__ = [
     "TemporalModel",
     "RandomWalkModel",
     "LocalLevelModel",
+    "LinearTrendModel",
     "LocalTrendModel",
     "DampedTrendModel",
     "MeanReversionModel",
@@ -56,6 +57,7 @@ def create_model_bank(config: AEGISConfig) -> list[TemporalModel]:
     models.append(RandomWalkModel())
     models.append(LocalLevelModel())
 
+    models.append(LinearTrendModel())
     models.append(LocalTrendModel())
     models.append(DampedTrendModel())
 
