@@ -115,11 +115,12 @@ class ScaleManager:
 
         # Models now return cumulative change over horizon.
         # Scale s models predict cumulative s-period returns; divide by s to get level change.
+        # Don't scale variance - use raw model variance to preserve calibration.
         level_changes = np.array([p.mean / s for p, s in zip(predictions, active_scales)])
-        variances = np.array([p.variance for p in predictions])
+        level_variances = np.array([p.variance for p in predictions])
 
         combined_level_change = np.sum(weights_arr * level_changes)
-        within_var = np.sum(weights_arr * variances)
+        within_var = np.sum(weights_arr * level_variances)
         between_var = np.sum(weights_arr * (level_changes - combined_level_change) ** 2)
 
         level_mean = self.history[-1] + combined_level_change
@@ -147,22 +148,26 @@ class ScaleManager:
         return combiner.combine_predictions(model_preds)
 
     def update_scale_weights(self, observed: float) -> None:
-        """Update scale weights based on prediction accuracy.
+        """Update scale weights based on level prediction accuracy.
+
+        Measures how well each scale's level-change prediction matches the
+        actual 1-step level change, properly weighting scales by accuracy.
 
         Args:
             observed: Observed value for error computation
         """
         decay = 0.95
 
+        if len(self.history) < 2:
+            return
+
+        actual_level_change = self.history[-1] - self.history[-2]
+
         for i, scale in enumerate(self.scales):
             if len(self.history) > scale:
                 pred = self.predict_at_scale(scale, horizon=1)
-                expected_return = (
-                    self.history[-1] - self.history[-1 - scale]
-                    if len(self.history) > scale
-                    else 0.0
-                )
-                error = (expected_return - pred.mean) ** 2
+                predicted_level_change = pred.mean / scale
+                error = (actual_level_change - predicted_level_change) ** 2
 
                 self.scale_errors[scale] = decay * self.scale_errors[scale] + (1 - decay) * error
 
