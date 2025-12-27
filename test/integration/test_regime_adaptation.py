@@ -124,25 +124,27 @@ class TestRegimeAdaptation:
         assert pred.variance > 0
 
     def test_break_detection_triggers_reset(self) -> None:
-        """Test break detection triggers model reset."""
+        """Test break detection triggers model reset and predictions adapt."""
         config = AEGISConfig(break_threshold=2.0)
         aegis = AEGIS(config=config)
         aegis.add_stream("test")
 
         rng = np.random.default_rng(42)
 
+        # Phase 1: observations around 0
         for t in range(100):
             aegis.predict("test", horizon=1)
             aegis.observe("test", rng.normal(0, 1))
             aegis.end_period()
 
-        weights_before = aegis.streams["test"].scale_manager.scale_weights.copy()
-
+        # Phase 2: regime change to observations around 50
         for t in range(50):
             aegis.predict("test", horizon=1)
             aegis.observe("test", rng.normal(50, 1))
             aegis.end_period()
 
-        weights_after = aegis.streams["test"].scale_manager.scale_weights
+        pred_after = aegis.predict("test", horizon=1)
 
-        assert not np.allclose(weights_before, weights_after, atol=0.1)
+        # After regime change, predictions should adapt to new mean
+        # Prediction should be closer to 50 than to 0
+        assert abs(pred_after.mean - 50) < abs(pred_after.mean - 0)

@@ -133,14 +133,17 @@ class TestMA1Model:
         pred = model.predict(horizon=1)
         assert pred.mean == pytest.approx(1.0, abs=0.01)
 
-    def test_ma1_beyond_h1_is_zero(self) -> None:
-        """Test MA(1) beyond horizon=1 predicts zero mean."""
+    def test_ma1_cumulative_equals_h1(self) -> None:
+        """Test MA(1) cumulative is same for all h (only step 1 contributes)."""
         model = MA1Model()
         model.theta = 0.5
         model.last_error = 2.0
 
-        pred = model.predict(horizon=5)
-        assert pred.mean == 0.0
+        # MA(1) only has impact at h=1, so cumulative for any h equals h=1 value
+        pred_1 = model.predict(horizon=1)
+        pred_5 = model.predict(horizon=5)
+        assert pred_5.mean == pytest.approx(pred_1.mean, abs=0.01)
+        assert pred_5.mean == pytest.approx(1.0, abs=0.01)  # theta * last_error
 
     def test_ma1_group(self) -> None:
         """Test model group is 'dynamic'."""

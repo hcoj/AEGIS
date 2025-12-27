@@ -93,6 +93,7 @@ class ScaleManager:
 
         predictions: list[Prediction] = []
         weights: list[float] = []
+        active_scales: list[int] = []
 
         for i, scale in enumerate(self.scales):
             if len(self.history) > scale:
@@ -104,6 +105,7 @@ class ScaleManager:
 
                 predictions.append(scale_pred)
                 weights.append(self.scale_weights[i])
+                active_scales.append(scale)
 
         if not predictions:
             return Prediction(mean=0.0, variance=1.0)
@@ -111,14 +113,16 @@ class ScaleManager:
         weights_arr = np.array(weights)
         weights_arr /= weights_arr.sum()
 
-        means = np.array([p.mean for p in predictions])
+        # Models now return cumulative change over horizon.
+        # Scale s models predict cumulative s-period returns; divide by s to get level change.
+        level_changes = np.array([p.mean / s for p, s in zip(predictions, active_scales)])
         variances = np.array([p.variance for p in predictions])
 
-        combined_mean = np.sum(weights_arr * means)
+        combined_level_change = np.sum(weights_arr * level_changes)
         within_var = np.sum(weights_arr * variances)
-        between_var = np.sum(weights_arr * (means - combined_mean) ** 2)
+        between_var = np.sum(weights_arr * (level_changes - combined_level_change) ** 2)
 
-        level_mean = self.history[-1] + combined_mean
+        level_mean = self.history[-1] + combined_level_change
         level_var = within_var + between_var
 
         return Prediction(mean=level_mean, variance=max(level_var, self.config.min_variance))

@@ -89,20 +89,51 @@ class OscillatorBankModel(TemporalModel):
 
         self._n_obs += 1
 
+    def _cumulative_prediction(self, horizon: int) -> float:
+        """Compute cumulative prediction over horizon.
+
+        Uses closed-form sum of sinusoids:
+        Σ_{k=1}^{h} cos(ω(t+k)) = sin(hω/2) / sin(ω/2) * cos(ω(t + (h+1)/2))
+        Σ_{k=1}^{h} sin(ω(t+k)) = sin(hω/2) / sin(ω/2) * sin(ω(t + (h+1)/2))
+
+        Args:
+            horizon: Number of steps
+
+        Returns:
+            Cumulative predicted value
+        """
+        cumsum = 0.0
+        for k, period in enumerate(self.periods):
+            omega = 2 * np.pi / period
+            half_omega = omega / 2
+
+            # Avoid division by zero for very long periods
+            if abs(np.sin(half_omega)) < 1e-10:
+                # For very long periods, sum ≈ horizon × current value
+                cumsum += horizon * (
+                    self.a[k] * np.cos(omega * (self.t + 1))
+                    + self.b[k] * np.sin(omega * (self.t + 1))
+                )
+            else:
+                scale = np.sin(horizon * half_omega) / np.sin(half_omega)
+                center_t = self.t + (horizon + 1) / 2
+                cumsum += self.a[k] * scale * np.cos(omega * center_t)
+                cumsum += self.b[k] * scale * np.sin(omega * center_t)
+
+        return cumsum
+
     def predict(self, horizon: int) -> Prediction:
-        """Predict future value.
+        """Predict cumulative change over horizon.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Prediction with oscillator extrapolation.
+            Cumulative prediction with oscillator extrapolation.
             Variance grows with horizon due to phase uncertainty.
         """
-        future_t = self.t + horizon
-        mean = self._compute_prediction(future_t)
+        mean = self._cumulative_prediction(horizon)
         # Phase uncertainty grows linearly with horizon
-        # The 0.01 factor ensures gradual growth without exploding
         phase_uncertainty = 0.01 * horizon
         variance = self.sigma_sq * (1 + phase_uncertainty)
         return Prediction(mean=mean, variance=max(variance, 1e-10))
@@ -205,20 +236,36 @@ class SeasonalDummyModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict future value.
+        """Predict cumulative change over horizon.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Prediction with seasonal mean.
+            Cumulative prediction with seasonal means.
             Variance grows with horizon due to phase uncertainty.
         """
-        s = (self.t + horizon) % self.period
+        # Sum seasonal means over the horizon
+        # Each complete cycle contributes sum(means)
+        # Plus partial cycle at the end
+        full_cycles = horizon // self.period
+        remainder = horizon % self.period
+
+        # Sum of one complete cycle
+        cycle_sum = np.sum(self.means)
+
+        # Cumulative = full_cycles * cycle_sum + partial cycle
+        cumsum = full_cycles * cycle_sum
+
+        # Add partial cycle (positions t+1 to t+remainder)
+        for k in range(1, remainder + 1):
+            s = (self.t + k) % self.period
+            cumsum += self.means[s]
+
         # Phase uncertainty grows linearly with horizon
         phase_uncertainty = 0.01 * horizon
         variance = self.sigma_sq * (1 + phase_uncertainty)
-        return Prediction(mean=self.means[s], variance=max(variance, 1e-10))
+        return Prediction(mean=cumsum, variance=max(variance, 1e-10))
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.

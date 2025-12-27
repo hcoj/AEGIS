@@ -196,8 +196,8 @@ class TestLocalLevelModel:
         model.reset(partial=1.0)
         assert model.level != initial_level
 
-    def test_local_level_horizon_invariant_mean(self) -> None:
-        """Test that mean is same for all horizons (martingale)."""
+    def test_local_level_cumulative_scales_with_horizon(self) -> None:
+        """Test that cumulative prediction scales linearly with horizon."""
         model = LocalLevelModel()
         for t in range(50):
             model.update(5.0 + np.random.normal(0, 0.5), t)
@@ -205,7 +205,8 @@ class TestLocalLevelModel:
         pred_1 = model.predict(horizon=1)
         pred_10 = model.predict(horizon=10)
 
-        assert pred_1.mean == pytest.approx(pred_10.mean, abs=0.01)
+        # Cumulative prediction should scale linearly: h=10 is 10x h=1
+        assert pred_10.mean == pytest.approx(10 * pred_1.mean, rel=0.01)
 
     def test_local_level_variance_increases_with_horizon(self) -> None:
         """Test that variance increases with horizon."""

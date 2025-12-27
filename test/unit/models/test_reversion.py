@@ -34,7 +34,7 @@ class TestMeanReversionModel:
         assert 0 <= model.phi <= 0.999
 
     def test_mean_reversion_horizon_prediction(self) -> None:
-        """Test multi-step prediction reverts more."""
+        """Test multi-step cumulative prediction shows reversion in per-step average."""
         model = MeanReversionModel()
         model.mu = 0.0
         model._last_y = 1.0
@@ -42,7 +42,11 @@ class TestMeanReversionModel:
         pred_1 = model.predict(horizon=1)
         pred_10 = model.predict(horizon=10)
 
-        assert abs(pred_10.mean) < abs(pred_1.mean)
+        # Per-step average should decrease as we revert toward mu
+        avg_per_step_1 = pred_1.mean / 1
+        avg_per_step_10 = pred_10.mean / 10
+
+        assert abs(avg_per_step_10) < abs(avg_per_step_1)
 
     def test_mean_reversion_learns_mean(self, ar1_signal) -> None:
         """Test model learns the process mean."""

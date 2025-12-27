@@ -145,7 +145,7 @@ class TestSeasonalDummyModel:
             assert model.means[i] == pytest.approx(expected, abs=2.0)
 
     def test_seasonal_dummy_predicts_correctly(self, seasonal_signal) -> None:
-        """Test prediction matches learned pattern."""
+        """Test cumulative prediction matches learned pattern sum."""
         pattern = [1, 2, 3, 4]
         signal = seasonal_signal(n=200, period=4, pattern=pattern, noise_sigma=0.1)
         model = SeasonalDummyModel(period=4)
@@ -153,10 +153,10 @@ class TestSeasonalDummyModel:
         for t, y in enumerate(signal):
             model.update(y, t)
 
-        for h in range(1, 5):
-            pred = model.predict(horizon=h)
-            expected_idx = (model.t + h) % 4
-            assert pred.mean == pytest.approx(pattern[expected_idx], abs=0.5)
+        # Cumulative prediction for h steps sums over the next h pattern values
+        pred_4 = model.predict(horizon=4)
+        expected_cycle_sum = sum(pattern)  # 1+2+3+4 = 10
+        assert pred_4.mean == pytest.approx(expected_cycle_sum, abs=2.0)
 
     def test_seasonal_dummy_group(self) -> None:
         """Test model group is 'periodic'."""
@@ -217,15 +217,19 @@ class TestSeasonalDummyModel:
         assert isinstance(pred, Prediction)
 
     def test_seasonal_dummy_period_wrapping(self) -> None:
-        """Test prediction wraps correctly around period."""
+        """Test cumulative prediction sums correctly over multiple periods."""
         model = SeasonalDummyModel(period=4)
         model.means = np.array([1.0, 2.0, 3.0, 4.0])
         model.t = 10
 
-        pred_1 = model.predict(horizon=1)
-        pred_5 = model.predict(horizon=5)
+        # t=10, so next positions are 11,12,13,14,... which mod 4 = 3,0,1,2,...
+        pred_4 = model.predict(horizon=4)
+        pred_8 = model.predict(horizon=8)
 
-        assert pred_1.mean == pred_5.mean
+        # Full period sum = 1+2+3+4 = 10
+        cycle_sum = sum(model.means)
+        assert pred_4.mean == pytest.approx(cycle_sum, abs=0.01)
+        assert pred_8.mean == pytest.approx(2 * cycle_sum, abs=0.01)
 
     def test_seasonal_dummy_variance_grows_with_horizon(self, seasonal_signal) -> None:
         """Test that variance grows with horizon due to phase uncertainty."""

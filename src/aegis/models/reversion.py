@@ -95,21 +95,25 @@ class MeanReversionModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict future value.
+        """Predict cumulative change over horizon.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Prediction reverting toward mu
+            Cumulative prediction reverting toward mu.
+            Sum of (mu + phi^k * (y - mu)) for k=1..h.
         """
         x = self._last_y - self.mu
-        phi_h = self.phi**horizon
-        mean = self.mu + phi_h * x
 
+        # Cumulative: sum_{k=1}^{h} (mu + phi^k * x)
+        # = h * mu + x * phi * (1 - phi^h) / (1 - phi)
         if abs(self.phi) < 0.999:
+            geometric_sum = self.phi * (1 - self.phi**horizon) / (1 - self.phi)
+            mean = horizon * self.mu + x * geometric_sum
             variance = self.sigma_sq * (1 - self.phi ** (2 * horizon)) / (1 - self.phi**2)
         else:
+            mean = horizon * self.mu + x * horizon  # phi ≈ 1, acts like random walk
             variance = self.sigma_sq * horizon
 
         return Prediction(mean=mean, variance=max(variance, 1e-10))
@@ -254,22 +258,24 @@ class AsymmetricMeanReversionModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict future value.
+        """Predict cumulative change over horizon.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Prediction using appropriate phi
+            Cumulative prediction using appropriate phi.
         """
         x = self._last_y - self.mu
         phi = self.phi_up if self._last_y > self.mu else self.phi_down
-        phi_h = phi**horizon
-        mean = self.mu + phi_h * x
 
+        # Cumulative: sum_{k=1}^{h} (mu + phi^k * x)
         if abs(phi) < 0.999:
+            geometric_sum = phi * (1 - phi**horizon) / (1 - phi)
+            mean = horizon * self.mu + x * geometric_sum
             variance = self.sigma_sq * (1 - phi ** (2 * horizon)) / (1 - phi**2)
         else:
+            mean = horizon * self.mu + x * horizon
             variance = self.sigma_sq * horizon
 
         return Prediction(mean=mean, variance=max(variance, 1e-10))
@@ -400,21 +406,23 @@ class ThresholdARModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict future value.
+        """Predict cumulative change over horizon.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Prediction using appropriate phi
+            Cumulative prediction using appropriate phi.
         """
         phi = self.phi_low if self._last_y < self.tau else self.phi_high
-        phi_h = phi**horizon
-        mean = phi_h * self._last_y
 
+        # Cumulative: sum_{k=1}^{h} phi^k * y = y * phi * (1 - phi^h) / (1 - phi)
         if abs(phi) < 0.999:
+            geometric_sum = phi * (1 - phi**horizon) / (1 - phi)
+            mean = self._last_y * geometric_sum
             variance = self.sigma_sq * (1 - phi ** (2 * horizon)) / (1 - phi**2)
         else:
+            mean = self._last_y * horizon
             variance = self.sigma_sq * horizon
 
         return Prediction(mean=mean, variance=max(variance, 1e-10))

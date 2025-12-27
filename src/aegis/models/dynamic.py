@@ -98,22 +98,24 @@ class AR2Model(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict future value.
+        """Predict cumulative change over horizon.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Prediction with AR(2) extrapolation
+            Cumulative prediction with AR(2) extrapolation
         """
         y1, y2 = self.y_lag1, self.y_lag2
+        cumsum = 0.0
 
         for _ in range(horizon):
             y_new = self.c + self.phi1 * y1 + self.phi2 * y2
+            cumsum += y_new
             y2 = y1
             y1 = y_new
 
-        return Prediction(mean=y1, variance=self.sigma_sq * horizon)
+        return Prediction(mean=cumsum, variance=self.sigma_sq * horizon)
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.
@@ -210,20 +212,18 @@ class MA1Model(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict future value.
+        """Predict cumulative change over horizon.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Prediction (only h=1 uses last_error, h>1 is zero mean)
+            Cumulative prediction. Only first step has non-zero mean (MA(1)).
         """
-        if horizon == 1:
-            mean = self.theta * self.last_error
-            variance = self.sigma_sq
-        else:
-            mean = 0.0
-            variance = self.sigma_sq * (1 + self.theta**2)
+        # MA(1): E[y_{t+1}] = theta * last_error, E[y_{t+k}] = 0 for k > 1
+        # Cumulative = theta * last_error + 0 + 0 + ... = theta * last_error
+        mean = self.theta * self.last_error
+        variance = self.sigma_sq * (1 + (horizon - 1) * (1 + self.theta**2))
 
         return Prediction(mean=mean, variance=variance)
 

@@ -51,16 +51,17 @@ class RandomWalkModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict future value.
+        """Predict cumulative change over horizon.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Prediction with mean = last_y, variance scales with horizon
+            Prediction with mean = horizon × last_y (cumulative),
+            variance scales with horizon
         """
         return Prediction(
-            mean=self.last_y,
+            mean=horizon * self.last_y,
             variance=self.sigma_sq * horizon,
         )
 
@@ -143,16 +144,17 @@ class LocalLevelModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict future value.
+        """Predict cumulative change over horizon.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Prediction with mean = level, variance increases with horizon
+            Prediction with mean = horizon × level (cumulative),
+            variance increases with horizon
         """
         return Prediction(
-            mean=self.level,
+            mean=horizon * self.level,
             variance=self.sigma_sq * (1 + (horizon - 1) * self.alpha**2),
         )
 
