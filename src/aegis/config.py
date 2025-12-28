@@ -16,6 +16,7 @@ class AEGISConfig:
         likelihood_forget: Forgetting factor for cumulative log-likelihood scores
         temperature: Softmax temperature for model weights
         complexity_penalty_weight: Weight on BIC-like complexity penalty (default 0)
+        entropy_penalty_weight: Weight on entropy penalty to encourage concentration (default 0)
         volatility_decay: EWMA decay for volatility tracking
         cross_stream_lags: Number of lags in cross-stream regression
         include_lag_zero: Whether to include contemporaneous terms
@@ -42,6 +43,7 @@ class AEGISConfig:
     likelihood_forget: float = 0.99
     temperature: float = 1.0
     complexity_penalty_weight: float = 0.0
+    entropy_penalty_weight: float = 0.0
 
     volatility_decay: float = 0.94
 

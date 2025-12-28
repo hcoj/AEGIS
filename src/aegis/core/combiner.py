@@ -41,10 +41,34 @@ class EFEModelCombiner:
     def get_weights(self) -> np.ndarray:
         """Compute current model weights via softmax.
 
+        If entropy_penalty_weight > 0, adaptively lower temperature
+        when weights are spread out to encourage concentration.
+
         Returns:
             Array of model weights summing to 1
         """
-        scores = self.cumulative_scores / max(self.config.temperature, 1e-10)
+        base_temp = max(self.config.temperature, 1e-10)
+
+        if self.config.entropy_penalty_weight > 0 and self.n_models > 1:
+            scores_base = self.cumulative_scores / base_temp
+            max_score = np.max(scores_base)
+            exp_scores = np.exp(scores_base - max_score)
+            weights_base = exp_scores / np.sum(exp_scores)
+
+            weights_clipped = np.clip(weights_base, 1e-10, 1.0)
+            entropy = -np.sum(weights_clipped * np.log(weights_clipped))
+            max_entropy = np.log(self.n_models)
+
+            entropy_ratio = entropy / max_entropy
+
+            temp_factor = 1.0 - self.config.entropy_penalty_weight * entropy_ratio
+            temp_factor = max(temp_factor, 0.2)
+
+            effective_temp = base_temp * temp_factor
+        else:
+            effective_temp = base_temp
+
+        scores = self.cumulative_scores / effective_temp
 
         max_score = np.max(scores)
         exp_scores = np.exp(scores - max_score)

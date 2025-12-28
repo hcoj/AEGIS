@@ -266,3 +266,49 @@ class TestEFEModelCombiner:
             f"Higher temperature should reduce concentration: "
             f"max_low={max_low:.3f}, max_default={max_default:.3f}, max_high={max_high:.3f}"
         )
+
+    def test_combiner_entropy_penalty_encourages_concentration(self) -> None:
+        """Entropy penalty should encourage weight concentration.
+
+        When weights are spread evenly (high entropy), the penalty
+        should sharpen the distribution to concentrate on fewer models.
+        """
+        config_no_penalty = AEGISConfig(entropy_penalty_weight=0.0)
+        config_with_penalty = AEGISConfig(entropy_penalty_weight=0.5)
+
+        combiner_no = EFEModelCombiner(n_models=4, config=config_no_penalty)
+        combiner_with = EFEModelCombiner(n_models=4, config=config_with_penalty)
+
+        # Create models with similar performance (leads to spread-out weights)
+        models_no = [RandomWalkModel(), LocalLevelModel(), LocalTrendModel(), MeanReversionModel()]
+        models_with = [
+            RandomWalkModel(),
+            LocalLevelModel(),
+            LocalTrendModel(),
+            MeanReversionModel(),
+        ]
+
+        # Feed data where models have similar performance
+        rng = np.random.default_rng(42)
+        for t in range(100):
+            y = rng.normal(0, 1)
+            combiner_no.update(models_no, y, t)
+            combiner_with.update(models_with, y, t)
+
+        weights_no = combiner_no.get_weights()
+        weights_with = combiner_with.get_weights()
+
+        # Measure concentration using max weight
+        max_no = np.max(weights_no)
+        max_with = np.max(weights_with)
+
+        # Entropy penalty should increase concentration
+        assert max_with > max_no, (
+            f"Entropy penalty should increase concentration: "
+            f"max_no={max_no:.3f}, max_with={max_with:.3f}"
+        )
+
+    def test_combiner_entropy_penalty_default_zero(self) -> None:
+        """Default entropy penalty weight should be 0 (backward compatible)."""
+        config = AEGISConfig()
+        assert config.entropy_penalty_weight == 0.0
