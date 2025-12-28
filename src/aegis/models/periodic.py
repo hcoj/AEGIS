@@ -45,6 +45,9 @@ class OscillatorBankModel(TemporalModel):
         self.a: np.ndarray = np.zeros(self.n_freqs)
         self.b: np.ndarray = np.zeros(self.n_freqs)
 
+        self.phase_stability: np.ndarray = np.zeros(self.n_freqs)
+        self._last_phase: np.ndarray = np.zeros(self.n_freqs)
+
         self.sigma_sq: float = 1.0
         self.prior_sigma_sq: float = 1.0
         self.t: int = 0
@@ -87,6 +90,20 @@ class OscillatorBankModel(TemporalModel):
 
             self.a[k] += self.lr * error * cos_term
             self.b[k] += self.lr * error * sin_term
+
+            amplitude = np.sqrt(self.a[k] ** 2 + self.b[k] ** 2)
+            if amplitude > 1e-6:
+                current_phase = np.arctan2(self.b[k], self.a[k])
+                phase_diff = abs(current_phase - self._last_phase[k])
+                phase_diff = min(phase_diff, 2 * np.pi - phase_diff)
+
+                phase_consistency = 1.0 - phase_diff / np.pi
+                stability_decay = 0.95
+                self.phase_stability[k] = (
+                    stability_decay * self.phase_stability[k]
+                    + (1 - stability_decay) * phase_consistency
+                )
+                self._last_phase[k] = current_phase
 
         self._n_obs += 1
 
@@ -131,11 +148,16 @@ class OscillatorBankModel(TemporalModel):
 
         Returns:
             Cumulative prediction with oscillator extrapolation.
-            Variance grows with horizon due to phase uncertainty.
+            Variance grows with horizon, reduced when phase is stable.
         """
         mean = self._cumulative_prediction(horizon)
-        # Phase uncertainty grows linearly with horizon
-        phase_uncertainty = 0.01 * horizon
+
+        avg_stability = np.mean(self.phase_stability) if self.n_freqs > 0 else 0.0
+        stability_factor = 1.0 - 0.8 * avg_stability
+
+        base_uncertainty = 0.01 * horizon
+        phase_uncertainty = base_uncertainty * stability_factor
+
         variance = self.sigma_sq * (1 + phase_uncertainty)
         return Prediction(mean=mean, variance=max(variance, 1e-10))
 

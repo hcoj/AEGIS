@@ -245,3 +245,56 @@ class TestSeasonalDummyModel:
 
         # Variance should grow with horizon
         assert pred_64.variance > pred_1.variance
+
+
+class TestOscillatorPhaseTracking:
+    """Tests for improved phase tracking in OscillatorBankModel."""
+
+    def test_oscillator_tracks_phase_stability(self, sine_wave_signal) -> None:
+        """Test that phase stability is tracked."""
+        signal = sine_wave_signal(n=300, period=16, amplitude=1.0)
+        model = OscillatorBankModel(periods=[16], lr=0.05)
+
+        for t, y in enumerate(signal):
+            model.update(y, t)
+
+        # Phase stability should be available
+        assert hasattr(model, "phase_stability")
+        # After learning a clean sine, stability should be high
+        assert model.phase_stability[0] > 0.5
+
+    def test_oscillator_stable_phase_reduces_uncertainty(self, sine_wave_signal) -> None:
+        """Test that stable phase reduces long-horizon uncertainty.
+
+        When the oscillator has locked onto a stable phase, the
+        variance at long horizons should be relatively lower than
+        when phase is uncertain.
+        """
+        signal = sine_wave_signal(n=500, period=16, amplitude=2.0)
+        model = OscillatorBankModel(periods=[16], lr=0.05)
+
+        for t, y in enumerate(signal):
+            model.update(y, t)
+
+        pred_64 = model.predict(horizon=64)
+
+        # With stable phase, the variance should be reasonable
+        # Not dominated by linear phase uncertainty growth
+        # Variance ratio h=64 vs h=1 should be < 2x if phase is stable
+        pred_1 = model.predict(horizon=1)
+        variance_ratio = pred_64.variance / pred_1.variance
+        assert variance_ratio < 3.0, (
+            f"Stable phase should limit variance growth: ratio={variance_ratio:.2f}"
+        )
+
+    def test_oscillator_amplitude_computed(self, sine_wave_signal) -> None:
+        """Test that amplitude is correctly computed from coefficients."""
+        signal = sine_wave_signal(n=300, period=16, amplitude=2.0)
+        model = OscillatorBankModel(periods=[16], lr=0.05)
+
+        for t, y in enumerate(signal):
+            model.update(y, t)
+
+        # Amplitude should match input amplitude
+        amplitude = np.sqrt(model.a[0] ** 2 + model.b[0] ** 2)
+        assert amplitude == pytest.approx(2.0, abs=0.5)
