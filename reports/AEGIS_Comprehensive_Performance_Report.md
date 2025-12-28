@@ -409,48 +409,48 @@ Challenging signals designed to test system robustness.
 - Added coverage-based LR boost when under-covering
 - Coverage improved from 85.5% to 86.0% at h=1
 
-### 7.2 Medium Priority
+### 7.2 Medium Priority - **ALL COMPLETED**
 
-| Improvement | Impact | Effort | Addresses |
-|-------------|--------|--------|-----------|
-| **Model group re-weighting** | Better model selection | Medium | Persistence/trend mismatch |
-| **Level-aware reversion model** | Correct φ estimation | High | MeanReversion on returns issue |
-| **Horizon-specific scale selection** | Better long-horizon | Medium | Long-horizon accuracy |
+| Improvement | Impact | Effort | Status |
+|-------------|--------|--------|--------|
+| **Horizon-specific scale selection** | Better long-horizon | Medium | **COMPLETED** |
+| **Entropy penalty for model weights** | Better model selection | Medium | **COMPLETED** |
+| **Adaptive forgetting factor** | Faster regime adaptation | Medium | **COMPLETED** |
+| **Phase tracking for oscillators** | Better sine prediction | Medium | **COMPLETED** |
+| **Level-aware reversion model** | Correct φ estimation | High | **COMPLETED** |
 
-**4. Model Group Weighting**
-- Add prior weight for persistence group on stable signals
-- Implement entropy penalty to encourage concentration
-- Consider signal classification preprocessing
+**3. Horizon-Specific Scale Selection** - **COMPLETED**
+- Short horizons now favor short scales, long horizons favor long scales
+- Uses log-space distance weighting combined with accuracy-based weights
+- `get_horizon_scale_weights(horizon)` method added to ScaleManager
 
-**5. Level-Aware Mean Reversion**
-- MeanReversionModel currently processes returns
-- φ≈0.01 learned instead of true φ=0.8 on levels
-- Option to process levels for some models
+**4. Entropy Penalty for Model Weights** - **COMPLETED**
+- Added `entropy_penalty_weight` config parameter
+- Adaptively lowers temperature when weights are spread out
+- Encourages concentration on fewer models for clearer selection
 
-**6. Horizon-Specific Scale Selection**
-- Currently all scales contribute equally at all horizons
-- Short horizons should weight short scales more
-- Implement horizon-dependent scale combination
+**5. Adaptive Forgetting Factor** - **COMPLETED**
+- Added `use_adaptive_forgetting` and `min_forget` config parameters
+- Forgetting factor decreases when surprise (poor log-likelihood) is detected
+- Recovers to base rate during stable periods
+
+**6. Phase Tracking for Oscillators** - **COMPLETED**
+- OscillatorBankModel now tracks phase stability using EMA
+- When phase is stable, long-horizon variance is reduced
+- Phase consistency computed from consecutive phase estimates
+
+**7. Level-Aware Mean Reversion** - **COMPLETED**
+- Added LevelAwareMeanReversionModel to model bank
+- Tracks cumulative level internally from returns input
+- Correctly identifies mean reversion in OU-like processes
 
 ### 7.3 Lower Priority
 
-| Improvement | Impact | Effort | Addresses |
-|-------------|--------|--------|-----------|
-| **Phase tracking for oscillators** | Better sine prediction | High | Sinusoidal long-horizon |
-| **Adaptive forgetting factor** | Faster regime adaptation | Medium | Regime change lag |
-| **Cross-validation for hyperparameters** | Tuned parameters | High | Overall performance |
+| Improvement | Impact | Effort | Status |
+|-------------|--------|--------|--------|
+| **Cross-validation for hyperparameters** | Tuned parameters | High | Pending |
 
-**7. Improved Phase Tracking**
-- OscillatorBank loses phase coherence at long horizons
-- Implement phase-locked loop (PLL) style updates
-- Consider Kalman filter for state estimation
-
-**8. Adaptive Forgetting**
-- Fixed likelihood_forget=0.99 may be too slow for fast regimes
-- Implement change-detection-based forgetting
-- Allow per-model forgetting rates
-
-**9. Hyperparameter Optimization**
+**8. Hyperparameter Optimization**
 - temperature, break_threshold, decay parameters are fixed
 - Implement online cross-validation
 - Add Bayesian hyperparameter selection
@@ -498,10 +498,14 @@ AEGIS demonstrates strong performance across a diverse signal taxonomy with 411 
 **Completed Improvements (2025-12-28):**
 1. **Fixed numerical overflow** - Added MAX_SIGMA_SQ clamping to all models
 2. **Enhanced short-horizon calibration** - Added adaptive learning rate with warm-up period
+3. **Horizon-specific scale selection** - Scales now weighted by proximity to target horizon
+4. **Entropy penalty for model weights** - Encourages concentration on fewer models
+5. **Adaptive forgetting factor** - Faster adaptation when surprise is detected
+6. **Phase tracking for oscillators** - Reduced variance when phase is stable
+7. **Level-aware mean reversion** - New model for OU-like processes
 
 **Remaining Next Steps:**
-1. Improve model group selection (medium-term)
-2. Research level-aware model variants (long-term)
+1. Hyperparameter optimization via cross-validation (long-term)
 
 ---
 
