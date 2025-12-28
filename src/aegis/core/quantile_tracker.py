@@ -176,6 +176,10 @@ class HorizonAwareQuantileTracker:
         for anchor in self.ANCHOR_HORIZONS:
             self._anchor_stats[anchor] = {"n_obs": 0, "n_in_interval": 0}
 
+        # Adaptive learning rate state
+        self._recent_coverage: float = target_coverage  # EMA of recent coverage
+        self._n_updates: int = 0  # Total observations for warm-up detection
+
     def _get_interpolation_weights(self, horizon: int) -> list[tuple[int, float]]:
         """Get anchor horizons and weights for interpolation.
 
@@ -256,13 +260,31 @@ class HorizonAwareQuantileTracker:
         interval = self.get_interval(pred_mean, pred_std, horizon)
         in_interval = interval[0] <= y <= interval[1]
 
+        # Update EMA coverage tracking
+        self._recent_coverage = 0.95 * self._recent_coverage + 0.05 * float(in_interval)
+        self._n_updates += 1
+
+        # Compute adaptive learning rate
+        base_lr = self.learning_rate
+        if self._n_updates < 100:
+            # Warm-up: 5x faster learning for first 100 observations
+            adaptive_lr = base_lr * 5.0
+        else:
+            # Coverage-based: increase LR when under-covering
+            coverage_gap = self.target_coverage - self._recent_coverage
+            if coverage_gap > 0:
+                # Up to 2x at 10% gap
+                adaptive_lr = base_lr * (1 + 10 * coverage_gap)
+            else:
+                adaptive_lr = base_lr
+
         for anchor, weight in weights:
             self._anchor_stats[anchor]["n_obs"] += weight
             if in_interval:
                 self._anchor_stats[anchor]["n_in_interval"] += weight
 
             q_low, q_high = self._anchor_quantiles[anchor]
-            scaled_lr = self.learning_rate * weight
+            scaled_lr = adaptive_lr * weight
 
             if z < q_low:
                 q_low -= scaled_lr * (1 - alpha / 2)
@@ -305,6 +327,10 @@ class HorizonAwareQuantileTracker:
         for anchor in self.ANCHOR_HORIZONS:
             self._anchor_quantiles[anchor] = (initial_q_low, initial_q_high)
             self._anchor_stats[anchor] = {"n_obs": 0, "n_in_interval": 0}
+
+        # Reset adaptive learning rate state
+        self._recent_coverage = self.target_coverage
+        self._n_updates = 0
 
     def get_coverage_stats(self, horizon: int | None = None) -> dict:
         """Get coverage statistics.

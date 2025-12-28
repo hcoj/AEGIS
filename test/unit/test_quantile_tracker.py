@@ -222,3 +222,74 @@ class TestHorizonAwareQuantileTracker:
 
         assert calibrated.interval_lower is not None
         assert calibrated.interval_upper is not None
+
+    def test_horizon_aware_tracker_warm_up_period(self) -> None:
+        """Test tracker uses higher learning rate during warm-up period."""
+        from aegis.core.quantile_tracker import HorizonAwareQuantileTracker
+
+        # Create two trackers
+        tracker_warmup = HorizonAwareQuantileTracker(target_coverage=0.95, learning_rate=0.01)
+        tracker_no_warmup = HorizonAwareQuantileTracker(target_coverage=0.95, learning_rate=0.01)
+
+        # Disable warmup and coverage-based adjustment for second tracker
+        # by setting _n_updates high and _recent_coverage to exactly target
+        tracker_no_warmup._n_updates = 200  # Past warm-up threshold
+
+        # Feed identical observations that are within bounds (to keep coverage high)
+        # This tests that warm-up period uses 5x LR even when coverage is good
+        for i in range(50):
+            # Small z-score updates that slowly adjust quantiles
+            tracker_warmup.update(y=2.5, pred_mean=0.0, pred_std=1.0, horizon=1)
+            # Keep coverage high for no_warmup tracker
+            tracker_no_warmup._recent_coverage = 0.95  # Maintain target coverage
+            tracker_no_warmup.update(y=2.5, pred_mean=0.0, pred_std=1.0, horizon=1)
+
+        # Tracker with warm-up should have adapted faster
+        q_warmup_low, q_warmup_high = tracker_warmup.get_quantiles(horizon=1)
+        q_no_warmup_low, q_no_warmup_high = tracker_no_warmup.get_quantiles(horizon=1)
+
+        # Warmup tracker should have higher quantiles (more adaptation at 5x LR)
+        assert q_warmup_high > q_no_warmup_high
+
+    def test_horizon_aware_tracker_adaptive_learning_rate(self) -> None:
+        """Test tracker increases learning rate when coverage is below target."""
+        from aegis.core.quantile_tracker import HorizonAwareQuantileTracker
+
+        # Create tracker and force low coverage
+        tracker = HorizonAwareQuantileTracker(target_coverage=0.95, learning_rate=0.01)
+
+        # Skip warm-up by setting _n_updates high
+        tracker._n_updates = 200
+
+        # Simulate low coverage by feeding observations outside intervals
+        for i in range(50):
+            tracker.update(y=10.0, pred_mean=0.0, pred_std=1.0, horizon=1)
+
+        # After consistently missing coverage, learning rate should have increased
+        # Check that _recent_coverage is tracking (should be below target)
+        assert tracker._recent_coverage < 0.95
+
+        # The quantile should have adapted despite post-warmup low LR
+        # (adaptive LR should boost it)
+        q_low, q_high = tracker.get_quantiles(horizon=1)
+        assert q_high > 2.5  # Should have widened
+
+    def test_horizon_aware_tracker_tracks_recent_coverage(self) -> None:
+        """Test tracker maintains EMA of recent coverage."""
+        from aegis.core.quantile_tracker import HorizonAwareQuantileTracker
+
+        tracker = HorizonAwareQuantileTracker(target_coverage=0.95)
+
+        # Feed observations that are always within interval
+        for _ in range(100):
+            tracker.update(y=0.5, pred_mean=0.0, pred_std=1.0, horizon=1)
+
+        # EMA coverage should be high (near 1.0)
+        assert tracker._recent_coverage > 0.8
+
+        # Now feed observations that are always outside interval
+        for _ in range(100):
+            tracker.update(y=10.0, pred_mean=0.0, pred_std=1.0, horizon=1)
+
+        # EMA coverage should have dropped
+        assert tracker._recent_coverage < 0.5
