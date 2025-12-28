@@ -38,6 +38,9 @@ class EFEModelCombiner:
         self.last_epistemic: np.ndarray | None = None
         self._n_obs: int = 0
 
+        self.current_forget: float = config.likelihood_forget
+        self._surprise_ema: float = 0.0
+
     def get_weights(self) -> np.ndarray:
         """Compute current model weights via softmax.
 
@@ -107,7 +110,34 @@ class EFEModelCombiner:
             penalty = -0.5 * n_params * np.log(n_effective) / n_effective
             scores += self.config.complexity_penalty_weight * penalty
 
-        self.cumulative_scores = self.config.likelihood_forget * self.cumulative_scores + scores
+        if self.config.use_adaptive_forgetting:
+            best_ll = np.max(pragmatic)
+            surprise = max(0, -best_ll - 1.0)
+
+            surprise_decay = 0.95
+            self._surprise_ema = (
+                surprise_decay * self._surprise_ema + (1 - surprise_decay) * surprise
+            )
+
+            surprise_threshold = 2.0
+            if self._surprise_ema > surprise_threshold:
+                forget_reduction = min(0.1, (self._surprise_ema - surprise_threshold) * 0.05)
+                self.current_forget = max(
+                    self.config.min_forget, self.config.likelihood_forget - forget_reduction
+                )
+            else:
+                recovery_rate = 0.05
+                gap = self.config.likelihood_forget - self.current_forget
+                self.current_forget = min(
+                    self.config.likelihood_forget,
+                    self.current_forget + recovery_rate * gap + 0.001,
+                )
+
+            forget = self.current_forget
+        else:
+            forget = self.config.likelihood_forget
+
+        self.cumulative_scores = forget * self.cumulative_scores + scores
 
         for m in models:
             m.update(y, t)

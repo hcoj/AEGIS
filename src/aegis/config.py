@@ -17,6 +17,8 @@ class AEGISConfig:
         temperature: Softmax temperature for model weights
         complexity_penalty_weight: Weight on BIC-like complexity penalty (default 0)
         entropy_penalty_weight: Weight on entropy penalty to encourage concentration (default 0)
+        use_adaptive_forgetting: Enable adaptive forgetting based on surprise (default False)
+        min_forget: Minimum forgetting factor when adapting (default 0.8)
         volatility_decay: EWMA decay for volatility tracking
         cross_stream_lags: Number of lags in cross-stream regression
         include_lag_zero: Whether to include contemporaneous terms
@@ -44,6 +46,8 @@ class AEGISConfig:
     temperature: float = 1.0
     complexity_penalty_weight: float = 0.0
     entropy_penalty_weight: float = 0.0
+    use_adaptive_forgetting: bool = False
+    min_forget: float = 0.8
 
     volatility_decay: float = 0.94
 

@@ -312,3 +312,64 @@ class TestEFEModelCombiner:
         """Default entropy penalty weight should be 0 (backward compatible)."""
         config = AEGISConfig()
         assert config.entropy_penalty_weight == 0.0
+
+    def test_combiner_adaptive_forgetting_starts_at_base(self) -> None:
+        """Adaptive forgetting should start at base rate."""
+        config = AEGISConfig(likelihood_forget=0.99, use_adaptive_forgetting=True)
+        combiner = EFEModelCombiner(n_models=2, config=config)
+
+        assert combiner.current_forget == 0.99
+
+    def test_combiner_adaptive_forgetting_reduces_on_surprise(self) -> None:
+        """Forgetting rate should decrease when errors are surprisingly large.
+
+        Large errors indicate the model needs to adapt faster, so we
+        should reduce the forgetting factor (forget more of the past).
+        """
+        config = AEGISConfig(likelihood_forget=0.99, use_adaptive_forgetting=True, min_forget=0.8)
+        combiner = EFEModelCombiner(n_models=2, config=config)
+
+        models = [RandomWalkModel(), LocalLevelModel()]
+
+        # Feed normal data first
+        for t in range(50):
+            combiner.update(models, float(t), t)
+
+        initial_forget = combiner.current_forget
+
+        # Feed surprising data (big jump)
+        for t in range(50, 60):
+            combiner.update(models, 1000.0, t)
+
+        # Forgetting should have decreased
+        assert combiner.current_forget < initial_forget
+
+    def test_combiner_adaptive_forgetting_recovers_after_stability(self) -> None:
+        """Forgetting rate should recover to base after stable period."""
+        config = AEGISConfig(likelihood_forget=0.99, use_adaptive_forgetting=True, min_forget=0.8)
+        combiner = EFEModelCombiner(n_models=2, config=config)
+
+        models = [RandomWalkModel(), LocalLevelModel()]
+
+        # Create surprise with a regime shift
+        for t in range(100):
+            combiner.update(models, 100.0 if t < 50 else 0.0, t)
+
+        # Capture forgetting after surprise (should be reduced)
+        post_surprise_forget = combiner.current_forget
+        assert post_surprise_forget < config.likelihood_forget, "Should have reduced after surprise"
+
+        # Very long stable period - models have adapted
+        for t in range(100, 500):
+            combiner.update(models, 0.0, t)
+
+        # Should have recovered toward base rate
+        assert combiner.current_forget > post_surprise_forget, (
+            f"Should have recovered: was {post_surprise_forget:.4f}, "
+            f"now {combiner.current_forget:.4f}"
+        )
+
+    def test_combiner_adaptive_forgetting_default_off(self) -> None:
+        """Adaptive forgetting should be off by default."""
+        config = AEGISConfig()
+        assert not config.use_adaptive_forgetting
