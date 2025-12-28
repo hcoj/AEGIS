@@ -5,10 +5,17 @@ Special models capture non-standard dynamics:
 - ChangePointModel: Explicit regime change detection
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from aegis.core.prediction import Prediction
 from aegis.models.base import MAX_SIGMA_SQ, TemporalModel
+
+if TYPE_CHECKING:
+    from aegis.config import AEGISConfig
 
 
 class JumpDiffusionModel(TemporalModel):
@@ -28,12 +35,14 @@ class JumpDiffusionModel(TemporalModel):
         self,
         jump_threshold: float = 3.0,
         decay: float = 0.95,
+        config: AEGISConfig | None = None,
     ) -> None:
         """Initialize JumpDiffusionModel.
 
         Args:
             jump_threshold: Number of std devs to classify as jump
             decay: EWMA decay for variance estimation
+            config: Optional AEGIS configuration for robust estimation
         """
         self.jump_threshold: float = jump_threshold
         self.decay: float = decay
@@ -48,6 +57,8 @@ class JumpDiffusionModel(TemporalModel):
         self.last_y: float = 0.0
         self.recent_jumps: list[float] = []
         self._n_obs: int = 0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
     def lambda_mean(self) -> float:
         """Return posterior mean of jump probability."""
@@ -81,9 +92,19 @@ class JumpDiffusionModel(TemporalModel):
 
                 self.lambda_a += 1
             else:
-                self.sigma_sq_diff = (
-                    self.decay * self.sigma_sq_diff + (1 - self.decay) * innovation**2
-                )
+                if self._use_robust:
+                    from aegis.models.robust import robust_weight
+
+                    weight = robust_weight(
+                        innovation, np.sqrt(self.sigma_sq_diff), self._outlier_threshold
+                    )
+                    self.sigma_sq_diff = (
+                        self.decay * self.sigma_sq_diff + (1 - self.decay) * weight * innovation**2
+                    )
+                else:
+                    self.sigma_sq_diff = (
+                        self.decay * self.sigma_sq_diff + (1 - self.decay) * innovation**2
+                    )
                 self.sigma_sq_diff = min(self.sigma_sq_diff, MAX_SIGMA_SQ)
                 self.lambda_b += 1
 

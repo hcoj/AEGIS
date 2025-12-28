@@ -5,10 +5,17 @@ Dynamic models capture autocorrelation structure:
 - MA1Model: Moving average with shock effects
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from aegis.core.prediction import Prediction
 from aegis.models.base import MAX_SIGMA_SQ, TemporalModel
+
+if TYPE_CHECKING:
+    from aegis.config import AEGISConfig
 
 
 class AR2Model(TemporalModel):
@@ -33,6 +40,7 @@ class AR2Model(TemporalModel):
         phi2: float = 0.3,
         forget: float = 0.99,
         decay: float = 0.95,
+        config: AEGISConfig | None = None,
     ) -> None:
         """Initialize AR2Model.
 
@@ -42,6 +50,7 @@ class AR2Model(TemporalModel):
             phi2: Initial second lag coefficient
             forget: RLS forgetting factor
             decay: EWMA decay for variance estimation
+            config: Optional AEGIS configuration for robust estimation
         """
         self.c: float = c
         self.phi1: float = phi1
@@ -59,6 +68,8 @@ class AR2Model(TemporalModel):
         self.y_lag1: float = 0.0
         self.y_lag2: float = 0.0
         self._n_obs: int = 0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
         self.P: np.ndarray = np.eye(3) * 10.0
         self.theta: np.ndarray = np.array([c, phi1, phi2])
@@ -91,7 +102,13 @@ class AR2Model(TemporalModel):
                 self.phi2 *= scale
                 self.theta[1:] = [self.phi1, self.phi2]
 
-            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+            if self._use_robust:
+                from aegis.models.robust import robust_weight
+
+                weight = robust_weight(error, np.sqrt(self.sigma_sq), self._outlier_threshold)
+                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
+            else:
+                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
             self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         self.y_lag2 = self.y_lag1
@@ -178,6 +195,7 @@ class MA1Model(TemporalModel):
         theta: float = 0.5,
         lr: float = 0.01,
         decay: float = 0.95,
+        config: AEGISConfig | None = None,
     ) -> None:
         """Initialize MA1Model.
 
@@ -185,6 +203,7 @@ class MA1Model(TemporalModel):
             theta: Initial MA coefficient
             lr: Learning rate for gradient updates
             decay: EWMA decay for variance estimation
+            config: Optional AEGIS configuration for robust estimation
         """
         self.theta: float = theta
         self.prior_theta: float = theta
@@ -195,6 +214,8 @@ class MA1Model(TemporalModel):
         self.sigma_sq: float = 1.0
         self.prior_sigma_sq: float = 1.0
         self._n_obs: int = 0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
     def update(self, y: float, t: int) -> None:
         """Update model with new observation.
@@ -209,7 +230,13 @@ class MA1Model(TemporalModel):
         grad = -error * self.last_error
         self.theta = np.clip(self.theta - self.lr * grad, -0.99, 0.99)
 
-        self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+        if self._use_robust:
+            from aegis.models.robust import robust_weight
+
+            weight = robust_weight(error, np.sqrt(self.sigma_sq), self._outlier_threshold)
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
+        else:
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
         self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
         self.last_error = error
         self._n_obs += 1

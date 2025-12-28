@@ -5,10 +5,17 @@ Variance models track and predict volatility:
 - LevelDependentVolModel: Variance scales with signal level
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from aegis.core.prediction import Prediction
 from aegis.models.base import MAX_SIGMA_SQ, TemporalModel
+
+if TYPE_CHECKING:
+    from aegis.config import AEGISConfig
 
 
 class VolatilityTrackerModel(TemporalModel):
@@ -27,12 +34,14 @@ class VolatilityTrackerModel(TemporalModel):
         self,
         decay: float = 0.94,
         long_run_decay: float = 0.999,
+        config: AEGISConfig | None = None,
     ) -> None:
         """Initialize VolatilityTrackerModel.
 
         Args:
             decay: EWMA decay for short-term variance
             long_run_decay: EWMA decay for long-run variance
+            config: Optional AEGIS configuration for robust estimation
         """
         self.decay: float = decay
         self.long_run_decay: float = long_run_decay
@@ -41,6 +50,8 @@ class VolatilityTrackerModel(TemporalModel):
         self.long_run_var: float = 1.0
         self.last_y: float = 0.0
         self._n_obs: int = 0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
     def update(self, y: float, t: int) -> None:
         """Update model with new observation.
@@ -51,11 +62,24 @@ class VolatilityTrackerModel(TemporalModel):
         """
         if self._n_obs > 0:
             innovation = y - self.last_y
-            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * innovation**2
+            if self._use_robust:
+                from aegis.models.robust import robust_weight
+
+                weight = robust_weight(innovation, np.sqrt(self.sigma_sq), self._outlier_threshold)
+                self.sigma_sq = (
+                    self.decay * self.sigma_sq + (1 - self.decay) * weight * innovation**2
+                )
+                self.long_run_var = (
+                    self.long_run_decay * self.long_run_var
+                    + (1 - self.long_run_decay) * weight * innovation**2
+                )
+            else:
+                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * innovation**2
+                self.long_run_var = (
+                    self.long_run_decay * self.long_run_var
+                    + (1 - self.long_run_decay) * innovation**2
+                )
             self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
-            self.long_run_var = (
-                self.long_run_decay * self.long_run_var + (1 - self.long_run_decay) * innovation**2
-            )
             self.long_run_var = min(self.long_run_var, MAX_SIGMA_SQ)
 
         self.last_y = y

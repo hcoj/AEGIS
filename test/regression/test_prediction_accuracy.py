@@ -389,3 +389,68 @@ class TestPeriodicLongHorizon:
         growth = (mae_h1024 + 0.01) / (mae_h1 + 0.01)
 
         assert growth < 50.0, f"Sinusoidal error growth {growth:.1f}x exceeds 50x"
+
+
+class TestRobustContaminatedData:
+    """Test robust estimation improves contaminated data handling."""
+
+    def test_contaminated_error_growth_bounded(self) -> None:
+        """Contaminated error growth should be < 100x with robust estimation."""
+        rng = np.random.default_rng(42)
+        n = 1000
+
+        # Generate contaminated random walk
+        y = np.zeros(n)
+        for t in range(1, n):
+            innovation = rng.normal(0, 1)
+            if rng.random() < 0.02:
+                innovation *= 10
+            y[t] = y[t - 1] + innovation
+
+        # Use AEGIS system with robust estimation
+        config = AEGISConfig(use_robust_estimation=True, outlier_threshold=5.0)
+        aegis = AEGIS(config=config)
+        aegis.add_stream("test")
+
+        errors_h1 = []
+        errors_h64 = []
+
+        for t in range(n):
+            if t >= 200 and t + 64 < n:
+                pred_h1 = aegis.predict("test", horizon=1)
+                pred_h64 = aegis.predict("test", horizon=64)
+                errors_h1.append(abs(y[t + 1] - pred_h1.mean))
+                errors_h64.append(abs(y[t + 64] - pred_h64.mean))
+
+            aegis.observe("test", y[t])
+            aegis.end_period()
+
+        mae_h1 = np.mean(errors_h1)
+        mae_h64 = np.mean(errors_h64)
+        growth = mae_h64 / mae_h1 if mae_h1 > 0 else float("inf")
+
+        # With robust estimation, growth should be bounded
+        assert growth < 100, f"Error growth {growth:.1f}x exceeds 100x"
+
+    def test_robust_variance_stable_under_outliers(self) -> None:
+        """Variance should not explode with robust estimation under outliers."""
+        from aegis.models.persistence import RandomWalkModel
+
+        config = AEGISConfig(use_robust_estimation=True, outlier_threshold=5.0)
+        model = RandomWalkModel(config=config)
+
+        # Warm up with normal data
+        for i in range(100):
+            model.update(float(i % 2), t=i)
+
+        variance_before = model.sigma_sq
+
+        # Hit with outliers
+        for i in range(100, 110):
+            model.update(100.0, t=i)
+
+        variance_after = model.sigma_sq
+
+        # Variance should increase but not by 10000x
+        ratio = variance_after / variance_before
+        assert ratio < 100, f"Variance increased by {ratio:.0f}x, expected < 100x"

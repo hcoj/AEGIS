@@ -5,10 +5,17 @@ Persistence models assume the future looks like the recent past:
 - LocalLevelModel: Exponentially smoothed level
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from aegis.core.prediction import Prediction
 from aegis.models.base import MAX_SIGMA_SQ, TemporalModel
+
+if TYPE_CHECKING:
+    from aegis.config import AEGISConfig
 
 
 class RandomWalkModel(TemporalModel):
@@ -23,18 +30,26 @@ class RandomWalkModel(TemporalModel):
         prior_sigma_sq: Prior variance for reset
     """
 
-    def __init__(self, sigma_sq: float = 1.0, decay: float = 0.94) -> None:
+    def __init__(
+        self,
+        sigma_sq: float = 1.0,
+        decay: float = 0.94,
+        config: AEGISConfig | None = None,
+    ) -> None:
         """Initialize RandomWalkModel.
 
         Args:
             sigma_sq: Initial variance estimate
             decay: EWMA decay for variance estimation
+            config: Optional AEGIS configuration for robust estimation
         """
         self.last_y: float = 0.0
         self.sigma_sq: float = sigma_sq
         self.prior_sigma_sq: float = sigma_sq
         self.decay: float = decay
         self._n_obs: int = 0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
     def update(self, y: float, t: int) -> None:
         """Update model with new observation.
@@ -45,7 +60,15 @@ class RandomWalkModel(TemporalModel):
         """
         if self._n_obs > 0:
             innovation = y - self.last_y
-            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * innovation**2
+            if self._use_robust:
+                from aegis.models.robust import robust_weight
+
+                weight = robust_weight(innovation, np.sqrt(self.sigma_sq), self._outlier_threshold)
+                self.sigma_sq = (
+                    self.decay * self.sigma_sq + (1 - self.decay) * weight * innovation**2
+                )
+            else:
+                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * innovation**2
             self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         self.last_y = y
@@ -110,13 +133,20 @@ class LocalLevelModel(TemporalModel):
         alpha: Smoothing parameter (higher = faster adaptation)
     """
 
-    def __init__(self, alpha: float = 0.1, sigma_sq: float = 1.0, decay: float = 0.94) -> None:
+    def __init__(
+        self,
+        alpha: float = 0.1,
+        sigma_sq: float = 1.0,
+        decay: float = 0.94,
+        config: AEGISConfig | None = None,
+    ) -> None:
         """Initialize LocalLevelModel.
 
         Args:
             alpha: Smoothing parameter in (0, 1)
             sigma_sq: Initial variance estimate
             decay: EWMA decay for variance estimation
+            config: Optional AEGIS configuration for robust estimation
         """
         self.alpha: float = alpha
         self.level: float = 0.0
@@ -126,6 +156,8 @@ class LocalLevelModel(TemporalModel):
         self.decay: float = decay
         self._initialized: bool = False
         self._n_obs: int = 0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
     def update(self, y: float, t: int) -> None:
         """Update model with new observation.
@@ -140,7 +172,13 @@ class LocalLevelModel(TemporalModel):
             self._initialized = True
         else:
             error = y - self.level
-            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+            if self._use_robust:
+                from aegis.models.robust import robust_weight
+
+                weight = robust_weight(error, np.sqrt(self.sigma_sq), self._outlier_threshold)
+                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
+            else:
+                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
             self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
             self.level = self.alpha * y + (1 - self.alpha) * self.level
 

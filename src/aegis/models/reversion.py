@@ -6,10 +6,17 @@ Reversion models capture mean-reverting dynamics:
 - ThresholdARModel: Regime-dependent dynamics based on threshold
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from aegis.core.prediction import Prediction
 from aegis.models.base import MAX_SIGMA_SQ, TemporalModel
+
+if TYPE_CHECKING:
+    from aegis.config import AEGISConfig
 
 
 class MeanReversionModel(TemporalModel):
@@ -32,6 +39,7 @@ class MeanReversionModel(TemporalModel):
         phi: float = 0.9,
         sigma_sq: float = 1.0,
         decay: float = 0.94,
+        config: AEGISConfig | None = None,
     ) -> None:
         """Initialize MeanReversionModel.
 
@@ -40,6 +48,7 @@ class MeanReversionModel(TemporalModel):
             phi: Initial AR coefficient
             sigma_sq: Initial variance estimate
             decay: EWMA decay for parameter estimation
+            config: Optional AEGIS configuration for robust estimation
         """
         self.mu: float = mu
         self.phi: float = phi
@@ -54,6 +63,8 @@ class MeanReversionModel(TemporalModel):
         self._last_y: float = 0.0
         self._initialized: bool = False
         self._n_obs: int = 0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
         self._sum_y: float = 0.0
         self._sum_y_sq: float = 0.0
@@ -77,7 +88,13 @@ class MeanReversionModel(TemporalModel):
         x = self._last_y - self.mu
 
         error = y - self.mu - self.phi * x
-        self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+        if self._use_robust:
+            from aegis.models.robust import robust_weight
+
+            weight = robust_weight(error, np.sqrt(self.sigma_sq), self._outlier_threshold)
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
+        else:
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
         self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         self._sum_y = self.decay * self._sum_y + y
@@ -186,6 +203,7 @@ class AsymmetricMeanReversionModel(TemporalModel):
         phi_down: float = 0.9,
         sigma_sq: float = 1.0,
         decay: float = 0.94,
+        config: AEGISConfig | None = None,
     ) -> None:
         """Initialize AsymmetricMeanReversionModel.
 
@@ -195,6 +213,7 @@ class AsymmetricMeanReversionModel(TemporalModel):
             phi_down: Initial AR coefficient below mean
             sigma_sq: Initial variance estimate
             decay: EWMA decay for parameter estimation
+            config: Optional AEGIS configuration for robust estimation
         """
         self.mu: float = mu
         self.phi_up: float = phi_up
@@ -210,6 +229,8 @@ class AsymmetricMeanReversionModel(TemporalModel):
         self._last_y: float = 0.0
         self._initialized: bool = False
         self._n_obs: int = 0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
         self._sum_xy_up: float = 0.0
         self._sum_x_sq_up: float = 0.0
@@ -239,7 +260,13 @@ class AsymmetricMeanReversionModel(TemporalModel):
             phi = self.phi_down
 
         error = y - self.mu - phi * x
-        self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+        if self._use_robust:
+            from aegis.models.robust import robust_weight
+
+            weight = robust_weight(error, np.sqrt(self.sigma_sq), self._outlier_threshold)
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
+        else:
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
         self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         if above:
@@ -338,6 +365,7 @@ class ThresholdARModel(TemporalModel):
         phi_high: float = 0.9,
         sigma_sq: float = 1.0,
         decay: float = 0.94,
+        config: AEGISConfig | None = None,
     ) -> None:
         """Initialize ThresholdARModel.
 
@@ -347,6 +375,7 @@ class ThresholdARModel(TemporalModel):
             phi_high: Initial AR coefficient above threshold
             sigma_sq: Initial variance estimate
             decay: EWMA decay for parameter estimation
+            config: Optional AEGIS configuration for robust estimation
         """
         self.tau: float = tau
         self.phi_low: float = phi_low
@@ -364,6 +393,8 @@ class ThresholdARModel(TemporalModel):
         self._last_y: float = 0.0
         self._initialized: bool = False
         self._n_obs: int = 0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
         self._sum_xy_low: float = 0.0
         self._sum_x_sq_low: float = 0.0
@@ -387,7 +418,13 @@ class ThresholdARModel(TemporalModel):
         phi = self.phi_low if below else self.phi_high
 
         error = y - phi * self._last_y
-        self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+        if self._use_robust:
+            from aegis.models.robust import robust_weight
+
+            weight = robust_weight(error, np.sqrt(self.sigma_sq), self._outlier_threshold)
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
+        else:
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
         self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         if below:
@@ -508,6 +545,7 @@ class LevelAwareMeanReversionModel(TemporalModel):
         phi: float = 0.9,
         sigma_sq: float = 1.0,
         decay: float = 0.94,
+        config: AEGISConfig | None = None,
     ) -> None:
         """Initialize LevelAwareMeanReversionModel.
 
@@ -516,6 +554,7 @@ class LevelAwareMeanReversionModel(TemporalModel):
             phi: Initial AR coefficient
             sigma_sq: Initial variance estimate
             decay: EWMA decay for parameter estimation
+            config: Optional AEGIS configuration for robust estimation
         """
         self.level: float = 0.0
         self.mu: float = mu
@@ -530,6 +569,8 @@ class LevelAwareMeanReversionModel(TemporalModel):
         self._n_obs: int = 0
         self._sum_xy: float = 0.0
         self._sum_x_sq: float = 0.0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
     def update(self, y: float, t: int) -> None:
         """Update model with new observation (a return/difference).
@@ -546,7 +587,13 @@ class LevelAwareMeanReversionModel(TemporalModel):
         expected_return = expected_next_level - self.level
 
         error = y - expected_return
-        self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+        if self._use_robust:
+            from aegis.models.robust import robust_weight
+
+            weight = robust_weight(error, np.sqrt(self.sigma_sq), self._outlier_threshold)
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
+        else:
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
         self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         self._sum_xy = self.decay * self._sum_xy + deviation * y

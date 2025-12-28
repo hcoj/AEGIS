@@ -59,6 +59,16 @@ class TestAEGISConfig:
         assert config.min_variance == 1e-10
         assert config.max_variance == 1e10
 
+    def test_config_default_use_robust_estimation(self) -> None:
+        """Test default use_robust_estimation is False for backward compatibility."""
+        config = AEGISConfig()
+        assert config.use_robust_estimation is False
+
+    def test_config_enable_robust_estimation(self) -> None:
+        """Test robust estimation can be enabled."""
+        config = AEGISConfig(use_robust_estimation=True)
+        assert config.use_robust_estimation is True
+
     def test_config_phase2(self) -> None:
         """Test Phase 2 configuration."""
         config = AEGISConfig(use_epistemic_value=True, epistemic_weight=2.0)

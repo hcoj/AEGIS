@@ -28,6 +28,7 @@ class AEGISConfig:
         post_break_duration: Steps to maintain elevated adaptation
         target_coverage: Target coverage for prediction intervals
         use_quantile_calibration: Enable quantile-based interval calibration
+        use_robust_estimation: Enable Huber-like outlier downweighting in variance updates
         outlier_threshold: Standard deviations for outlier detection
         min_variance: Minimum variance floor to prevent numerical issues
         max_variance: Maximum variance ceiling to prevent overflow
@@ -63,6 +64,7 @@ class AEGISConfig:
     target_coverage: float = 0.95
     use_quantile_calibration: bool = True
 
+    use_robust_estimation: bool = False
     outlier_threshold: float = 5.0
     min_variance: float = 1e-10
     max_variance: float = 1e10

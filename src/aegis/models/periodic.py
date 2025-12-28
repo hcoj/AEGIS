@@ -5,10 +5,17 @@ Periodic models capture cyclical patterns:
 - SeasonalDummyModel: Separate mean for each position in the cycle
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from aegis.core.prediction import Prediction
 from aegis.models.base import MAX_SIGMA_SQ, TemporalModel
+
+if TYPE_CHECKING:
+    from aegis.config import AEGISConfig
 
 
 class OscillatorBankModel(TemporalModel):
@@ -30,6 +37,7 @@ class OscillatorBankModel(TemporalModel):
         lr: float = 0.01,
         decay: float = 0.95,
         phase_lock_threshold: float = 0.8,
+        config: AEGISConfig | None = None,
     ) -> None:
         """Initialize OscillatorBankModel.
 
@@ -38,6 +46,7 @@ class OscillatorBankModel(TemporalModel):
             lr: Learning rate for coefficient updates
             decay: EWMA decay for variance estimation
             phase_lock_threshold: Stability threshold for phase locking (0-1)
+            config: Optional AEGIS configuration for robust estimation
         """
         self.periods: list[int] = periods or [4, 8, 16, 32, 64, 128, 256]
         self.n_freqs: int = len(self.periods)
@@ -57,6 +66,8 @@ class OscillatorBankModel(TemporalModel):
         self.prior_sigma_sq: float = 1.0
         self.t: int = 0
         self._n_obs: int = 0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
     def _compute_prediction(self, t: int) -> float:
         """Compute prediction at time t.
@@ -97,7 +108,13 @@ class OscillatorBankModel(TemporalModel):
         pred = self._compute_prediction(t)
         error = y - pred
 
-        self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+        if self._use_robust:
+            from aegis.models.robust import robust_weight
+
+            weight = robust_weight(error, np.sqrt(self.sigma_sq), self._outlier_threshold)
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
+        else:
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
         self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         for k, period in enumerate(self.periods):
@@ -299,6 +316,7 @@ class SeasonalDummyModel(TemporalModel):
         period: int,
         forget: float = 0.99,
         decay: float = 0.95,
+        config: AEGISConfig | None = None,
     ) -> None:
         """Initialize SeasonalDummyModel.
 
@@ -306,6 +324,7 @@ class SeasonalDummyModel(TemporalModel):
             period: Length of seasonal cycle
             forget: Forgetting factor for seasonal mean updates
             decay: EWMA decay for variance estimation
+            config: Optional AEGIS configuration for robust estimation
         """
         self.period: int = period
         self.forget: float = forget
@@ -318,6 +337,8 @@ class SeasonalDummyModel(TemporalModel):
         self.prior_sigma_sq: float = 1.0
         self.t: int = 0
         self._n_obs: int = 0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
     def update(self, y: float, t: int) -> None:
         """Update model with new observation.
@@ -330,7 +351,13 @@ class SeasonalDummyModel(TemporalModel):
         s = t % self.period
 
         error = y - self.means[s]
-        self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+        if self._use_robust:
+            from aegis.models.robust import robust_weight
+
+            weight = robust_weight(error, np.sqrt(self.sigma_sq), self._outlier_threshold)
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
+        else:
+            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
         self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         self.counts[s] = self.forget * self.counts[s] + 1

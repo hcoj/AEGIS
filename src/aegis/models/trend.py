@@ -6,10 +6,17 @@ Trend models capture directional drift:
 - DampedTrendModel: Trend that decays toward zero over horizon
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from aegis.core.prediction import Prediction
 from aegis.models.base import MAX_SIGMA_SQ, TemporalModel
+
+if TYPE_CHECKING:
+    from aegis.config import AEGISConfig
 
 
 class LinearTrendModel(TemporalModel):
@@ -25,12 +32,18 @@ class LinearTrendModel(TemporalModel):
         slope_var: Estimated slope uncertainty from regression SE
     """
 
-    def __init__(self, sigma_sq: float = 1.0, decay: float = 0.99) -> None:
+    def __init__(
+        self,
+        sigma_sq: float = 1.0,
+        decay: float = 0.99,
+        config: AEGISConfig | None = None,
+    ) -> None:
         """Initialize LinearTrendModel.
 
         Args:
             sigma_sq: Initial variance estimate
             decay: EWMA decay for variance estimation
+            config: Optional AEGIS configuration for robust estimation
         """
         self.intercept: float = 0.0
         self.slope: float = 0.0
@@ -43,6 +56,8 @@ class LinearTrendModel(TemporalModel):
         self._n_obs: int = 0
         self.slope_var: float = 0.01
         self.prior_slope_var: float = 0.01
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
         # Sufficient statistics for online regression
         self._sum_t: float = 0.0
@@ -86,7 +101,15 @@ class LinearTrendModel(TemporalModel):
                 # Update residual variance
                 pred = self.intercept + self.slope * t
                 error = y - pred
-                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+                if self._use_robust:
+                    from aegis.models.robust import robust_weight
+
+                    weight = robust_weight(error, np.sqrt(self.sigma_sq), self._outlier_threshold)
+                    self.sigma_sq = (
+                        self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
+                    )
+                else:
+                    self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
                 self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
                 # Compute standard error of slope from regression statistics
@@ -171,6 +194,7 @@ class LocalTrendModel(TemporalModel):
         beta: float = 0.1,
         sigma_sq: float = 1.0,
         decay: float = 0.94,
+        config: AEGISConfig | None = None,
     ) -> None:
         """Initialize LocalTrendModel.
 
@@ -179,6 +203,7 @@ class LocalTrendModel(TemporalModel):
             beta: Slope smoothing parameter
             sigma_sq: Initial variance estimate
             decay: EWMA decay for variance estimation
+            config: Optional AEGIS configuration for robust estimation
         """
         self.alpha: float = alpha
         self.beta: float = beta
@@ -194,6 +219,8 @@ class LocalTrendModel(TemporalModel):
         self.slope_var: float = 0.01
         self.prior_slope_var: float = 0.01
         self._prev_slope: float = 0.0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
     def update(self, y: float, t: int) -> None:
         """Update model with new observation.
@@ -208,7 +235,13 @@ class LocalTrendModel(TemporalModel):
             self._initialized = True
         else:
             error = y - (self.level + self.slope)
-            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+            if self._use_robust:
+                from aegis.models.robust import robust_weight
+
+                weight = robust_weight(error, np.sqrt(self.sigma_sq), self._outlier_threshold)
+                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
+            else:
+                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
             self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
             new_level = self.alpha * y + (1 - self.alpha) * (self.level + self.slope)
@@ -295,6 +328,7 @@ class DampedTrendModel(TemporalModel):
         phi: float = 0.9,
         sigma_sq: float = 1.0,
         decay: float = 0.94,
+        config: AEGISConfig | None = None,
     ) -> None:
         """Initialize DampedTrendModel.
 
@@ -304,6 +338,7 @@ class DampedTrendModel(TemporalModel):
             phi: Damping parameter in (0, 1)
             sigma_sq: Initial variance estimate
             decay: EWMA decay for variance estimation
+            config: Optional AEGIS configuration for robust estimation
         """
         self.alpha: float = alpha
         self.beta: float = beta
@@ -320,6 +355,8 @@ class DampedTrendModel(TemporalModel):
         self.slope_var: float = 0.01
         self.prior_slope_var: float = 0.01
         self._prev_slope: float = 0.0
+        self._use_robust: bool = config.use_robust_estimation if config else False
+        self._outlier_threshold: float = config.outlier_threshold if config else 5.0
 
     def update(self, y: float, t: int) -> None:
         """Update model with new observation.
@@ -334,7 +371,13 @@ class DampedTrendModel(TemporalModel):
             self._initialized = True
         else:
             error = y - (self.level + self.phi * self.slope)
-            self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+            if self._use_robust:
+                from aegis.models.robust import robust_weight
+
+                weight = robust_weight(error, np.sqrt(self.sigma_sq), self._outlier_threshold)
+                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
+            else:
+                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
             self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
             new_level = self.alpha * y + (1 - self.alpha) * (self.level + self.phi * self.slope)

@@ -317,6 +317,39 @@ def heavy_tailed_signal(rng: np.random.Generator) -> Callable[[int, float], np.n
 
 
 @pytest.fixture
+def contaminated_signal(
+    rng: np.random.Generator,
+) -> Callable[[int, float, float, float], np.ndarray]:
+    """Generate contaminated random walk with outliers.
+
+    Args:
+        n: Number of observations
+        sigma: Base innovation standard deviation (default 1.0)
+        contamination_prob: Probability of outlier (default 0.02)
+        contamination_scale: Outlier magnitude multiplier (default 10.0)
+
+    Returns:
+        Random walk with occasional large outliers
+    """
+
+    def generate(
+        n: int = 500,
+        sigma: float = 1.0,
+        contamination_prob: float = 0.02,
+        contamination_scale: float = 10.0,
+    ) -> np.ndarray:
+        y = np.zeros(n)
+        for t in range(1, n):
+            innovation = rng.normal(0, sigma)
+            if rng.random() < contamination_prob:
+                innovation *= contamination_scale
+            y[t] = y[t - 1] + innovation
+        return y
+
+    return generate
+
+
+@pytest.fixture
 def correlated_streams_signal(
     rng: np.random.Generator,
 ) -> Callable[[int, float], tuple[np.ndarray, np.ndarray]]:
