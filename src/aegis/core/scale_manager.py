@@ -240,9 +240,15 @@ class ScaleManager:
 
         for scale in self.scales:
             combiner = self.scale_combiners[scale]
+            models = self.scale_models[scale]
+            model_names = [m.name for m in models]
+            weights = combiner.get_weights()
+
             result["per_scale"][scale] = {
-                "weights": combiner.get_weights(),
+                "weights": weights,
                 "cumulative_scores": combiner.cumulative_scores.copy(),
+                "model_names": model_names,
+                "score_breakdown": combiner.get_score_breakdown(),
             }
 
         return result

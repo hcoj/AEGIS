@@ -180,3 +180,22 @@ class EFEModelCombiner:
             partial: Interpolation weight (1.0 = full reset to uniform)
         """
         self.cumulative_scores = (1 - partial) * self.cumulative_scores
+
+    def get_score_breakdown(self) -> dict:
+        """Get detailed score breakdown for debugging.
+
+        Returns:
+            Dictionary with cumulative scores, last log-likelihoods,
+            current weights, and observation count.
+        """
+        return {
+            "cumulative_scores": self.cumulative_scores.tolist(),
+            "last_log_likelihoods": self.last_pragmatic.tolist(),
+            "last_epistemic": self.last_epistemic.tolist()
+            if self.last_epistemic is not None
+            else None,
+            "current_weights": self.get_weights().tolist(),
+            "n_observations": self._n_obs,
+            "current_forget": self.current_forget,
+            "surprise_ema": self._surprise_ema,
+        }

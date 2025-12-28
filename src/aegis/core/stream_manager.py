@@ -171,11 +171,25 @@ class StreamManager:
         if total > 0:
             group_weights = {k: v / total for k, v in group_weights.items()}
 
+        per_scale_summary: dict = {}
+        for scale, data in scale_diag["per_scale"].items():
+            model_names = data.get("model_names", [])
+            weights = data["weights"]
+            score_breakdown = data.get("score_breakdown", {})
+            top_3_idx = np.argsort(weights)[::-1][:3]
+            top_3 = [(model_names[i], float(weights[i])) for i in top_3_idx if i < len(model_names)]
+            per_scale_summary[scale] = {
+                "top_models": top_3,
+                "n_observations": score_breakdown.get("n_observations", 0),
+                "surprise_ema": score_breakdown.get("surprise_ema", 0.0),
+            }
+
         return {
             "model_weights": model_weights,
             "group_weights": group_weights,
             "top_models": sorted(model_weights.items(), key=lambda x: -x[1])[:10],
             "scale_weights": scale_diag["scale_weights"],
+            "per_scale_summary": per_scale_summary,
             "volatility": self.volatility,
             "in_break_adaptation": self.in_break_adaptation,
             "quantile_multipliers": self.quantile_tracker.get_quantiles(horizon=1),

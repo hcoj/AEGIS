@@ -1,7 +1,6 @@
 """Robust estimation utilities for AEGIS models."""
 
 
-
 def robust_weight(error: float, sigma: float, threshold: float) -> float:
     """Compute Huber-like downweighting factor for outliers.
 
