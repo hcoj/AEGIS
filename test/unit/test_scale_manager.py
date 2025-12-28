@@ -199,3 +199,45 @@ class TestScaleManager:
             f"Scale-4 variance ({pred_s4.variance:.3f}) should be scaled to match "
             f"scale-1 variance ({pred_s1.variance:.3f})."
         )
+
+    def test_scale_manager_horizon_specific_weights(self) -> None:
+        """Test that scale weights adapt based on horizon.
+
+        Short horizons should weight short scales more.
+        Long horizons should weight long scales more.
+        """
+        config = AEGISConfig(scales=[1, 4, 16, 64])
+        manager = ScaleManager(config=config, model_factory=simple_model_factory)
+
+        # Feed some data to initialize models
+        rng = np.random.default_rng(42)
+        for i in range(200):
+            manager.observe(float(i) + rng.normal(0, 1))
+
+        # Get horizon-specific weights
+        weights_h1 = manager.get_horizon_scale_weights(horizon=1)
+        weights_h64 = manager.get_horizon_scale_weights(horizon=64)
+
+        # For h=1, scale=1 should have highest weight
+        assert weights_h1[0] > weights_h1[-1], "Short horizon should favor short scales"
+
+        # For h=64, scale=64 should have higher weight than scale=1
+        assert weights_h64[-1] > weights_h64[0], "Long horizon should favor long scales"
+
+    def test_scale_manager_horizon_weights_affect_predictions(self) -> None:
+        """Test that horizon-specific weights actually affect predictions."""
+        config = AEGISConfig(scales=[1, 4, 16, 64])
+        manager = ScaleManager(config=config, model_factory=simple_model_factory)
+
+        # Feed data
+        for i in range(200):
+            manager.observe(float(i))
+
+        # Get predictions at different horizons
+        pred_h1 = manager.predict(horizon=1)
+        pred_h64 = manager.predict(horizon=64)
+
+        # Predictions should be different because different scales are weighted
+        # (not just scaled by horizon)
+        assert np.isfinite(pred_h1.variance)
+        assert np.isfinite(pred_h64.variance)

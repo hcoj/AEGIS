@@ -185,6 +185,29 @@ class ScaleManager:
                 model.reset(partial=0.5)
             self.scale_combiners[scale].reset_scores(partial=0.5)
 
+    def get_horizon_scale_weights(self, horizon: int) -> np.ndarray:
+        """Get horizon-specific scale weights.
+
+        Weights scales based on proximity to the target horizon.
+        Short horizons favor short scales, long horizons favor long scales.
+
+        Args:
+            horizon: Target prediction horizon
+
+        Returns:
+            Array of weights, one per scale, summing to 1.0
+        """
+        log_horizon = np.log(max(horizon, 1))
+        log_scales = np.log(np.array(self.scales, dtype=float))
+
+        distances = np.abs(log_scales - log_horizon)
+
+        temperature = 1.0
+        proximity_weights = np.exp(-distances / temperature)
+
+        combined = proximity_weights * self.scale_weights
+        return combined / combined.sum()
+
     def get_diagnostics(self) -> dict:
         """Get diagnostic information.
 

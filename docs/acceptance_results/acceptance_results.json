@@ -1,0 +1,3840 @@
+[
+  {
+    "signal_name": "Constant Value",
+    "signal_category": "Deterministic",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.0,
+        "rmse": 0.0,
+        "coverage_95": 1.0,
+        "mean_interval_width": 0.00010776102774092864,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.0,
+        "rmse": 0.0,
+        "coverage_95": 1.0,
+        "mean_interval_width": 0.0001343621870336225,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.0,
+        "rmse": 0.0,
+        "coverage_95": 1.0,
+        "mean_interval_width": 0.00017036911993299758,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 0.0,
+        "rmse": 0.0,
+        "coverage_95": 1.0,
+        "mean_interval_width": 0.00021600540315124846,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 0.0,
+        "rmse": 0.0,
+        "coverage_95": 1.0,
+        "mean_interval_width": 0.00027593775020548803,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 0.0,
+        "rmse": 0.0,
+        "coverage_95": 1.0,
+        "mean_interval_width": 0.0003696921945827528,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 0.0,
+        "rmse": 0.0,
+        "coverage_95": 1.0,
+        "mean_interval_width": 0.0005365983550718926,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 0.0,
+        "rmse": 0.0,
+        "coverage_95": 1.0,
+        "mean_interval_width": 0.0008534625338028793,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 0.0,
+        "rmse": 0.0,
+        "coverage_95": 1.0,
+        "mean_interval_width": 0.0015028667584589702,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 0.0,
+        "rmse": 0.0,
+        "coverage_95": 1.0,
+        "mean_interval_width": 0.002989117592421075,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 0.0,
+        "rmse": 0.0,
+        "coverage_95": 1.0,
+        "mean_interval_width": 0.007219537022622427,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "persistence",
+    "dominant_group_weight": 0.6666666666666666,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": true,
+    "runtime_seconds": 11.319737911224365,
+    "notes": "LocalLevel should converge to constant"
+  },
+  {
+    "signal_name": "Linear Trend",
+    "signal_category": "Deterministic",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.10001140635068308,
+        "rmse": 0.10001156841783482,
+        "coverage_95": 0.04145818441744103,
+        "mean_interval_width": 0.07861690983791918,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.10003071922863867,
+        "rmse": 0.1000317849572424,
+        "coverage_95": 0.04576331784054344,
+        "mean_interval_width": 0.10727880896053586,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.10008558856200855,
+        "rmse": 0.10009357162863718,
+        "coverage_95": 0.05008944543828265,
+        "mean_interval_width": 0.1480324493460341,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 0.10024526555258695,
+        "rmse": 0.10031110785626063,
+        "coverage_95": 0.05446076675026872,
+        "mean_interval_width": 0.2054755227793854,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 0.10065872537017909,
+        "rmse": 0.10112869901909813,
+        "coverage_95": 0.05892921307941071,
+        "mean_interval_width": 0.2869843695886657,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 0.10153353076297288,
+        "rmse": 0.10403162949594298,
+        "coverage_95": 0.06324539212143115,
+        "mean_interval_width": 0.4055174605216345,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 0.1033331203455952,
+        "rmse": 0.1141605773207405,
+        "coverage_95": 0.06837294332723949,
+        "mean_interval_width": 0.5839956373947421,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 0.1068119586837127,
+        "rmse": 0.14496561682235898,
+        "coverage_95": 0.07412953949831524,
+        "mean_interval_width": 0.8656434222447106,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 0.11438786500635811,
+        "rmse": 0.23117374182107833,
+        "coverage_95": 0.08218639402280771,
+        "mean_interval_width": 1.3457433117973638,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 0.13223351150743043,
+        "rmse": 0.4443553351577572,
+        "coverage_95": 0.09575863576738085,
+        "mean_interval_width": 2.280510880839009,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 0.1843558824690347,
+        "rmse": 0.9838466047040331,
+        "coverage_95": 0.12901408450704224,
+        "mean_interval_width": 4.640601262353557,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "persistence",
+    "dominant_group_weight": 0.9999999997036627,
+    "expected_dominant": "trend",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.524813175201416,
+    "notes": "LocalTrend or DampedTrend should dominate"
+  },
+  {
+    "signal_name": "Sinusoidal",
+    "signal_category": "Deterministic",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.22805512453215157,
+        "rmse": 0.2565696922469597,
+        "coverage_95": 0.3052180128663331,
+        "mean_interval_width": 0.44406768137347524,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.33384227432398056,
+        "rmse": 0.3778490173205226,
+        "coverage_95": 0.2803003217733286,
+        "mean_interval_width": 0.5684921921690551,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.5499024014843509,
+        "rmse": 0.6232441770631431,
+        "coverage_95": 0.2708407871198569,
+        "mean_interval_width": 0.7498663390517176,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 0.9930394986041982,
+        "rmse": 1.1156709690744213,
+        "coverage_95": 0.25940523109996416,
+        "mean_interval_width": 1.0093361462121422,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.8554502014370902,
+        "rmse": 2.0620442945195685,
+        "coverage_95": 0.15594681997844054,
+        "mean_interval_width": 1.3775185503277163,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 2.991810129986372,
+        "rmse": 3.439233644796007,
+        "coverage_95": 0.09035056017347308,
+        "mean_interval_width": 1.8930501825721013,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 1.3548227654874618,
+        "rmse": 2.966175388082302,
+        "coverage_95": 0.2797074954296161,
+        "mean_interval_width": 2.579192916928138,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 2.529728564913216,
+        "rmse": 5.872901552547158,
+        "coverage_95": 0.4058405091725945,
+        "mean_interval_width": 3.4780649484700197,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 5.223408310270177,
+        "rmse": 11.916744066640565,
+        "coverage_95": 0.15493511600471885,
+        "mean_interval_width": 4.904946481302205,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 11.437491853299575,
+        "rmse": 24.657049345918637,
+        "coverage_95": 0.034105815478793176,
+        "mean_interval_width": 7.223357482733201,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 28.51568946160048,
+        "rmse": 54.61976717347074,
+        "coverage_95": 0.05070422535211268,
+        "mean_interval_width": 12.921198353829178,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "variance",
+    "dominant_group_weight": 0.8569592323186315,
+    "expected_dominant": "periodic",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 9.855715990066528,
+    "notes": "OscillatorBank should dominate with matching period"
+  },
+  {
+    "signal_name": "Square Wave",
+    "signal_category": "Deterministic",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.12481347401534337,
+        "rmse": 0.4988625048903378,
+        "coverage_95": 0.9378127233738385,
+        "mean_interval_width": 0.29360601721503804,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.18749759917597997,
+        "rmse": 0.6112122063543514,
+        "coverage_95": 0.9066857347157669,
+        "mean_interval_width": 0.40621584426941915,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.31299463744053235,
+        "rmse": 0.7896991067345354,
+        "coverage_95": 0.8443649373881932,
+        "mean_interval_width": 0.5666306809421283,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 0.564515255090475,
+        "rmse": 1.061187725378886,
+        "coverage_95": 0.7194553923324973,
+        "mean_interval_width": 0.7939118195464759,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.0697259147345966,
+        "rmse": 1.4634545356539859,
+        "coverage_95": 0.46927775781530723,
+        "mean_interval_width": 1.1151183402904137,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 1.9518040686618905,
+        "rmse": 1.9828054900617653,
+        "coverage_95": 0.040477050957715935,
+        "mean_interval_width": 1.5718874569231658,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 0.09114254573332149,
+        "rmse": 0.36887096305409944,
+        "coverage_95": 0.9689213893967094,
+        "mean_interval_width": 2.226089553883077,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 0.10505734962872332,
+        "rmse": 0.3757466902227954,
+        "coverage_95": 0.9711718457506552,
+        "mean_interval_width": 3.1025916185828764,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 0.13295941147761595,
+        "rmse": 0.40174886641934904,
+        "coverage_95": 0.976799056232796,
+        "mean_interval_width": 4.456847351953174,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 0.18444044208273064,
+        "rmse": 0.43767164322616353,
+        "coverage_95": 0.9934411893310013,
+        "mean_interval_width": 6.45549340852874,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 0.30676332621966046,
+        "rmse": 0.6120186135218412,
+        "coverage_95": 0.9983098591549295,
+        "mean_interval_width": 9.734783602660704,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "periodic",
+    "dominant_group_weight": 0.4118651798407589,
+    "expected_dominant": "periodic",
+    "dominant_matches_expected": true,
+    "runtime_seconds": 11.531883716583252,
+    "notes": "SeasonalDummy should capture sharp transitions"
+  },
+  {
+    "signal_name": "Polynomial Trend",
+    "signal_category": "Deterministic",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": NaN,
+        "rmse": NaN,
+        "coverage_95": 0.03788420300214439,
+        "mean_interval_width": NaN,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": NaN,
+        "rmse": NaN,
+        "coverage_95": 0.042188058634250986,
+        "mean_interval_width": NaN,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": NaN,
+        "rmse": NaN,
+        "coverage_95": 0.046511627906976744,
+        "mean_interval_width": NaN,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": NaN,
+        "rmse": NaN,
+        "coverage_95": 0.050161232533142246,
+        "mean_interval_width": NaN,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": NaN,
+        "rmse": NaN,
+        "coverage_95": 0.05282069708947179,
+        "mean_interval_width": NaN,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": NaN,
+        "rmse": NaN,
+        "coverage_95": 0.0516805204192266,
+        "mean_interval_width": NaN,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": NaN,
+        "rmse": NaN,
+        "coverage_95": 0.06508226691042047,
+        "mean_interval_width": NaN,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": NaN,
+        "rmse": NaN,
+        "coverage_95": 0.03519281168101834,
+        "mean_interval_width": NaN,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": NaN,
+        "rmse": NaN,
+        "coverage_95": 0.022807707432166733,
+        "mean_interval_width": NaN,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": NaN,
+        "rmse": NaN,
+        "coverage_95": 0.010056843025797988,
+        "mean_interval_width": NaN,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 101.58379284029459,
+        "rmse": 102.35161559437294,
+        "coverage_95": 0.003943661971830986,
+        "mean_interval_width": 3.6588108195615003,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "persistence",
+    "dominant_group_weight": NaN,
+    "expected_dominant": "trend",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.731276035308838,
+    "notes": "LocalTrend tracks slope but underestimates curvature"
+  },
+  {
+    "signal_name": "White Noise",
+    "signal_category": "Stochastic",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.12655945406587,
+        "rmse": 1.4199343692429907,
+        "coverage_95": 0.6225875625446747,
+        "mean_interval_width": 2.9278170902449743,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.1182359556863795,
+        "rmse": 1.4006890501118827,
+        "coverage_95": 0.6406864497676081,
+        "mean_interval_width": 3.088102835666161,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.181635225652634,
+        "rmse": 1.4777622057110225,
+        "coverage_95": 0.6590339892665474,
+        "mean_interval_width": 3.37892260169317,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 1.2138143522498765,
+        "rmse": 1.5274055564153415,
+        "coverage_95": 0.7069150841992118,
+        "mean_interval_width": 3.90838133495067,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.2023839402236418,
+        "rmse": 1.58531027259628,
+        "coverage_95": 0.8070427596119296,
+        "mean_interval_width": 4.823624181838644,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 1.271320349046462,
+        "rmse": 2.2217725332496117,
+        "coverage_95": 0.8966389591615468,
+        "mean_interval_width": 6.366405094079189,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 1.476257385693622,
+        "rmse": 5.44464844927484,
+        "coverage_95": 0.9583180987202925,
+        "mean_interval_width": 8.966746199190014,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 2.1552003243337166,
+        "rmse": 16.178412663411184,
+        "coverage_95": 0.9760389367278173,
+        "mean_interval_width": 13.452172862637129,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 4.18829585450338,
+        "rmse": 44.43775715413714,
+        "coverage_95": 0.9752261108926464,
+        "mean_interval_width": 21.5598919179014,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 9.980886597993914,
+        "rmse": 107.42185220770769,
+        "coverage_95": 0.9571491036292086,
+        "mean_interval_width": 34.81976561900698,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 26.823735910969553,
+        "rmse": 195.3883365066031,
+        "coverage_95": 0.8901408450704226,
+        "mean_interval_width": 64.84790258355154,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "periodic",
+    "dominant_group_weight": 0.3814650735471198,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.883261919021606,
+    "notes": "RandomWalk should dominate, predicting 0"
+  },
+  {
+    "signal_name": "Random Walk",
+    "signal_category": "Stochastic",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.1444335792464218,
+        "rmse": 1.4327691449271145,
+        "coverage_95": 0.9721229449606862,
+        "mean_interval_width": 8.639926060417116,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.4094840711016083,
+        "rmse": 1.7575344255735932,
+        "coverage_95": 0.9835538076510547,
+        "mean_interval_width": 12.10603991772359,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.803223266680811,
+        "rmse": 2.265633056394978,
+        "coverage_95": 0.98783542039356,
+        "mean_interval_width": 16.89127289154995,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 2.494235997912498,
+        "rmse": 3.136874257542867,
+        "coverage_95": 0.9892511644571838,
+        "mean_interval_width": 23.44623757189832,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 3.6035382230994117,
+        "rmse": 4.578904791417591,
+        "coverage_95": 0.9795185052102048,
+        "mean_interval_width": 32.40438495520535,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 5.935346956467174,
+        "rmse": 7.35060946688415,
+        "coverage_95": 0.9660281893747741,
+        "mean_interval_width": 44.776722477209745,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 9.954825055415334,
+        "rmse": 12.529096475039635,
+        "coverage_95": 0.9542961608775137,
+        "mean_interval_width": 62.09605412330256,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 16.38453386769285,
+        "rmse": 20.61029845440407,
+        "coverage_95": 0.956196181205541,
+        "mean_interval_width": 86.97810088439294,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 30.565551024725504,
+        "rmse": 40.30035903925693,
+        "coverage_95": 0.8926464805348014,
+        "mean_interval_width": 125.01841982276078,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 57.57090373974196,
+        "rmse": 77.44196983553618,
+        "coverage_95": 0.7918670747704416,
+        "mean_interval_width": 183.51759030920195,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 130.30811159747734,
+        "rmse": 181.69943440186347,
+        "coverage_95": 0.6597183098591549,
+        "mean_interval_width": 280.3522419540105,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.3737146913378944,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.68659496307373,
+    "notes": "RandomWalk is optimal for this signal"
+  },
+  {
+    "signal_name": "AR(1) phi=0.8",
+    "signal_category": "Stochastic",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.5680039463850336,
+        "rmse": 0.7138275391411253,
+        "coverage_95": 0.8466761972837741,
+        "mean_interval_width": 3.083789774602081,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.669918282829011,
+        "rmse": 0.8450592139366376,
+        "coverage_95": 0.8834465498748659,
+        "mean_interval_width": 4.021279187838957,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.8106637844780681,
+        "rmse": 1.0222498587080553,
+        "coverage_95": 0.8887298747763864,
+        "mean_interval_width": 5.139516153058387,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 0.9641507256102361,
+        "rmse": 1.2231179299523,
+        "coverage_95": 0.9140093156574705,
+        "mean_interval_width": 6.519921329799748,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.1398512412514825,
+        "rmse": 1.4549742145912696,
+        "coverage_95": 0.9184333453108157,
+        "mean_interval_width": 8.4057402713075,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 1.3556598631152983,
+        "rmse": 1.846554441261858,
+        "coverage_95": 0.953017708709794,
+        "mean_interval_width": 11.215412926424378,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 1.927263933739606,
+        "rmse": 3.05022076713803,
+        "coverage_95": 0.9659963436928702,
+        "mean_interval_width": 15.508660816293707,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 3.271758202227289,
+        "rmse": 6.7418009198997995,
+        "coverage_95": 0.9670535380007488,
+        "mean_interval_width": 22.04468482942138,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 6.499845671017318,
+        "rmse": 16.31841044931785,
+        "coverage_95": 0.9476995674400315,
+        "mean_interval_width": 32.28319987463217,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 13.512885358050955,
+        "rmse": 36.87383148023191,
+        "coverage_95": 0.8981198076082204,
+        "mean_interval_width": 48.20437633840355,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 32.871333304913314,
+        "rmse": 86.36699285508175,
+        "coverage_95": 0.7830985915492957,
+        "mean_interval_width": 78.84379650639737,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.6202945405942712,
+    "expected_dominant": "reversion",
+    "dominant_matches_expected": true,
+    "runtime_seconds": 11.71624207496643,
+    "notes": "MeanReversion should dominate"
+  },
+  {
+    "signal_name": "AR(1) phi=0.99",
+    "signal_category": "Stochastic",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.5796318376632564,
+        "rmse": 0.7243843569958628,
+        "coverage_95": 0.9835596854896355,
+        "mean_interval_width": 4.877703200286624,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.718757888364214,
+        "rmse": 0.8975409668639381,
+        "coverage_95": 0.9885591705398641,
+        "mean_interval_width": 6.801873036922359,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.9217940538835825,
+        "rmse": 1.1578967001194396,
+        "coverage_95": 0.9910554561717353,
+        "mean_interval_width": 9.425047475570492,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 1.2525966856530486,
+        "rmse": 1.552130783436949,
+        "coverage_95": 0.9892511644571838,
+        "mean_interval_width": 12.962995935420661,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.7259226162841126,
+        "rmse": 2.178422460596934,
+        "coverage_95": 0.9899389148401007,
+        "mean_interval_width": 17.73660344154181,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 2.654485556084469,
+        "rmse": 3.3178143732812395,
+        "coverage_95": 0.9808456812432237,
+        "mean_interval_width": 24.298186234287094,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 4.434840762207744,
+        "rmse": 5.4363415874276315,
+        "coverage_95": 0.9842778793418647,
+        "mean_interval_width": 33.57643830532887,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 8.521388002460423,
+        "rmse": 10.293333763750523,
+        "coverage_95": 0.9603144889554474,
+        "mean_interval_width": 47.16581135570446,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 15.962920284647653,
+        "rmse": 20.065141240046056,
+        "coverage_95": 0.9284309870232009,
+        "mean_interval_width": 67.74417974882222,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 29.841954029728726,
+        "rmse": 39.12262058697961,
+        "coverage_95": 0.8727590730214254,
+        "mean_interval_width": 96.18604918798314,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 57.5537021020062,
+        "rmse": 75.96646893837554,
+        "coverage_95": 0.6783098591549296,
+        "mean_interval_width": 133.62746142398152,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.3732506223568081,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.751459121704102,
+    "notes": "Near unit root - hard to distinguish from RW at short scales"
+  },
+  {
+    "signal_name": "MA(1)",
+    "signal_category": "Stochastic",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.331944741998232,
+        "rmse": 1.6796443026660468,
+        "coverage_95": 0.5732666190135811,
+        "mean_interval_width": 3.4844636239618065,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.2933598671270756,
+        "rmse": 1.6234811906279787,
+        "coverage_95": 0.6514122273864855,
+        "mean_interval_width": 4.1058782247610255,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.3264230395189114,
+        "rmse": 1.6585710774651274,
+        "coverage_95": 0.685509838998211,
+        "mean_interval_width": 4.594962226957058,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 1.348762759217478,
+        "rmse": 1.7070586204539098,
+        "coverage_95": 0.7384450017914725,
+        "mean_interval_width": 5.429575642858861,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.3777356651615391,
+        "rmse": 1.7538749626501964,
+        "coverage_95": 0.830398850161696,
+        "mean_interval_width": 6.784811958073577,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 1.4582278823315586,
+        "rmse": 2.0100640235129283,
+        "coverage_95": 0.8984459703650163,
+        "mean_interval_width": 8.91388129383403,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 1.6304337644768814,
+        "rmse": 3.1014193347130146,
+        "coverage_95": 0.9623400365630713,
+        "mean_interval_width": 12.189480343515523,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 2.1804067656754644,
+        "rmse": 7.044132862110207,
+        "coverage_95": 0.9797828528640958,
+        "mean_interval_width": 17.28249903905405,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 3.7171580559395134,
+        "rmse": 18.092188540373822,
+        "coverage_95": 0.9858434919386552,
+        "mean_interval_width": 25.444529994621416,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 8.650829018951903,
+        "rmse": 45.37885130581059,
+        "coverage_95": 0.9685177087888063,
+        "mean_interval_width": 39.7990167775058,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 29.94529700380135,
+        "rmse": 128.96504150691777,
+        "coverage_95": 0.9245070422535211,
+        "mean_interval_width": 70.99053902988209,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "dynamic",
+    "dominant_group_weight": 0.9931793181924143,
+    "expected_dominant": "dynamic",
+    "dominant_matches_expected": true,
+    "runtime_seconds": 11.73833703994751,
+    "notes": "MA1 model should capture structure"
+  },
+  {
+    "signal_name": "ARMA(1,1)",
+    "signal_category": "Stochastic",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.3493167856398962,
+        "rmse": 1.6775751390985454,
+        "coverage_95": 0.8495353824160115,
+        "mean_interval_width": 6.947850130892533,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.6331697644923928,
+        "rmse": 2.0287663771603057,
+        "coverage_95": 0.8802288165892027,
+        "mean_interval_width": 9.273227415639612,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.9373533592829604,
+        "rmse": 2.4374705588973167,
+        "coverage_95": 0.8872987477638641,
+        "mean_interval_width": 12.020458661375473,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 2.282436389625568,
+        "rmse": 2.8707977844394486,
+        "coverage_95": 0.909709781440344,
+        "mean_interval_width": 15.436893171047702,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 2.4374841925635753,
+        "rmse": 3.165022479785423,
+        "coverage_95": 0.9493352497305066,
+        "mean_interval_width": 20.02006823489644,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 3.003068831232146,
+        "rmse": 4.26140715127871,
+        "coverage_95": 0.9609685580050596,
+        "mean_interval_width": 26.674924200114752,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 4.262763279866297,
+        "rmse": 7.55018422755245,
+        "coverage_95": 0.9813528336380256,
+        "mean_interval_width": 36.66020364607349,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 7.197612278054335,
+        "rmse": 17.962389006806998,
+        "coverage_95": 0.9805316360913515,
+        "mean_interval_width": 51.628756091244945,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 14.26151445664894,
+        "rmse": 44.917949061071205,
+        "coverage_95": 0.9634290208415257,
+        "mean_interval_width": 75.19996564241983,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 31.52176130471992,
+        "rmse": 105.70337648097004,
+        "coverage_95": 0.9142982072584172,
+        "mean_interval_width": 114.08335515672312,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 64.02567379031221,
+        "rmse": 118.49883140766535,
+        "coverage_95": 0.7949295774647888,
+        "mean_interval_width": 166.71998796601042,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "dynamic",
+    "dominant_group_weight": 0.41738711339873874,
+    "expected_dominant": "dynamic",
+    "dominant_matches_expected": true,
+    "runtime_seconds": 11.898123979568481,
+    "notes": "Combination of AR and MA models"
+  },
+  {
+    "signal_name": "Ornstein-Uhlenbeck",
+    "signal_category": "Stochastic",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.5935290715934455,
+        "rmse": 0.7410892674827682,
+        "coverage_95": 0.9135096497498213,
+        "mean_interval_width": 3.7423845079680476,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.7252748220098637,
+        "rmse": 0.9068645651695094,
+        "coverage_95": 0.9356453342867358,
+        "mean_interval_width": 5.074215994376097,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.9432832759332503,
+        "rmse": 1.171232742641199,
+        "coverage_95": 0.9395348837209302,
+        "mean_interval_width": 6.774664319953853,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 1.228181616391229,
+        "rmse": 1.5311437035898743,
+        "coverage_95": 0.9326406305983519,
+        "mean_interval_width": 8.929471795684778,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.530113609424449,
+        "rmse": 1.939504934109621,
+        "coverage_95": 0.9450233560905498,
+        "mean_interval_width": 11.75451557868613,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 1.944201441769211,
+        "rmse": 2.5086071176140834,
+        "coverage_95": 0.9573545355981207,
+        "mean_interval_width": 15.716096222870812,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 2.761527367778328,
+        "rmse": 3.8053276552010025,
+        "coverage_95": 0.9663619744058501,
+        "mean_interval_width": 21.503953524225945,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 4.4378460111574105,
+        "rmse": 6.956818967802636,
+        "coverage_95": 0.9678023212280045,
+        "mean_interval_width": 30.16528345554535,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 8.722089609199774,
+        "rmse": 15.39708894983392,
+        "coverage_95": 0.9414077860794338,
+        "mean_interval_width": 43.633377157437685,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 18.39236686876641,
+        "rmse": 34.42195291702182,
+        "coverage_95": 0.8819414079580236,
+        "mean_interval_width": 64.08304904700681,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 40.36870536907612,
+        "rmse": 78.39664080654538,
+        "coverage_95": 0.7363380281690141,
+        "mean_interval_width": 93.93943649051074,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.39466173184069736,
+    "expected_dominant": "reversion",
+    "dominant_matches_expected": true,
+    "runtime_seconds": 11.80970811843872,
+    "notes": "Discretized OU is AR(1) toward mean"
+  },
+  {
+    "signal_name": "Trend + Noise",
+    "signal_category": "Composite",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.0896975418355899,
+        "rmse": 1.3658379362674613,
+        "coverage_95": 0.8609721229449607,
+        "mean_interval_width": 5.2755201341512725,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.0726187398320925,
+        "rmse": 1.3366961231177186,
+        "coverage_95": 0.896675008938148,
+        "mean_interval_width": 5.795145965951853,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.153470856183115,
+        "rmse": 1.442168060934796,
+        "coverage_95": 0.9044722719141324,
+        "mean_interval_width": 6.6789219901741825,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 1.1321913476369043,
+        "rmse": 1.4212093243161965,
+        "coverage_95": 0.9355069867431028,
+        "mean_interval_width": 8.178416964982405,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.1212137610833155,
+        "rmse": 1.4080030908061403,
+        "coverage_95": 0.9647862019403521,
+        "mean_interval_width": 10.60211698543246,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 1.1838691577944935,
+        "rmse": 1.500641808290426,
+        "coverage_95": 0.9826526924466932,
+        "mean_interval_width": 14.42264907431169,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 1.3144162873105139,
+        "rmse": 1.6907554925032053,
+        "coverage_95": 0.9923217550274223,
+        "mean_interval_width": 20.418994450258648,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 1.701068825411813,
+        "rmse": 2.412604226533206,
+        "coverage_95": 0.9985024335454886,
+        "mean_interval_width": 30.07936781054435,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 2.81052193494807,
+        "rmse": 4.674497491703763,
+        "coverage_95": 1.0,
+        "mean_interval_width": 46.26562514688598,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 6.067410059738801,
+        "rmse": 12.455452838281618,
+        "coverage_95": 0.9982509838216004,
+        "mean_interval_width": 75.24204761068164,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 17.890160906757224,
+        "rmse": 45.43447864733909,
+        "coverage_95": 0.9881690140845071,
+        "mean_interval_width": 136.15601344322454,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "dynamic",
+    "dominant_group_weight": 0.3547201126140053,
+    "expected_dominant": "trend",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.679468870162964,
+    "notes": "LocalTrend should dominate"
+  },
+  {
+    "signal_name": "Sine + Noise",
+    "signal_category": "Composite",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.6030740889479759,
+        "rmse": 0.7577083777409395,
+        "coverage_95": 0.9971408148677627,
+        "mean_interval_width": 5.9752865645418956,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.6488497298806454,
+        "rmse": 0.8065843305861257,
+        "coverage_95": 0.9989274222381123,
+        "mean_interval_width": 7.007555242341014,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.7451801666577178,
+        "rmse": 0.932148806799272,
+        "coverage_95": 1.0,
+        "mean_interval_width": 8.565041171601509,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 1.01623780693912,
+        "rmse": 1.262395151910888,
+        "coverage_95": 1.0,
+        "mean_interval_width": 10.855406125103027,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.630846733578543,
+        "rmse": 2.0605869241703765,
+        "coverage_95": 1.0,
+        "mean_interval_width": 14.180386087624601,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 3.105550456644527,
+        "rmse": 3.6640490945542763,
+        "coverage_95": 0.9913263462233466,
+        "mean_interval_width": 19.041121397818806,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 3.97673856961325,
+        "rmse": 4.679415989070895,
+        "coverage_95": 0.9458866544789762,
+        "mean_interval_width": 26.264296038062948,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 7.972347670659189,
+        "rmse": 9.578439233016411,
+        "coverage_95": 0.8442530887308124,
+        "mean_interval_width": 37.207180686070906,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 16.202572034112524,
+        "rmse": 20.41735335621433,
+        "coverage_95": 0.7412504915454188,
+        "mean_interval_width": 54.242599759746156,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 33.325062563587124,
+        "rmse": 44.63607215767688,
+        "coverage_95": 0.6475732400524705,
+        "mean_interval_width": 83.12188855234724,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 73.70000900596642,
+        "rmse": 108.47942055874685,
+        "coverage_95": 0.532394366197183,
+        "mean_interval_width": 137.72833892995888,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "periodic",
+    "dominant_group_weight": 0.6449406326133463,
+    "expected_dominant": "periodic",
+    "dominant_matches_expected": true,
+    "runtime_seconds": 9.783407926559448,
+    "notes": "OscillatorBank captures periodic component"
+  },
+  {
+    "signal_name": "Trend + Seasonality + Noise",
+    "signal_category": "Composite",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.6023753235851284,
+        "rmse": 0.7552709490786946,
+        "coverage_95": 0.9910650464617584,
+        "mean_interval_width": 5.5818650783313,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.6563504907443537,
+        "rmse": 0.8205749274624266,
+        "coverage_95": 0.9978548444762245,
+        "mean_interval_width": 7.214208797462014,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.8126044531727897,
+        "rmse": 1.0041066493694797,
+        "coverage_95": 0.9992844364937388,
+        "mean_interval_width": 9.562001151904285,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 1.2181170544579012,
+        "rmse": 1.4596503894506623,
+        "coverage_95": 0.9989251164457184,
+        "mean_interval_width": 12.823189715636751,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 2.157199816307749,
+        "rmse": 2.548058383072952,
+        "coverage_95": 0.9985627021200144,
+        "mean_interval_width": 17.3255784863353,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 3.6117443840131873,
+        "rmse": 4.197575602683927,
+        "coverage_95": 0.9808456812432237,
+        "mean_interval_width": 23.636629598870837,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 3.3234892937124427,
+        "rmse": 4.085720028190392,
+        "coverage_95": 0.9579524680073126,
+        "mean_interval_width": 32.78092067150584,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 6.696251716756871,
+        "rmse": 8.6151371014751,
+        "coverage_95": 0.9168850617746163,
+        "mean_interval_width": 46.59248669176859,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 14.017447694351972,
+        "rmse": 19.382222873925265,
+        "coverage_95": 0.8765237907982698,
+        "mean_interval_width": 68.2437212876602,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 31.315472256184048,
+        "rmse": 45.364844670508184,
+        "coverage_95": 0.7883690424136424,
+        "mean_interval_width": 103.82499547032175,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 78.46638213980944,
+        "rmse": 119.77540711896383,
+        "coverage_95": 0.6923943661971831,
+        "mean_interval_width": 186.36935618659248,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "periodic",
+    "dominant_group_weight": 0.45033967024195876,
+    "expected_dominant": "trend",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.291737079620361,
+    "notes": "Mix of LocalTrend and SeasonalDummy"
+  },
+  {
+    "signal_name": "Mean-Reversion + Oscillation",
+    "signal_category": "Composite",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.3662471511334274,
+        "rmse": 0.45912702160466634,
+        "coverage_95": 0.9753395282344531,
+        "mean_interval_width": 3.5255736263882573,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.43724480577709113,
+        "rmse": 0.5518465363765314,
+        "coverage_95": 0.9871290668573471,
+        "mean_interval_width": 4.931357557883817,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.5669366230336933,
+        "rmse": 0.70744653482443,
+        "coverage_95": 0.9917710196779964,
+        "mean_interval_width": 6.872005245395761,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 0.8095102271867067,
+        "rmse": 1.0030388674843076,
+        "coverage_95": 0.9896094589752776,
+        "mean_interval_width": 9.534780865581954,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.4071265077881958,
+        "rmse": 1.660479374099419,
+        "coverage_95": 0.986704994610133,
+        "mean_interval_width": 13.189761442101434,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 2.4157063877728944,
+        "rmse": 2.7876656588729496,
+        "coverage_95": 0.979761474521142,
+        "mean_interval_width": 18.264087362950832,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 2.406829980057974,
+        "rmse": 2.8932997091745043,
+        "coverage_95": 0.9930530164533821,
+        "mean_interval_width": 25.477843513963794,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 4.645566686882365,
+        "rmse": 5.557620143939687,
+        "coverage_95": 0.9835267690003744,
+        "mean_interval_width": 36.027612666653816,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 9.400477639942945,
+        "rmse": 11.246969891501434,
+        "coverage_95": 0.9528116397955171,
+        "mean_interval_width": 51.7419324312672,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 20.035212847213746,
+        "rmse": 24.419619681810683,
+        "coverage_95": 0.9094884127678181,
+        "mean_interval_width": 75.27128245582222,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 52.71628476726799,
+        "rmse": 65.55556038835394,
+        "coverage_95": 0.6540845070422535,
+        "mean_interval_width": 113.61018176992535,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.4799074701512337,
+    "expected_dominant": "periodic",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 9.833448886871338,
+    "notes": "Split weight between reversion and periodic"
+  },
+  {
+    "signal_name": "Random Walk with Drift",
+    "signal_category": "Non-Stationary",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.145690995482738,
+        "rmse": 1.4302986168478942,
+        "coverage_95": 0.9781987133666905,
+        "mean_interval_width": 8.874008106499257,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.4078572641471552,
+        "rmse": 1.752886299322991,
+        "coverage_95": 0.9874865927779765,
+        "mean_interval_width": 12.414521596064503,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.854064042269396,
+        "rmse": 2.29346377798471,
+        "coverage_95": 0.9932021466905188,
+        "mean_interval_width": 17.285434145077424,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 2.6164485335298022,
+        "rmse": 3.2204860913295574,
+        "coverage_95": 0.994267287710498,
+        "mean_interval_width": 23.93350448837928,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 3.797307575552963,
+        "rmse": 4.781367557755516,
+        "coverage_95": 0.9946101329500538,
+        "mean_interval_width": 33.00746403521547,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 5.988515837852351,
+        "rmse": 7.516411541339064,
+        "coverage_95": 0.9902421395012649,
+        "mean_interval_width": 45.548409599230126,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 9.886561705358012,
+        "rmse": 12.300379568530834,
+        "coverage_95": 0.9703839122486289,
+        "mean_interval_width": 63.253982914061076,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 17.178465768274922,
+        "rmse": 21.165967795104045,
+        "coverage_95": 0.9550730063646574,
+        "mean_interval_width": 88.56746792139363,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 29.418464401970898,
+        "rmse": 36.50317743815743,
+        "coverage_95": 0.9205662603224538,
+        "mean_interval_width": 125.74108706340286,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 56.428500350585374,
+        "rmse": 72.21245772210042,
+        "coverage_95": 0.8439003060778312,
+        "mean_interval_width": 181.17412962336851,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 121.57099616344809,
+        "rmse": 158.2004636022769,
+        "coverage_95": 0.6501408450704226,
+        "mean_interval_width": 269.6033374505094,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.30241589207164055,
+    "expected_dominant": "trend",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.55480670928955,
+    "notes": "LocalTrend captures drift"
+  },
+  {
+    "signal_name": "Variance Switching",
+    "signal_category": "Non-Stationary",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 2.382143733641805,
+        "rmse": 3.493063347919049,
+        "coverage_95": 0.8774124374553253,
+        "mean_interval_width": 14.695567326228714,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 2.3376356833663534,
+        "rmse": 3.416695948927601,
+        "coverage_95": 0.8905970682874509,
+        "mean_interval_width": 16.198512333244615,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 2.6239641301341914,
+        "rmse": 3.8703682180252215,
+        "coverage_95": 0.8858676207513417,
+        "mean_interval_width": 18.576872590682758,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 2.763423796104871,
+        "rmse": 4.150494390506537,
+        "coverage_95": 0.9107846649946256,
+        "mean_interval_width": 22.438836030638523,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 3.1940829785278417,
+        "rmse": 5.161210675323692,
+        "coverage_95": 0.9277757815307223,
+        "mean_interval_width": 28.634487374259642,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 4.138270050696647,
+        "rmse": 7.7337477276192805,
+        "coverage_95": 0.9356704011564871,
+        "mean_interval_width": 38.58023813077316,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 6.317839715416257,
+        "rmse": 14.248804540671424,
+        "coverage_95": 0.9338208409506399,
+        "mean_interval_width": 54.829847877645484,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 11.28840570694127,
+        "rmse": 29.29663900590147,
+        "coverage_95": 0.9277424185698241,
+        "mean_interval_width": 82.03242739533506,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 23.189374848913157,
+        "rmse": 61.017558935113236,
+        "coverage_95": 0.9311836413684624,
+        "mean_interval_width": 130.5278802372295,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 58.58000296750112,
+        "rmse": 158.81993607719508,
+        "coverage_95": 0.8832531700918234,
+        "mean_interval_width": 221.89956710893418,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 220.87908586336445,
+        "rmse": 584.4723174933198,
+        "coverage_95": 0.7673239436619719,
+        "mean_interval_width": 452.23021382143327,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "periodic",
+    "dominant_group_weight": 0.44344591444785714,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.688755989074707,
+    "notes": "VolatilityTracker should adapt"
+  },
+  {
+    "signal_name": "Mean Switching",
+    "signal_category": "Non-Stationary",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.1702903096547128,
+        "rmse": 1.5538419567721096,
+        "coverage_95": 0.9031451036454611,
+        "mean_interval_width": 8.064357530454464,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.2272638045448636,
+        "rmse": 1.6600430223274876,
+        "coverage_95": 0.9113335716839471,
+        "mean_interval_width": 9.826331441504479,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.3484702242750075,
+        "rmse": 1.8684447121813732,
+        "coverage_95": 0.916994633273703,
+        "mean_interval_width": 12.265175911867058,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 1.5490424576869197,
+        "rmse": 2.1603460499677114,
+        "coverage_95": 0.9168756718022214,
+        "mean_interval_width": 15.760571185050468,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.9296802168632223,
+        "rmse": 2.684590068490135,
+        "coverage_95": 0.9177146963708228,
+        "mean_interval_width": 20.946885917551924,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 2.7871984617684364,
+        "rmse": 3.8348021957736314,
+        "coverage_95": 0.9255511384170582,
+        "mean_interval_width": 28.876174133910094,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 4.332029735893671,
+        "rmse": 6.49889906513172,
+        "coverage_95": 0.9414990859232175,
+        "mean_interval_width": 41.2123318730687,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 7.247157640834872,
+        "rmse": 13.722942895943985,
+        "coverage_95": 0.9580681392736803,
+        "mean_interval_width": 61.0809741801045,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 16.022750032460987,
+        "rmse": 34.46104148195462,
+        "coverage_95": 0.9622493118364137,
+        "mean_interval_width": 94.38520755961777,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 45.59589460101678,
+        "rmse": 98.05520175267799,
+        "coverage_95": 0.9173589855706166,
+        "mean_interval_width": 151.72561422616187,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 163.7703456125655,
+        "rmse": 333.276391421257,
+        "coverage_95": 0.7177464788732394,
+        "mean_interval_width": 273.93319155820717,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "trend",
+    "dominant_group_weight": 0.32968483777275864,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.669796228408813,
+    "notes": "Break detection should trigger on large shifts"
+  },
+  {
+    "signal_name": "Threshold AR",
+    "signal_category": "Non-Stationary",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.5846649589601448,
+        "rmse": 0.7385411151101224,
+        "coverage_95": 0.8709792709077913,
+        "mean_interval_width": 3.4170211869223945,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.6764235380317357,
+        "rmse": 0.8506738979656695,
+        "coverage_95": 0.9023954236682159,
+        "mean_interval_width": 4.32473994051882,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.8089046095548672,
+        "rmse": 1.0075562090573764,
+        "coverage_95": 0.9137745974955277,
+        "mean_interval_width": 5.354021750109309,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 0.9545864824800318,
+        "rmse": 1.206440927043612,
+        "coverage_95": 0.9175922608384092,
+        "mean_interval_width": 6.602687195845524,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.0642744002265554,
+        "rmse": 1.3708010908416983,
+        "coverage_95": 0.9446640316205533,
+        "mean_interval_width": 8.340257351881167,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 1.2695757364173699,
+        "rmse": 1.7419943195565881,
+        "coverage_95": 0.956270328876039,
+        "mean_interval_width": 11.000656575491002,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 1.8461795438104602,
+        "rmse": 3.2396070543387703,
+        "coverage_95": 0.9674588665447897,
+        "mean_interval_width": 15.149885161356478,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 3.127020746681172,
+        "rmse": 7.513801475199894,
+        "coverage_95": 0.976787719955073,
+        "mean_interval_width": 21.579887117174202,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 6.685778403875447,
+        "rmse": 19.258847841451974,
+        "coverage_95": 0.9480928037750688,
+        "mean_interval_width": 32.200145596751256,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 15.7699253135512,
+        "rmse": 46.26698415406501,
+        "coverage_95": 0.8841276781810232,
+        "mean_interval_width": 49.70842019165363,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 41.14747641498811,
+        "rmse": 111.32979875921984,
+        "coverage_95": 0.7470422535211267,
+        "mean_interval_width": 83.64353617250687,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.5892813196670456,
+    "expected_dominant": "reversion",
+    "dominant_matches_expected": true,
+    "runtime_seconds": 11.66704511642456,
+    "notes": "ThresholdAR should learn regimes"
+  },
+  {
+    "signal_name": "Structural Break",
+    "signal_category": "Non-Stationary",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.1120037554139972,
+        "rmse": 1.3962653998402805,
+        "coverage_95": 0.7498213009292352,
+        "mean_interval_width": 4.524226072110431,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.1060380612032472,
+        "rmse": 1.3998694321905003,
+        "coverage_95": 0.7747586700035752,
+        "mean_interval_width": 4.818880887362809,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.1656467142778237,
+        "rmse": 1.4723217218715703,
+        "coverage_95": 0.7867620751341682,
+        "mean_interval_width": 5.324838126942629,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 1.1698358645926514,
+        "rmse": 1.4919254369853487,
+        "coverage_95": 0.838767466857757,
+        "mean_interval_width": 6.213801403435008,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.2170110198485873,
+        "rmse": 1.5663285047956896,
+        "coverage_95": 0.9026230686309737,
+        "mean_interval_width": 7.7272160440817785,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 1.360924195060717,
+        "rmse": 1.9236984087510343,
+        "coverage_95": 0.9425370437296712,
+        "mean_interval_width": 10.291052066222374,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 1.6882454722001103,
+        "rmse": 3.0495878050076057,
+        "coverage_95": 0.9692870201096893,
+        "mean_interval_width": 14.644367282909299,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 2.679599575651982,
+        "rmse": 6.75595916581917,
+        "coverage_95": 0.979408461250468,
+        "mean_interval_width": 22.294340515397124,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 5.335063798197178,
+        "rmse": 16.29279511706933,
+        "coverage_95": 0.9756193472276838,
+        "mean_interval_width": 36.52573842111249,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 14.409991983218324,
+        "rmse": 40.71185481595651,
+        "coverage_95": 0.9575863576738085,
+        "mean_interval_width": 65.98423605158072,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 51.819316909814674,
+        "rmse": 118.49204656401429,
+        "coverage_95": 0.8743661971830986,
+        "mean_interval_width": 138.7200073134804,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "periodic",
+    "dominant_group_weight": 0.4179827077111971,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.559467077255249,
+    "notes": "CUSUM should detect break"
+  },
+  {
+    "signal_name": "Gradual Drift",
+    "signal_category": "Non-Stationary",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.0773382927912145,
+        "rmse": 1.363088438626589,
+        "coverage_95": 0.6515368120085776,
+        "mean_interval_width": 3.3158475531271434,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.097322194131408,
+        "rmse": 1.372141735052922,
+        "coverage_95": 0.6721487307829818,
+        "mean_interval_width": 3.4970599388591603,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.1400835959609215,
+        "rmse": 1.4379003956402245,
+        "coverage_95": 0.6976744186046512,
+        "mean_interval_width": 3.8284421575890177,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 1.1484446855277681,
+        "rmse": 1.4493451862572917,
+        "coverage_95": 0.7506270154066643,
+        "mean_interval_width": 4.427122312027705,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.1529073961659666,
+        "rmse": 1.4586049291739611,
+        "coverage_95": 0.8375853395616242,
+        "mean_interval_width": 5.4653292769363695,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 1.2235999418446017,
+        "rmse": 1.5729827436885058,
+        "coverage_95": 0.9056740151788941,
+        "mean_interval_width": 7.2448580127794004,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 1.3497001615899484,
+        "rmse": 1.922397016143185,
+        "coverage_95": 0.956855575868373,
+        "mean_interval_width": 10.311879567716058,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 1.7416344462510083,
+        "rmse": 3.309384955385203,
+        "coverage_95": 0.979408461250468,
+        "mean_interval_width": 15.729092597316418,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 3.017314245946585,
+        "rmse": 7.635460594946189,
+        "coverage_95": 0.9775855289028706,
+        "mean_interval_width": 25.88679065872286,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 7.468639244011197,
+        "rmse": 19.874277863146915,
+        "coverage_95": 0.9777000437254044,
+        "mean_interval_width": 47.03424781390628,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 25.15523160302359,
+        "rmse": 62.97788130644802,
+        "coverage_95": 0.9436619718309859,
+        "mean_interval_width": 97.31775208531242,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "periodic",
+    "dominant_group_weight": 0.5018482503647398,
+    "expected_dominant": "trend",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.655882120132446,
+    "notes": "Exponential forgetting tracks drift"
+  },
+  {
+    "signal_name": "Student-t (df=4)",
+    "signal_category": "Heavy-Tailed",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.5747950480535018,
+        "rmse": 2.0905986649391557,
+        "coverage_95": 0.9017155110793423,
+        "mean_interval_width": 11.485231486735872,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.8323578253844313,
+        "rmse": 2.4187240821029072,
+        "coverage_95": 0.9256346085091169,
+        "mean_interval_width": 15.041079342660057,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 2.097502629833088,
+        "rmse": 2.781634804173853,
+        "coverage_95": 0.9388193202146691,
+        "mean_interval_width": 19.52924271224705,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 2.330933919397848,
+        "rmse": 3.0837198087652684,
+        "coverage_95": 0.9537800071658904,
+        "mean_interval_width": 25.640958537051628,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 2.717601282894147,
+        "rmse": 3.6822024402913582,
+        "coverage_95": 0.9669421487603306,
+        "mean_interval_width": 34.46365482570991,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 3.3271001160678013,
+        "rmse": 4.8782425233530535,
+        "coverage_95": 0.9772316588362848,
+        "mean_interval_width": 47.469854543905036,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 4.8160440359642855,
+        "rmse": 8.108301903068728,
+        "coverage_95": 0.9824497257769652,
+        "mean_interval_width": 66.6562042557474,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 9.068443243247067,
+        "rmse": 17.57716602315173,
+        "coverage_95": 0.9812804193186072,
+        "mean_interval_width": 95.4509746572972,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 23.173048727937367,
+        "rmse": 47.01860169867667,
+        "coverage_95": 0.9610696028313016,
+        "mean_interval_width": 140.13851667540945,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 75.08989928902648,
+        "rmse": 148.05872572814178,
+        "coverage_95": 0.8731963270660253,
+        "mean_interval_width": 211.5703587206192,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 275.38834930215427,
+        "rmse": 565.2327072139822,
+        "coverage_95": 0.5887323943661972,
+        "mean_interval_width": 303.73047948994423,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "dynamic",
+    "dominant_group_weight": 0.3733179441276299,
+    "expected_dominant": "reversion",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.741732120513916,
+    "notes": "QuantileTracker should calibrate intervals"
+  },
+  {
+    "signal_name": "Student-t (df=3)",
+    "signal_category": "Heavy-Tailed",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.7703992830752262,
+        "rmse": 2.5386330178308394,
+        "coverage_95": 0.9435310936383131,
+        "mean_interval_width": 16.652913187954656,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 2.1018906056901443,
+        "rmse": 2.9377205030004445,
+        "coverage_95": 0.9585269932070075,
+        "mean_interval_width": 21.85030135793766,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 2.5124059027710417,
+        "rmse": 3.458540093519832,
+        "coverage_95": 0.9660107334525939,
+        "mean_interval_width": 28.478337775728253,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 2.834473943654683,
+        "rmse": 4.069349257965856,
+        "coverage_95": 0.9742027946972411,
+        "mean_interval_width": 37.52483044775304,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 3.246765587541704,
+        "rmse": 4.846691874836803,
+        "coverage_95": 0.9770032339202299,
+        "mean_interval_width": 50.58045260019508,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 4.388275568492165,
+        "rmse": 7.089001216891297,
+        "coverage_95": 0.9844597036501627,
+        "mean_interval_width": 69.99353187486493,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 7.011046425409964,
+        "rmse": 12.943462500608927,
+        "coverage_95": 0.9879341864716636,
+        "mean_interval_width": 99.22668673370718,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 15.387404079495203,
+        "rmse": 32.56630059741186,
+        "coverage_95": 0.982029202545863,
+        "mean_interval_width": 143.77104897042705,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 45.191608737799996,
+        "rmse": 99.4292861960341,
+        "coverage_95": 0.9406213134093591,
+        "mean_interval_width": 214.0172963374183,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 168.4545351698859,
+        "rmse": 345.73902061278886,
+        "coverage_95": 0.784871010056843,
+        "mean_interval_width": 341.44454105412893,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 489.6369193922032,
+        "rmse": 912.1864132205812,
+        "coverage_95": 0.48507042253521127,
+        "mean_interval_width": 464.3060363204904,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.5267638741482663,
+    "expected_dominant": "reversion",
+    "dominant_matches_expected": true,
+    "runtime_seconds": 11.638832807540894,
+    "notes": "Heavier tails, harder calibration"
+  },
+  {
+    "signal_name": "Occasional Jumps",
+    "signal_category": "Heavy-Tailed",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.6859456100713558,
+        "rmse": 1.0291488838290688,
+        "coverage_95": 0.9810578984989278,
+        "mean_interval_width": 7.6964558938855205,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.8813284744330278,
+        "rmse": 1.2834059238088587,
+        "coverage_95": 0.9814086521272792,
+        "mean_interval_width": 10.75336200232066,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.1889405522425978,
+        "rmse": 1.6732618958074843,
+        "coverage_95": 0.9853309481216458,
+        "mean_interval_width": 14.967455838861767,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 1.7141959039158134,
+        "rmse": 2.3190677136755706,
+        "coverage_95": 0.9871013973486206,
+        "mean_interval_width": 20.7544323526735,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 2.6176652332137,
+        "rmse": 3.429897610123861,
+        "coverage_95": 0.9831117499101689,
+        "mean_interval_width": 28.74867264381783,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 4.403311979531117,
+        "rmse": 5.582718455718858,
+        "coverage_95": 0.9761474521142031,
+        "mean_interval_width": 39.981784397381034,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 7.8264452245188325,
+        "rmse": 9.936358560133868,
+        "coverage_95": 0.969652650822669,
+        "mean_interval_width": 56.15126906452022,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 15.639171225321274,
+        "rmse": 20.980622963945574,
+        "coverage_95": 0.9385997753650318,
+        "mean_interval_width": 80.51013708101503,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 35.935778432501124,
+        "rmse": 52.48216110215131,
+        "coverage_95": 0.8458513566653558,
+        "mean_interval_width": 117.46444809091732,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 94.59071620335278,
+        "rmse": 157.57643318935453,
+        "coverage_95": 0.635330126803673,
+        "mean_interval_width": 174.86493699750622,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 388.53710872270136,
+        "rmse": 647.8551243230431,
+        "coverage_95": 0.26535211267605635,
+        "mean_interval_width": 301.25806782177926,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.340504007346601,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.797046899795532,
+    "notes": "JumpDiffusion should provide jump risk variance"
+  },
+  {
+    "signal_name": "Power-Law Tails (alpha=2.5)",
+    "signal_category": "Heavy-Tailed",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.0695778091734183,
+        "rmse": 1.7665545897155166,
+        "coverage_95": 0.9642601858470335,
+        "mean_interval_width": 12.646580091345575,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.4302744967896577,
+        "rmse": 2.22570071695965,
+        "coverage_95": 0.9706828745084018,
+        "mean_interval_width": 17.726837212440746,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 2.0392282131733293,
+        "rmse": 2.978754128191853,
+        "coverage_95": 0.9720930232558139,
+        "mean_interval_width": 24.80473313760803,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 3.0786973308421812,
+        "rmse": 4.311436755965999,
+        "coverage_95": 0.9706198495163024,
+        "mean_interval_width": 34.64025754011623,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 4.759380082697299,
+        "rmse": 6.589273493743198,
+        "coverage_95": 0.9658641753503413,
+        "mean_interval_width": 48.330383286505,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 7.853935113663554,
+        "rmse": 11.42903795889996,
+        "coverage_95": 0.949765088543549,
+        "mean_interval_width": 67.62141128823717,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 13.268903044010033,
+        "rmse": 21.782457706258032,
+        "coverage_95": 0.9414990859232175,
+        "mean_interval_width": 95.72014174683176,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 27.5370533433441,
+        "rmse": 51.48036326800455,
+        "coverage_95": 0.9041557469112692,
+        "mean_interval_width": 137.5754092149256,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 59.85485848028313,
+        "rmse": 124.65058446091618,
+        "coverage_95": 0.8018088871411718,
+        "mean_interval_width": 201.68116480120366,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 160.77897029799354,
+        "rmse": 312.1925255181749,
+        "coverage_95": 0.6222125054656755,
+        "mean_interval_width": 316.1709005942362,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 464.5677701058694,
+        "rmse": 856.0710134875243,
+        "coverage_95": 0.35098591549295777,
+        "mean_interval_width": 494.8674444192665,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "special",
+    "dominant_group_weight": 0.47731621313795136,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.583086729049683,
+    "notes": "Finite variance, trackable"
+  },
+  {
+    "signal_name": "fBM Persistent (H=0.7)",
+    "signal_category": "Multi-Scale",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.43572216787766405,
+        "rmse": 0.5488290355192696,
+        "coverage_95": 0.994639027877055,
+        "mean_interval_width": 4.8065896773097565,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.5727664004958117,
+        "rmse": 0.7197450376782568,
+        "coverage_95": 0.995709688952449,
+        "mean_interval_width": 6.763060079972351,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.8282361756908719,
+        "rmse": 1.0325045202189933,
+        "coverage_95": 0.9942754919499106,
+        "mean_interval_width": 9.51876336206108,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 1.2876281412087862,
+        "rmse": 1.5897813623802106,
+        "coverage_95": 0.9924758151200287,
+        "mean_interval_width": 13.385752985046814,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 2.1091799063442984,
+        "rmse": 2.6219526980690544,
+        "coverage_95": 0.9913762127200862,
+        "mean_interval_width": 18.79885032002941,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 3.708915232295795,
+        "rmse": 4.564861000302249,
+        "coverage_95": 0.9819298879653053,
+        "mean_interval_width": 26.381949980576973,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 6.691858109042815,
+        "rmse": 8.164762111364611,
+        "coverage_95": 0.9714808043875686,
+        "mean_interval_width": 37.06321359987558,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 12.012124739897251,
+        "rmse": 14.663620873782085,
+        "coverage_95": 0.9367278172968926,
+        "mean_interval_width": 52.2626735585469,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 22.077893515905615,
+        "rmse": 26.64183303416783,
+        "coverage_95": 0.8600078647267008,
+        "mean_interval_width": 74.97087263174208,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 42.91492277772887,
+        "rmse": 52.42418518124861,
+        "coverage_95": 0.6777437691298644,
+        "mean_interval_width": 106.49462099247916,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 85.34250893836425,
+        "rmse": 104.09534476491031,
+        "coverage_95": 0.4304225352112676,
+        "mean_interval_width": 147.6233747015613,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.35392306862043843,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.483801126480103,
+    "notes": "Long scales should detect persistence"
+  },
+  {
+    "signal_name": "fBM Antipersistent (H=0.3)",
+    "signal_category": "Multi-Scale",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.9468011273662067,
+        "rmse": 1.1791178484873723,
+        "coverage_95": 0.9871336669049321,
+        "mean_interval_width": 7.675424286118586,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.1712261488651798,
+        "rmse": 1.4664827465226244,
+        "coverage_95": 0.9935645334286736,
+        "mean_interval_width": 10.763232372233436,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.5619306169331932,
+        "rmse": 1.956061858860154,
+        "coverage_95": 0.9949910554561717,
+        "mean_interval_width": 15.040767239825717,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 2.2475370621326056,
+        "rmse": 2.8164302669747174,
+        "coverage_95": 0.9928341096381226,
+        "mean_interval_width": 20.913240914986776,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 3.3708014245521993,
+        "rmse": 4.211044090995234,
+        "coverage_95": 0.9917355371900827,
+        "mean_interval_width": 28.94023774250374,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 5.162855094064312,
+        "rmse": 6.434517899899612,
+        "coverage_95": 0.9880737260571015,
+        "mean_interval_width": 39.96453498279598,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 8.52482539449509,
+        "rmse": 10.351405634013636,
+        "coverage_95": 0.9835466179159049,
+        "mean_interval_width": 55.357169723913735,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 14.57303656460826,
+        "rmse": 17.94975561065359,
+        "coverage_95": 0.9816548109322352,
+        "mean_interval_width": 77.42513253128715,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 25.65124085601431,
+        "rmse": 31.96606678082168,
+        "coverage_95": 0.9410145497443964,
+        "mean_interval_width": 109.2299844111195,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 48.72391249187154,
+        "rmse": 60.697796860228216,
+        "coverage_95": 0.8434630520332314,
+        "mean_interval_width": 152.93765846540157,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 98.82651471581951,
+        "rmse": 120.7899697929793,
+        "coverage_95": 0.5988732394366197,
+        "mean_interval_width": 211.01101651313303,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.3420934035654544,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.47405219078064,
+    "notes": "Long scales should detect mean-reversion"
+  },
+  {
+    "signal_name": "Multi-Timescale Mean-Reversion",
+    "signal_category": "Multi-Scale",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.6046435690263181,
+        "rmse": 0.758859843073393,
+        "coverage_95": 0.8087919942816297,
+        "mean_interval_width": 2.7216639390228914,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.658014232660551,
+        "rmse": 0.8275632439504524,
+        "coverage_95": 0.854486950303897,
+        "mean_interval_width": 3.3008806647860416,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.7195689439659501,
+        "rmse": 0.9130253223266025,
+        "coverage_95": 0.8686940966010733,
+        "mean_interval_width": 3.872360679653853,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 0.7862275163882897,
+        "rmse": 0.9998939138780418,
+        "coverage_95": 0.8885704048728055,
+        "mean_interval_width": 4.562898658081807,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 0.8942415312583665,
+        "rmse": 1.1825897042750853,
+        "coverage_95": 0.9083722601509163,
+        "mean_interval_width": 5.578362183428397,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 1.0931964690798324,
+        "rmse": 1.7218917683418664,
+        "coverage_95": 0.9201301048066498,
+        "mean_interval_width": 7.1906622950129435,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 1.4990860192543494,
+        "rmse": 3.9180376490988045,
+        "coverage_95": 0.9363802559414991,
+        "mean_interval_width": 9.756350090321204,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 2.405245110820832,
+        "rmse": 11.368794744610707,
+        "coverage_95": 0.9475851740921003,
+        "mean_interval_width": 13.875931870851915,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 4.687833889998059,
+        "rmse": 31.511452364712788,
+        "coverage_95": 0.9213527329925285,
+        "mean_interval_width": 20.51367975858103,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 10.543603814192329,
+        "rmse": 76.94704592248061,
+        "coverage_95": 0.8382160034980324,
+        "mean_interval_width": 31.732383204469183,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 25.90121659070385,
+        "rmse": 180.07905076596887,
+        "coverage_95": 0.7492957746478873,
+        "mean_interval_width": 55.20939052343262,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "dynamic",
+    "dominant_group_weight": 0.47578329627875543,
+    "expected_dominant": "reversion",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.536132097244263,
+    "notes": "Different scales capture different components"
+  },
+  {
+    "signal_name": "Trend + Momentum + Reversion",
+    "signal_category": "Multi-Scale",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.5824314939369446,
+        "rmse": 0.7316331602765408,
+        "coverage_95": 0.7848463187991422,
+        "mean_interval_width": 2.723431445706692,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.6011468048077803,
+        "rmse": 0.7548677615396214,
+        "coverage_95": 0.8255273507329282,
+        "mean_interval_width": 3.0588392128612494,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.6386737607900732,
+        "rmse": 0.7972027665745675,
+        "coverage_95": 0.857602862254025,
+        "mean_interval_width": 3.4462995586406597,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 0.665567861088875,
+        "rmse": 0.8352236692697105,
+        "coverage_95": 0.892869939089932,
+        "mean_interval_width": 4.035962840128186,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 0.7036081213929636,
+        "rmse": 0.8979042714580039,
+        "coverage_95": 0.9324469996406756,
+        "mean_interval_width": 5.029568927663788,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 0.8502925882164468,
+        "rmse": 1.1094339251370893,
+        "coverage_95": 0.9602457535236718,
+        "mean_interval_width": 6.769968225931089,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 1.1549587341801824,
+        "rmse": 1.7492454656976428,
+        "coverage_95": 0.9674588665447897,
+        "mean_interval_width": 9.884249426449177,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 1.872723002753891,
+        "rmse": 3.8081719255170565,
+        "coverage_95": 0.9640584050917259,
+        "mean_interval_width": 15.640094655219588,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 3.985984203514102,
+        "rmse": 9.859957647972461,
+        "coverage_95": 0.9524184034604798,
+        "mean_interval_width": 26.677666137646394,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 10.311985552183144,
+        "rmse": 24.60119944656483,
+        "coverage_95": 0.9230432881504154,
+        "mean_interval_width": 48.842477080091186,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 35.63688894210129,
+        "rmse": 75.22521098720223,
+        "coverage_95": 0.811830985915493,
+        "mean_interval_width": 101.32568587052593,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.5193525741238457,
+    "expected_dominant": "trend",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.78883409500122,
+    "notes": "Multi-scale architecture advantage"
+  },
+  {
+    "signal_name": "GARCH-like Volatility",
+    "signal_category": "Multi-Scale",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.0745350354273029,
+        "rmse": 1.3899604998008959,
+        "coverage_95": 0.7162258756254467,
+        "mean_interval_width": 3.7083734511892925,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.0697375010745394,
+        "rmse": 1.3706392586934468,
+        "coverage_95": 0.7436539149088309,
+        "mean_interval_width": 3.8870778560548405,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.1199446601495506,
+        "rmse": 1.4410412046985284,
+        "coverage_95": 0.7506261180679785,
+        "mean_interval_width": 4.213961634899848,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 1.1283691942352219,
+        "rmse": 1.449284790597885,
+        "coverage_95": 0.8133285560730921,
+        "mean_interval_width": 4.8135566221370905,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 1.1800727798018373,
+        "rmse": 1.519701122965415,
+        "coverage_95": 0.8674092705713259,
+        "mean_interval_width": 5.867389975177654,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 1.2720407543430643,
+        "rmse": 1.8708617258717057,
+        "coverage_95": 0.926273942898446,
+        "mean_interval_width": 7.700421488180965,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 1.5878451028061689,
+        "rmse": 3.634219824015594,
+        "coverage_95": 0.9678244972577696,
+        "mean_interval_width": 10.90140585776223,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 2.3414107519832763,
+        "rmse": 9.675327684698663,
+        "coverage_95": 0.979408461250468,
+        "mean_interval_width": 16.58389105244974,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 4.812988783433664,
+        "rmse": 26.570388762171365,
+        "coverage_95": 0.9689343295320487,
+        "mean_interval_width": 27.209998999105284,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 12.077987010005375,
+        "rmse": 65.85185674334437,
+        "coverage_95": 0.9370354175776126,
+        "mean_interval_width": 49.330916294169064,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 38.95643364376825,
+        "rmse": 163.40352021379178,
+        "coverage_95": 0.8749295774647887,
+        "mean_interval_width": 101.80679169999281,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "periodic",
+    "dominant_group_weight": 0.4971170611995409,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.68343186378479,
+    "notes": "VolatilityTracker captures clustering"
+  },
+  {
+    "signal_name": "Perfectly Correlated",
+    "signal_category": "Multi-Stream",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.1251700428330091,
+        "rmse": 1.4083063237076567,
+        "coverage_95": 0.9792709077912795,
+        "mean_interval_width": 8.824561786993462,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.3867618201059073,
+        "rmse": 1.7379757706012,
+        "coverage_95": 0.9896317483017518,
+        "mean_interval_width": 12.354449449239818,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.8352929815998276,
+        "rmse": 2.2812190366743343,
+        "coverage_95": 0.9928443649373881,
+        "mean_interval_width": 17.222703393401424,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 2.577800401939464,
+        "rmse": 3.1966930058673424,
+        "coverage_95": 0.991400931565747,
+        "mean_interval_width": 23.877698146873808,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 3.853522230312948,
+        "rmse": 4.764191155259036,
+        "coverage_95": 0.9827524254401725,
+        "mean_interval_width": 32.95778869592759,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 5.9970118333811175,
+        "rmse": 7.437217704795923,
+        "coverage_95": 0.970003614022407,
+        "mean_interval_width": 45.47559517497263,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 9.299847284019437,
+        "rmse": 11.464026635740787,
+        "coverage_95": 0.9762340036563071,
+        "mean_interval_width": 63.107940244728454,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 16.200409703010966,
+        "rmse": 19.825655534342403,
+        "coverage_95": 0.9681767128416323,
+        "mean_interval_width": 88.88537858418903,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 26.849888141018553,
+        "rmse": 34.97678123565548,
+        "coverage_95": 0.9433739677546206,
+        "mean_interval_width": 126.36811207258604,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 51.51013462243012,
+        "rmse": 66.16721015469957,
+        "coverage_95": 0.8863139484040228,
+        "mean_interval_width": 180.6799116461795,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 106.20503500139021,
+        "rmse": 136.66632288293866,
+        "coverage_95": 0.7036619718309859,
+        "mean_interval_width": 260.20685147627154,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.32507481755754325,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 14.854204177856445,
+    "notes": "Cross-stream should identify common factor"
+  },
+  {
+    "signal_name": "Contemporaneous Relationship",
+    "signal_category": "Multi-Stream",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.0553691228917592,
+        "rmse": 1.3345814099352658,
+        "coverage_95": 0.9488920657612581,
+        "mean_interval_width": 8.538824645869822,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.26783862896116,
+        "rmse": 1.5938471022916252,
+        "coverage_95": 0.9653199856989632,
+        "mean_interval_width": 11.772991763973835,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.5887481117225735,
+        "rmse": 1.9976522837801831,
+        "coverage_95": 0.9738819320214669,
+        "mean_interval_width": 16.12963264947869,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 2.1603501610918854,
+        "rmse": 2.6899058235112077,
+        "coverage_95": 0.9731279111429595,
+        "mean_interval_width": 21.954927840056314,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 3.0182272040140847,
+        "rmse": 3.788880351666334,
+        "coverage_95": 0.9665828242903342,
+        "mean_interval_width": 29.85125753967654,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 4.511309759133907,
+        "rmse": 5.680711399551393,
+        "coverage_95": 0.9537405131911818,
+        "mean_interval_width": 40.88544747313125,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 7.329681268047527,
+        "rmse": 9.163772812594559,
+        "coverage_95": 0.9429616087751371,
+        "mean_interval_width": 56.82824945183287,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 12.316568057321271,
+        "rmse": 15.871080157783508,
+        "coverage_95": 0.9108947959565705,
+        "mean_interval_width": 80.59815729685394,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 22.368286744409286,
+        "rmse": 30.043260578596826,
+        "coverage_95": 0.8843885174990169,
+        "mean_interval_width": 115.38666194494884,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 46.85243223369367,
+        "rmse": 64.8830425500732,
+        "coverage_95": 0.8592041976388282,
+        "mean_interval_width": 171.19750934125415,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 120.08406663111441,
+        "rmse": 169.10297662127797,
+        "coverage_95": 0.7194366197183099,
+        "mean_interval_width": 262.67964384338785,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.45836210685373835,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 14.976247072219849,
+    "notes": "Lag-0 regression captures beta"
+  },
+  {
+    "signal_name": "Lead-Lag",
+    "signal_category": "Multi-Stream",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.2775304879929688,
+        "rmse": 1.6138807180705825,
+        "coverage_95": 0.9692637598284489,
+        "mean_interval_width": 9.756759404731795,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.5117428074792238,
+        "rmse": 1.9283978631779572,
+        "coverage_95": 0.9764032892384698,
+        "mean_interval_width": 13.50341670511813,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.9066954623744095,
+        "rmse": 2.409897589551504,
+        "coverage_95": 0.9835420393559928,
+        "mean_interval_width": 18.54426220269506,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 2.529393121747151,
+        "rmse": 3.202801999982138,
+        "coverage_95": 0.9820852740953063,
+        "mean_interval_width": 25.298601418750103,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 3.65272014675509,
+        "rmse": 4.519871542879563,
+        "coverage_95": 0.9813151275601868,
+        "mean_interval_width": 34.46790220197029,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 5.511298207352117,
+        "rmse": 6.881292838475451,
+        "coverage_95": 0.9714492229851825,
+        "mean_interval_width": 47.277389848895275,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 8.335849713982302,
+        "rmse": 10.40841383645908,
+        "coverage_95": 0.9780621572212066,
+        "mean_interval_width": 65.72074474043848,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 15.23486425510621,
+        "rmse": 19.424202735502035,
+        "coverage_95": 0.9663047547734931,
+        "mean_interval_width": 92.4826707907215,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 26.43411286807984,
+        "rmse": 34.91085753402995,
+        "coverage_95": 0.950452221785293,
+        "mean_interval_width": 132.2405092223445,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 57.632580740833184,
+        "rmse": 75.89624063366473,
+        "coverage_95": 0.8596414516834281,
+        "mean_interval_width": 194.18576961172187,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 119.06143987166688,
+        "rmse": 161.70927754362407,
+        "coverage_95": 0.7138028169014085,
+        "mean_interval_width": 286.3515570125746,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.40814194230460094,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 14.98639988899231,
+    "notes": "Cross-stream regression learns lag"
+  },
+  {
+    "signal_name": "Cointegrated Pair",
+    "signal_category": "Multi-Stream",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.2859918549081326,
+        "rmse": 1.608536690398201,
+        "coverage_95": 0.9778413152251608,
+        "mean_interval_width": 9.800360602477005,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.5544302712686309,
+        "rmse": 1.9429051100846204,
+        "coverage_95": 0.9871290668573471,
+        "mean_interval_width": 13.696998169353625,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.9917148710367634,
+        "rmse": 2.4843385484892804,
+        "coverage_95": 0.99391771019678,
+        "mean_interval_width": 19.045565555228926,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 2.749418314870038,
+        "rmse": 3.396951894048768,
+        "coverage_95": 0.9960587603009674,
+        "mean_interval_width": 26.32792917948083,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 3.9734164527976743,
+        "rmse": 4.972568214490858,
+        "coverage_95": 0.9935321595400647,
+        "mean_interval_width": 36.26088474530012,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 6.279590248419533,
+        "rmse": 7.859174506071202,
+        "coverage_95": 0.9887965305384894,
+        "mean_interval_width": 50.01000028900406,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 10.63784609096561,
+        "rmse": 13.478143653496476,
+        "coverage_95": 0.9645338208409506,
+        "mean_interval_width": 69.4704920768699,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 18.214577639733456,
+        "rmse": 22.76612180656962,
+        "coverage_95": 0.971546237364283,
+        "mean_interval_width": 97.69819880912848,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 32.22578389637339,
+        "rmse": 41.20514388183604,
+        "coverage_95": 0.9437672040896579,
+        "mean_interval_width": 139.91037603937698,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 63.10677044360994,
+        "rmse": 83.3777904586591,
+        "coverage_95": 0.8390905115872321,
+        "mean_interval_width": 201.70973754974077,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 124.65959822149738,
+        "rmse": 175.03715591323567,
+        "coverage_95": 0.6822535211267605,
+        "mean_interval_width": 280.8184242216046,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "reversion",
+    "dominant_group_weight": 0.35431592610278234,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 14.836857080459595,
+    "notes": "Cross-stream captures error correction"
+  },
+  {
+    "signal_name": "Impulse",
+    "signal_category": "Edge Case",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.007977874803778682,
+        "rmse": 0.2889815721742287,
+        "coverage_95": 0.9996426018584703,
+        "mean_interval_width": 0.2816962592318892,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.008810926506778878,
+        "rmse": 0.3120060659576259,
+        "coverage_95": 0.9996424740793708,
+        "mean_interval_width": 0.32288338804207223,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.010478808762583294,
+        "rmse": 0.3610731757031905,
+        "coverage_95": 0.9996422182468694,
+        "mean_interval_width": 0.3851346165044954,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 0.01382176248150217,
+        "rmse": 0.4667808390062877,
+        "coverage_95": 0.9996417054819061,
+        "mean_interval_width": 0.47781472906860756,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 0.0205364995220389,
+        "rmse": 0.6922216392854195,
+        "coverage_95": 0.9992813510600072,
+        "mean_interval_width": 0.6149049107238506,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 0.03408245621236015,
+        "rmse": 1.1620228644243014,
+        "coverage_95": 0.9992771955186122,
+        "mean_interval_width": 0.8176537171480952,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 0.061649840102629194,
+        "rmse": 2.1249260171248934,
+        "coverage_95": 0.9992687385740402,
+        "mean_interval_width": 1.1196476193504166,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 0.11876623937573484,
+        "rmse": 4.095731501348604,
+        "coverage_95": 0.9992512167727443,
+        "mean_interval_width": 1.578539802470999,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 0.2416237714499896,
+        "rmse": 8.191605849908168,
+        "coverage_95": 0.9992135273299253,
+        "mean_interval_width": 2.3091498771921137,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 0.5285957594286049,
+        "rmse": 17.064910717469388,
+        "coverage_95": 0.9986882378662003,
+        "mean_interval_width": 3.601409719109049,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 1.3452377490963139,
+        "rmse": 38.50274126622108,
+        "coverage_95": 0.9988732394366198,
+        "mean_interval_width": 6.5351239438674344,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "persistence",
+    "dominant_group_weight": 0.9999999999999986,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": true,
+    "runtime_seconds": 11.529417991638184,
+    "notes": "LocalLevel tracks then decays"
+  },
+  {
+    "signal_name": "Step Function",
+    "signal_category": "Edge Case",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 0.024299316818509033,
+        "rmse": 0.27574827990009404,
+        "coverage_95": 0.9964260185847034,
+        "mean_interval_width": 0.3289808477692038,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 0.04069964612695734,
+        "rmse": 0.3439342752725126,
+        "coverage_95": 0.9946371111905613,
+        "mean_interval_width": 0.44535587857817943,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 0.07341714771030318,
+        "rmse": 0.4611757592143783,
+        "coverage_95": 0.9910554561717353,
+        "mean_interval_width": 0.6122664648473328,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 0.13865585873351066,
+        "rmse": 0.6633281444931406,
+        "coverage_95": 0.9838767466857757,
+        "mean_interval_width": 0.8473872814593155,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 0.26902373150710407,
+        "rmse": 1.022596247841147,
+        "coverage_95": 0.9687387711103126,
+        "mean_interval_width": 1.1750763323836264,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 0.5315181618982863,
+        "rmse": 1.692376317985205,
+        "coverage_95": 0.9385616190820383,
+        "mean_interval_width": 1.6344473086363958,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 1.066717117983459,
+        "rmse": 3.0012603388368366,
+        "coverage_95": 0.873491773308958,
+        "mean_interval_width": 2.2975030025937535,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 2.177935389915666,
+        "rmse": 5.640552802410765,
+        "coverage_95": 0.729314863347061,
+        "mean_interval_width": 3.298328572023622,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 4.572351531811368,
+        "rmse": 11.111017746588379,
+        "coverage_95": 0.4298073141958317,
+        "mean_interval_width": 4.904729125191814,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 8.781699049002919,
+        "rmse": 22.816887375500727,
+        "coverage_95": 0.050284215128989944,
+        "mean_interval_width": 7.023560169630035,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 10.717777197751552,
+        "rmse": 44.36401848515679,
+        "coverage_95": 0.14873239436619717,
+        "mean_interval_width": 10.887909100509637,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "variance",
+    "dominant_group_weight": 0.8573915915611753,
+    "expected_dominant": "persistence",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.616084098815918,
+    "notes": "Break detection may trigger at jumps"
+  },
+  {
+    "signal_name": "Contaminated Data",
+    "signal_category": "Edge Case",
+    "n_observations": 3000,
+    "horizon_metrics": [
+      {
+        "horizon": 1,
+        "mae": 1.0214507806772004,
+        "rmse": 2.35644126080085,
+        "coverage_95": 0.952108649035025,
+        "mean_interval_width": 9.721292338752729,
+        "n_predictions": 2798
+      },
+      {
+        "horizon": 2,
+        "mae": 1.2130236697679506,
+        "rmse": 2.7535084720089777,
+        "coverage_95": 0.9560243117626028,
+        "mean_interval_width": 11.110392688348323,
+        "n_predictions": 2797
+      },
+      {
+        "horizon": 4,
+        "mae": 1.5489697838186318,
+        "rmse": 3.6500956418280945,
+        "coverage_95": 0.9549194991055456,
+        "mean_interval_width": 13.238714369220766,
+        "n_predictions": 2795
+      },
+      {
+        "horizon": 8,
+        "mae": 2.0935759516171424,
+        "rmse": 5.714936315065114,
+        "coverage_95": 0.94912217843067,
+        "mean_interval_width": 16.512279297732174,
+        "n_predictions": 2791
+      },
+      {
+        "horizon": 16,
+        "mae": 3.078813772254901,
+        "rmse": 10.302349466980393,
+        "coverage_95": 0.9464606539705354,
+        "mean_interval_width": 21.514961844669866,
+        "n_predictions": 2783
+      },
+      {
+        "horizon": 32,
+        "mae": 5.194714462322588,
+        "rmse": 20.380614301607338,
+        "coverage_95": 0.9241055294542826,
+        "mean_interval_width": 29.21575979725736,
+        "n_predictions": 2767
+      },
+      {
+        "horizon": 64,
+        "mae": 9.666610507085911,
+        "rmse": 44.030257211858135,
+        "coverage_95": 0.8972577696526508,
+        "mean_interval_width": 41.061661448706715,
+        "n_predictions": 2735
+      },
+      {
+        "horizon": 128,
+        "mae": 19.586963817862824,
+        "rmse": 108.42048778742412,
+        "coverage_95": 0.8483713964807188,
+        "mean_interval_width": 60.28495873647082,
+        "n_predictions": 2671
+      },
+      {
+        "horizon": 256,
+        "mae": 40.986063946269624,
+        "rmse": 316.13349544497015,
+        "coverage_95": 0.7888320880849391,
+        "mean_interval_width": 89.61910636557822,
+        "n_predictions": 2543
+      },
+      {
+        "horizon": 512,
+        "mae": 98.73471424715046,
+        "rmse": 1158.8353147470498,
+        "coverage_95": 0.7144731088762571,
+        "mean_interval_width": 147.47677829592513,
+        "n_predictions": 2287
+      },
+      {
+        "horizon": 1024,
+        "mae": 332.1525570202602,
+        "rmse": 4946.928918221172,
+        "coverage_95": 0.5661971830985916,
+        "mean_interval_width": 270.0427731328067,
+        "n_predictions": 1775
+      }
+    ],
+    "dominant_group": "variance",
+    "dominant_group_weight": 0.9996418150333141,
+    "expected_dominant": "reversion",
+    "dominant_matches_expected": false,
+    "runtime_seconds": 11.639909982681274,
+    "notes": "JumpDiffusion absorbs some outliers"
+  }
+]
