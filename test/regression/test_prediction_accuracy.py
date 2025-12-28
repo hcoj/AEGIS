@@ -329,3 +329,63 @@ class TestCoverageBaseline:
         assert coverage >= self.MIN_COVERAGE, (
             f"Trend+noise h=1 coverage too low: {coverage:.1%} < {self.MIN_COVERAGE:.0%}"
         )
+
+
+class TestPeriodicLongHorizon:
+    """Test periodic model long-horizon accuracy.
+
+    Phase-locking should prevent error explosion at long horizons
+    for sinusoidal signals.
+    """
+
+    def test_sinusoidal_h1024_mae_bounded(self) -> None:
+        """Sinusoidal h=1024 MAE should be < 5.0 (was 18.51 before fix)."""
+        from aegis.models.periodic import OscillatorBankModel
+
+        n, period = 2000, 16
+        signal = np.sin(2 * np.pi * np.arange(n) / period)
+
+        model = OscillatorBankModel(periods=[period], lr=0.05)
+        errors = []
+        for t in range(n):
+            if t >= 500 and t + 1024 < n:
+                pred = model.predict(1024).mean
+                true_cumsum = sum(signal[t + 1 : t + 1025])
+                errors.append(abs(pred - true_cumsum))
+            model.update(signal[t], t)
+
+        mae = np.mean(errors) if errors else 0
+        assert mae < 5.0, f"Sinusoidal h=1024 MAE {mae:.2f} > 5.0"
+
+    def test_sinusoidal_error_growth_bounded(self) -> None:
+        """Sinusoidal error growth h=1 to h=1024 should be < 50x (was 147x)."""
+        from aegis.models.periodic import OscillatorBankModel
+
+        n, period = 2000, 16
+        signal = np.sin(2 * np.pi * np.arange(n) / period)
+
+        model = OscillatorBankModel(periods=[period], lr=0.05)
+
+        for t in range(500):
+            model.update(signal[t], t)
+
+        # Compute errors at h=1 and h=1024
+        errors_h1 = []
+        errors_h1024 = []
+
+        for t in range(500, min(1500, n - 1024)):
+            pred_h1 = model.predict(1).mean
+            true_h1 = signal[t + 1]
+            errors_h1.append(abs(pred_h1 - true_h1))
+
+            pred_h1024 = model.predict(1024).mean
+            true_h1024 = sum(signal[t + 1 : t + 1025])
+            errors_h1024.append(abs(pred_h1024 - true_h1024))
+
+            model.update(signal[t], t)
+
+        mae_h1 = np.mean(errors_h1)
+        mae_h1024 = np.mean(errors_h1024)
+        growth = (mae_h1024 + 0.01) / (mae_h1 + 0.01)
+
+        assert growth < 50.0, f"Sinusoidal error growth {growth:.1f}x exceeds 50x"

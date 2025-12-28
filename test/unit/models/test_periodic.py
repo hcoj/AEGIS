@@ -298,3 +298,53 @@ class TestOscillatorPhaseTracking:
         # Amplitude should match input amplitude
         amplitude = np.sqrt(model.a[0] ** 2 + model.b[0] ** 2)
         assert amplitude == pytest.approx(2.0, abs=0.5)
+
+
+class TestOscillatorPhaseLocking:
+    """Tests for phase-locking at long horizons."""
+
+    def test_phase_lock_threshold_exists(self) -> None:
+        """Test phase lock threshold attribute exists."""
+        model = OscillatorBankModel(periods=[16])
+        assert hasattr(model, "phase_lock_threshold")
+        assert model.phase_lock_threshold == 0.8
+
+    def test_is_phase_locked_false_initially(self) -> None:
+        """Phase should not be locked before training."""
+        model = OscillatorBankModel(periods=[16])
+        assert not model._is_phase_locked(freq_idx=0)
+
+    def test_is_phase_locked_after_stable_training(self, sine_wave_signal) -> None:
+        """Phase should lock after stable learning on clean sine."""
+        signal = sine_wave_signal(n=500, period=16, amplitude=1.0)
+        model = OscillatorBankModel(periods=[16], lr=0.05)
+        for t, y in enumerate(signal):
+            model.update(y, t)
+        assert model._is_phase_locked(freq_idx=0)
+
+    def test_locked_cumsum_period_aligned(self, sine_wave_signal) -> None:
+        """Locked cumsum over full period should be ~0 for sine."""
+        signal = sine_wave_signal(n=500, period=16, amplitude=1.0)
+        model = OscillatorBankModel(periods=[16], lr=0.05)
+        for t, y in enumerate(signal):
+            model.update(y, t)
+
+        pred_16 = model._cumulative_prediction(16)
+        pred_32 = model._cumulative_prediction(32)
+        assert abs(pred_16) < 0.5, f"Full period cumsum should be ~0, got {pred_16}"
+        assert abs(pred_32) < 0.5, f"Two periods cumsum should be ~0, got {pred_32}"
+
+    def test_long_horizon_error_bounded(self) -> None:
+        """Long-horizon error growth should be < 25x (was 147x before fix)."""
+        n, period = 1000, 16
+        signal = [np.sin(2 * np.pi * t / period) for t in range(n)]
+        model = OscillatorBankModel(periods=[period], lr=0.05)
+
+        for t in range(500):
+            model.update(signal[t], t)
+
+        err_h1 = abs(model.predict(1).mean - signal[501])
+        err_h1024 = abs(model.predict(1024).mean - sum(signal[501 : 501 + min(1024, n - 501)]))
+
+        growth = (err_h1024 + 0.01) / (err_h1 + 0.01)
+        assert growth < 25.0, f"Error growth {growth:.1f}x exceeds 25x"

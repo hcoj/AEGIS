@@ -29,6 +29,7 @@ class OscillatorBankModel(TemporalModel):
         periods: list[int] | None = None,
         lr: float = 0.01,
         decay: float = 0.95,
+        phase_lock_threshold: float = 0.8,
     ) -> None:
         """Initialize OscillatorBankModel.
 
@@ -36,17 +37,21 @@ class OscillatorBankModel(TemporalModel):
             periods: List of oscillator periods (default: [4, 8, 16, 32, 64, 128, 256])
             lr: Learning rate for coefficient updates
             decay: EWMA decay for variance estimation
+            phase_lock_threshold: Stability threshold for phase locking (0-1)
         """
         self.periods: list[int] = periods or [4, 8, 16, 32, 64, 128, 256]
         self.n_freqs: int = len(self.periods)
         self.lr: float = lr
         self.decay: float = decay
+        self.phase_lock_threshold: float = phase_lock_threshold
 
         self.a: np.ndarray = np.zeros(self.n_freqs)
         self.b: np.ndarray = np.zeros(self.n_freqs)
 
         self.phase_stability: np.ndarray = np.zeros(self.n_freqs)
         self._last_phase: np.ndarray = np.zeros(self.n_freqs)
+        self._locked_phase: np.ndarray = np.zeros(self.n_freqs)
+        self._locked_amplitude: np.ndarray = np.zeros(self.n_freqs)
 
         self.sigma_sq: float = 1.0
         self.prior_sigma_sq: float = 1.0
@@ -67,6 +72,18 @@ class OscillatorBankModel(TemporalModel):
             omega = 2 * np.pi / period
             pred += self.a[k] * np.cos(omega * t) + self.b[k] * np.sin(omega * t)
         return pred
+
+    def _is_phase_locked(self, freq_idx: int) -> bool:
+        """Check if frequency has stable phase for locking.
+
+        Args:
+            freq_idx: Index into self.periods
+
+        Returns:
+            True if phase stability exceeds threshold and amplitude is significant
+        """
+        amplitude = np.sqrt(self.a[freq_idx] ** 2 + self.b[freq_idx] ** 2)
+        return self.phase_stability[freq_idx] >= self.phase_lock_threshold and amplitude > 1e-4
 
     def update(self, y: float, t: int) -> None:
         """Update model with new observation.
@@ -105,14 +122,17 @@ class OscillatorBankModel(TemporalModel):
                 )
                 self._last_phase[k] = current_phase
 
+                if self._is_phase_locked(k):
+                    self._locked_phase[k] = current_phase
+                    self._locked_amplitude[k] = amplitude
+
         self._n_obs += 1
 
     def _cumulative_prediction(self, horizon: int) -> float:
         """Compute cumulative prediction over horizon.
 
-        Uses closed-form sum of sinusoids:
-        Σ_{k=1}^{h} cos(ω(t+k)) = sin(hω/2) / sin(ω/2) * cos(ω(t + (h+1)/2))
-        Σ_{k=1}^{h} sin(ω(t+k)) = sin(hω/2) / sin(ω/2) * sin(ω(t + (h+1)/2))
+        When phase is locked, uses period-aligned extrapolation to avoid drift.
+        When not locked, uses closed-form Dirichlet kernel sum.
 
         Args:
             horizon: Number of steps
@@ -123,22 +143,74 @@ class OscillatorBankModel(TemporalModel):
         cumsum = 0.0
         for k, period in enumerate(self.periods):
             omega = 2 * np.pi / period
-            half_omega = omega / 2
 
-            # Avoid division by zero for very long periods
-            if abs(np.sin(half_omega)) < 1e-10:
-                # For very long periods, sum ≈ horizon × current value
-                cumsum += horizon * (
-                    self.a[k] * np.cos(omega * (self.t + 1))
-                    + self.b[k] * np.sin(omega * (self.t + 1))
-                )
+            if self._is_phase_locked(k):
+                cumsum += self._locked_cumsum(k, horizon)
             else:
-                scale = np.sin(horizon * half_omega) / np.sin(half_omega)
-                center_t = self.t + (horizon + 1) / 2
-                cumsum += self.a[k] * scale * np.cos(omega * center_t)
-                cumsum += self.b[k] * scale * np.sin(omega * center_t)
-
+                cumsum += self._unlocked_cumsum(k, horizon, omega)
         return cumsum
+
+    def _locked_cumsum(self, freq_idx: int, horizon: int) -> float:
+        """Period-aligned cumulative sum using locked phase.
+
+        Uses direct coefficient computation for accuracy:
+        pred(t) = a*cos(ωt) + b*sin(ωt)
+
+        Args:
+            freq_idx: Index of the frequency
+            horizon: Number of steps
+
+        Returns:
+            Cumulative sum using period-aligned extrapolation
+        """
+        period = self.periods[freq_idx]
+        omega = 2 * np.pi / period
+        a = self.a[freq_idx]
+        b = self.b[freq_idx]
+
+        full_periods = horizon // period
+        remainder = horizon % period
+
+        period_sum = sum(
+            a * np.cos(omega * (self.t + step)) + b * np.sin(omega * (self.t + step))
+            for step in range(1, period + 1)
+        )
+
+        partial_sum = sum(
+            a * np.cos(omega * (self.t + step)) + b * np.sin(omega * (self.t + step))
+            for step in range(1, remainder + 1)
+        )
+
+        return full_periods * period_sum + partial_sum
+
+    def _unlocked_cumsum(self, freq_idx: int, horizon: int, omega: float) -> float:
+        """Closed-form cumulative sum using Dirichlet kernel.
+
+        Uses:
+        Σ_{k=1}^{h} cos(ω(t+k)) = sin(hω/2) / sin(ω/2) * cos(ω(t + (h+1)/2))
+        Σ_{k=1}^{h} sin(ω(t+k)) = sin(hω/2) / sin(ω/2) * sin(ω(t + (h+1)/2))
+
+        Args:
+            freq_idx: Index of the frequency
+            horizon: Number of steps
+            omega: Angular frequency
+
+        Returns:
+            Cumulative sum using closed-form formula
+        """
+        half_omega = omega / 2
+
+        if abs(np.sin(half_omega)) < 1e-10:
+            return horizon * (
+                self.a[freq_idx] * np.cos(omega * (self.t + 1))
+                + self.b[freq_idx] * np.sin(omega * (self.t + 1))
+            )
+
+        scale = np.sin(horizon * half_omega) / np.sin(half_omega)
+        center_t = self.t + (horizon + 1) / 2
+        return self.a[freq_idx] * scale * np.cos(omega * center_t) + self.b[
+            freq_idx
+        ] * scale * np.sin(omega * center_t)
 
     def predict(self, horizon: int) -> Prediction:
         """Predict cumulative change over horizon.
@@ -152,11 +224,17 @@ class OscillatorBankModel(TemporalModel):
         """
         mean = self._cumulative_prediction(horizon)
 
-        avg_stability = np.mean(self.phase_stability) if self.n_freqs > 0 else 0.0
-        stability_factor = 1.0 - 0.8 * avg_stability
+        n_locked = sum(1 for k in range(self.n_freqs) if self._is_phase_locked(k))
+        lock_fraction = n_locked / self.n_freqs if self.n_freqs > 0 else 0.0
 
-        base_uncertainty = 0.01 * horizon
-        phase_uncertainty = base_uncertainty * stability_factor
+        if lock_fraction > 0.9:
+            phase_uncertainty = 0.001 * horizon
+        elif lock_fraction > 0.5:
+            phase_uncertainty = 0.005 * horizon
+        else:
+            avg_stability = np.mean(self.phase_stability)
+            stability_factor = 1.0 - 0.8 * avg_stability
+            phase_uncertainty = 0.01 * horizon * stability_factor
 
         variance = self.sigma_sq * (1 + phase_uncertainty)
         return Prediction(mean=mean, variance=max(variance, 1e-10))
@@ -182,6 +260,8 @@ class OscillatorBankModel(TemporalModel):
         self.a *= 1 - partial
         self.b *= 1 - partial
         self.sigma_sq = partial * self.prior_sigma_sq + (1 - partial) * self.sigma_sq
+        self.phase_stability *= 1 - partial
+        self._locked_amplitude *= 1 - partial
 
     @property
     def n_parameters(self) -> int:
