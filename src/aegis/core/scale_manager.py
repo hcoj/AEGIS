@@ -82,6 +82,10 @@ class ScaleManager:
     def predict(self, horizon: int) -> Prediction:
         """Generate combined prediction across all scales.
 
+        Uses horizon-aware filtering: only scales <= horizon contribute to the mean
+        (to avoid interpolation errors), but all scales contribute to variance
+        (to preserve calibration).
+
         Args:
             horizon: Steps ahead to predict
 
@@ -91,9 +95,15 @@ class ScaleManager:
         if len(self.history) < 2:
             return Prediction(mean=0.0, variance=1.0)
 
-        predictions: list[Prediction] = []
-        weights: list[float] = []
-        active_scales: list[int] = []
+        # Collect predictions from all available scales
+        all_predictions: list[Prediction] = []
+        all_weights: list[float] = []
+        all_scales: list[int] = []
+
+        # Also track which are valid for mean estimation (scale <= horizon)
+        mean_predictions: list[Prediction] = []
+        mean_weights: list[float] = []
+        mean_scales: list[int] = []
 
         for i, scale in enumerate(self.scales):
             if len(self.history) > scale:
@@ -103,29 +113,38 @@ class ScaleManager:
                 model_preds = [m.predict(horizon) for m in models]
                 scale_pred = combiner.combine_predictions(model_preds)
 
-                predictions.append(scale_pred)
-                weights.append(self.scale_weights[i])
-                active_scales.append(scale)
+                all_predictions.append(scale_pred)
+                all_weights.append(self.scale_weights[i])
+                all_scales.append(scale)
 
-        if not predictions:
+                # Only use scales <= horizon for mean (avoid interpolation errors)
+                if scale <= horizon:
+                    mean_predictions.append(scale_pred)
+                    mean_weights.append(self.scale_weights[i])
+                    mean_scales.append(scale)
+
+        if not mean_predictions:
             return Prediction(mean=0.0, variance=1.0)
 
-        weights_arr = np.array(weights)
-        weights_arr /= weights_arr.sum()
+        # Compute mean using only horizon-appropriate scales
+        mean_weights_arr = np.array(mean_weights)
+        mean_weights_arr /= mean_weights_arr.sum()
 
-        # Models now return cumulative change over horizon.
-        # Scale s models predict cumulative s-period returns; divide by s to get level change.
-        # Don't scale variance - use raw model variance to preserve calibration.
-        level_changes = np.array([p.mean / s for p, s in zip(predictions, active_scales)])
-        level_variances = np.array([p.variance for p in predictions])
-
-        # Clamp level changes to prevent overflow when computing squared differences
+        mean_level_changes = np.array([p.mean / s for p, s in zip(mean_predictions, mean_scales)])
         max_level_change = 1e6
-        clamped_level_changes = np.clip(level_changes, -max_level_change, max_level_change)
+        clamped_mean_changes = np.clip(mean_level_changes, -max_level_change, max_level_change)
+        combined_level_change = np.sum(mean_weights_arr * clamped_mean_changes)
 
-        combined_level_change = np.sum(weights_arr * clamped_level_changes)
-        within_var = np.sum(weights_arr * level_variances)
-        between_var = np.sum(weights_arr * (clamped_level_changes - combined_level_change) ** 2)
+        # Compute variance using ALL scales (preserves calibration)
+        all_weights_arr = np.array(all_weights)
+        all_weights_arr /= all_weights_arr.sum()
+
+        all_level_changes = np.array([p.mean / s for p, s in zip(all_predictions, all_scales)])
+        all_level_variances = np.array([p.variance for p in all_predictions])
+        clamped_all_changes = np.clip(all_level_changes, -max_level_change, max_level_change)
+
+        within_var = np.sum(all_weights_arr * all_level_variances)
+        between_var = np.sum(all_weights_arr * (clamped_all_changes - combined_level_change) ** 2)
 
         level_mean = self.history[-1] + combined_level_change
         level_var = within_var + between_var
