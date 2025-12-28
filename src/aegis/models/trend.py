@@ -9,7 +9,7 @@ Trend models capture directional drift:
 import numpy as np
 
 from aegis.core.prediction import Prediction
-from aegis.models.base import TemporalModel
+from aegis.models.base import MAX_SIGMA_SQ, TemporalModel
 
 
 class LinearTrendModel(TemporalModel):
@@ -87,6 +87,7 @@ class LinearTrendModel(TemporalModel):
                 pred = self.intercept + self.slope * t
                 error = y - pred
                 self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+                self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
                 # Compute standard error of slope from regression statistics
                 if self._n_obs > 2:
@@ -208,6 +209,7 @@ class LocalTrendModel(TemporalModel):
         else:
             error = y - (self.level + self.slope)
             self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+            self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
             new_level = self.alpha * y + (1 - self.alpha) * (self.level + self.slope)
             new_slope = self.beta * (new_level - self.level) + (1 - self.beta) * self.slope
@@ -333,6 +335,7 @@ class DampedTrendModel(TemporalModel):
         else:
             error = y - (self.level + self.phi * self.slope)
             self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+            self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
             new_level = self.alpha * y + (1 - self.alpha) * (self.level + self.phi * self.slope)
             new_slope = (

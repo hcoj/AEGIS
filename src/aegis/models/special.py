@@ -8,7 +8,7 @@ Special models capture non-standard dynamics:
 import numpy as np
 
 from aegis.core.prediction import Prediction
-from aegis.models.base import TemporalModel
+from aegis.models.base import MAX_SIGMA_SQ, TemporalModel
 
 
 class JumpDiffusionModel(TemporalModel):
@@ -84,6 +84,7 @@ class JumpDiffusionModel(TemporalModel):
                 self.sigma_sq_diff = (
                     self.decay * self.sigma_sq_diff + (1 - self.decay) * innovation**2
                 )
+                self.sigma_sq_diff = min(self.sigma_sq_diff, MAX_SIGMA_SQ)
                 self.lambda_b += 1
 
         self.last_y = y
@@ -239,6 +240,7 @@ class ChangePointModel(TemporalModel):
                 if self.regime_n > 1:
                     var = (self.regime_sum_sq - self.regime_n * self.mu**2) / (self.regime_n - 1)
                     self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * max(var, 0.01)
+                    self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
         else:
             self.mu = y
             self.regime_sum = y

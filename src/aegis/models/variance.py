@@ -8,7 +8,7 @@ Variance models track and predict volatility:
 import numpy as np
 
 from aegis.core.prediction import Prediction
-from aegis.models.base import TemporalModel
+from aegis.models.base import MAX_SIGMA_SQ, TemporalModel
 
 
 class VolatilityTrackerModel(TemporalModel):
@@ -52,9 +52,11 @@ class VolatilityTrackerModel(TemporalModel):
         if self._n_obs > 0:
             innovation = y - self.last_y
             self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * innovation**2
+            self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
             self.long_run_var = (
                 self.long_run_decay * self.long_run_var + (1 - self.long_run_decay) * innovation**2
             )
+            self.long_run_var = min(self.long_run_var, MAX_SIGMA_SQ)
 
         self.last_y = y
         self._n_obs += 1
@@ -153,6 +155,7 @@ class LevelDependentVolModel(TemporalModel):
             level_factor = abs(self.last_y) ** self.gamma
             normalised_sq = (innovation / max(level_factor, 1e-6)) ** 2
             self.sigma_sq_base = self.decay * self.sigma_sq_base + (1 - self.decay) * normalised_sq
+            self.sigma_sq_base = min(self.sigma_sq_base, MAX_SIGMA_SQ)
 
         self.last_y = y
         self._n_obs += 1

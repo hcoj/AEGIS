@@ -8,7 +8,7 @@ Periodic models capture cyclical patterns:
 import numpy as np
 
 from aegis.core.prediction import Prediction
-from aegis.models.base import TemporalModel
+from aegis.models.base import MAX_SIGMA_SQ, TemporalModel
 
 
 class OscillatorBankModel(TemporalModel):
@@ -78,6 +78,7 @@ class OscillatorBankModel(TemporalModel):
         error = y - pred
 
         self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+        self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         for k, period in enumerate(self.periods):
             omega = 2 * np.pi / period
@@ -228,6 +229,7 @@ class SeasonalDummyModel(TemporalModel):
 
         error = y - self.means[s]
         self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+        self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         self.counts[s] = self.forget * self.counts[s] + 1
         alpha = 1.0 / self.counts[s]

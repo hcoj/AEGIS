@@ -8,7 +8,7 @@ Dynamic models capture autocorrelation structure:
 import numpy as np
 
 from aegis.core.prediction import Prediction
-from aegis.models.base import TemporalModel
+from aegis.models.base import MAX_SIGMA_SQ, TemporalModel
 
 
 class AR2Model(TemporalModel):
@@ -92,6 +92,7 @@ class AR2Model(TemporalModel):
                 self.theta[1:] = [self.phi1, self.phi2]
 
             self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+            self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         self.y_lag2 = self.y_lag1
         self.y_lag1 = y
@@ -209,6 +210,7 @@ class MA1Model(TemporalModel):
         self.theta = np.clip(self.theta - self.lr * grad, -0.99, 0.99)
 
         self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+        self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
         self.last_error = error
         self._n_obs += 1
 

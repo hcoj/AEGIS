@@ -106,6 +106,51 @@ class TestModelOverflowProtection:
 
         assert pred.variance >= 1e-10
 
+    def test_ar2_sigma_sq_clamped_during_update(self) -> None:
+        """AR2Model sigma_sq should be clamped during update, not just in predict."""
+        from aegis.models.base import MAX_SIGMA_SQ
+
+        model = AR2Model()
+        # Feed extreme values that would cause large errors
+        model.update(0.0, 0)
+        model.update(0.0, 1)
+        model.update(1e10, 2)  # Huge error should trigger sigma_sq update
+
+        # sigma_sq should be clamped during update
+        assert model.sigma_sq <= MAX_SIGMA_SQ
+
+    def test_all_models_sigma_sq_clamped_during_update(self) -> None:
+        """All models should clamp sigma_sq during update."""
+        from aegis.models.base import MAX_SIGMA_SQ
+        from aegis.models.reversion import (
+            AsymmetricMeanReversionModel,
+            MeanReversionModel,
+            ThresholdARModel,
+        )
+        from aegis.models.trend import DampedTrendModel, LinearTrendModel, LocalTrendModel
+
+        # Test each model with extreme error
+        models = [
+            RandomWalkModel(),
+            LocalLevelModel(),
+            AR2Model(),
+            MA1Model(),
+            LinearTrendModel(),
+            LocalTrendModel(),
+            DampedTrendModel(),
+            MeanReversionModel(),
+            AsymmetricMeanReversionModel(),
+            ThresholdARModel(),
+        ]
+
+        for model in models:
+            # Initialize with small values, then hit with extreme value
+            model.update(0.0, 0)
+            model.update(0.0, 1)
+            model.update(1e10, 2)  # Huge error
+
+            assert model.sigma_sq <= MAX_SIGMA_SQ, f"{model.name} sigma_sq not clamped"
+
 
 class TestCombinerOverflowProtection:
     """Test overflow protection in prediction combiners."""

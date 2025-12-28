@@ -6,6 +6,9 @@ import numpy as np
 
 from aegis.core.prediction import Prediction
 
+# Maximum variance to prevent overflow in variance * horizon calculations
+MAX_SIGMA_SQ: float = 1e8
+
 
 class TemporalModel(ABC):
     """Abstract base class for all temporal models.

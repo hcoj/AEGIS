@@ -8,7 +8,7 @@ Persistence models assume the future looks like the recent past:
 import numpy as np
 
 from aegis.core.prediction import Prediction
-from aegis.models.base import TemporalModel
+from aegis.models.base import MAX_SIGMA_SQ, TemporalModel
 
 
 class RandomWalkModel(TemporalModel):
@@ -46,6 +46,7 @@ class RandomWalkModel(TemporalModel):
         if self._n_obs > 0:
             innovation = y - self.last_y
             self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * innovation**2
+            self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         self.last_y = y
         self._n_obs += 1
@@ -140,6 +141,7 @@ class LocalLevelModel(TemporalModel):
         else:
             error = y - self.level
             self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+            self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
             self.level = self.alpha * y + (1 - self.alpha) * self.level
 
         self._n_obs += 1
