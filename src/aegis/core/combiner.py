@@ -105,15 +105,19 @@ class EFEModelCombiner:
         means = np.array([p.mean for p in predictions])
         variances = np.array([p.variance for p in predictions])
 
-        combined_mean = np.sum(weights * means)
+        # Clamp means to prevent overflow when computing squared differences
+        max_mean = 1e6
+        clamped_means = np.clip(means, -max_mean, max_mean)
+
+        combined_mean = np.sum(weights * clamped_means)
 
         within_var = np.sum(weights * variances)
 
-        between_var = np.sum(weights * (means - combined_mean) ** 2)
+        between_var = np.sum(weights * (clamped_means - combined_mean) ** 2)
 
         combined_variance = within_var + between_var
 
-        return Prediction(mean=combined_mean, variance=max(combined_variance, 1e-10))
+        return Prediction(mean=combined_mean, variance=np.clip(combined_variance, 1e-10, 1e10))
 
     def reset_scores(self, partial: float = 1.0) -> None:
         """Reset cumulative scores.

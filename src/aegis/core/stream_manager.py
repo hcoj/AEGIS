@@ -11,7 +11,7 @@ import numpy as np
 from aegis.config import AEGISConfig
 from aegis.core.break_detector import CUSUMBreakDetector
 from aegis.core.prediction import Prediction
-from aegis.core.quantile_tracker import QuantileTracker
+from aegis.core.quantile_tracker import HorizonAwareQuantileTracker
 from aegis.core.scale_manager import ScaleManager
 from aegis.models.base import TemporalModel
 
@@ -52,7 +52,7 @@ class StreamManager:
             threshold=config.break_threshold
         )
 
-        self.quantile_tracker: QuantileTracker = QuantileTracker(
+        self.quantile_tracker: HorizonAwareQuantileTracker = HorizonAwareQuantileTracker(
             target_coverage=config.target_coverage
         )
 
@@ -61,6 +61,7 @@ class StreamManager:
 
         self.t: int = 0
         self.last_prediction: Prediction | None = None
+        self.last_h1_prediction: Prediction | None = None
         self.in_break_adaptation: bool = False
         self.break_countdown: int = 0
 
@@ -74,9 +75,9 @@ class StreamManager:
         if t is not None:
             self.t = t
 
-        if self.last_prediction is not None:
-            error = y - self.last_prediction.mean
-            std = self.last_prediction.std
+        if self.last_h1_prediction is not None:
+            error = y - self.last_h1_prediction.mean
+            std = self.last_h1_prediction.std
 
             self.volatility = (
                 self.config.volatility_decay * self.volatility
@@ -85,7 +86,7 @@ class StreamManager:
             self.long_run_vol = 0.999 * self.long_run_vol + 0.001 * error**2
 
             if std > 0:
-                self.quantile_tracker.update(y, self.last_prediction.mean, std)
+                self.quantile_tracker.update(y, self.last_h1_prediction.mean, std, horizon=1)
 
             if self.break_detector.update(error):
                 self._handle_break()
@@ -116,7 +117,7 @@ class StreamManager:
 
         if self.config.use_quantile_calibration:
             std = np.sqrt(scaled_var)
-            q_low, q_high = self.quantile_tracker.q_low, self.quantile_tracker.q_high
+            q_low, q_high = self.quantile_tracker.get_quantiles(horizon)
             interval_lower = pred.mean + q_low * std
             interval_upper = pred.mean + q_high * std
         else:
@@ -129,6 +130,9 @@ class StreamManager:
             interval_lower=interval_lower,
             interval_upper=interval_upper,
         )
+
+        if horizon == 1:
+            self.last_h1_prediction = self.last_prediction
 
         return self.last_prediction
 
@@ -174,8 +178,5 @@ class StreamManager:
             "scale_weights": scale_diag["scale_weights"],
             "volatility": self.volatility,
             "in_break_adaptation": self.in_break_adaptation,
-            "quantile_multipliers": (
-                self.quantile_tracker.q_low,
-                self.quantile_tracker.q_high,
-            ),
+            "quantile_multipliers": self.quantile_tracker.get_quantiles(horizon=1),
         }

@@ -156,3 +156,46 @@ class TestScaleManager:
         pred = manager.predict(horizon=1)
         assert pred.mean == 0.0
         assert pred.variance == 1.0
+
+    def test_scale_manager_variance_scaling(self) -> None:
+        """Test that variance is properly scaled when converting from returns to levels.
+
+        The issue: when models predict s-period returns, the variance should be
+        scaled by 1/s when converting to per-step level predictions.
+
+        Without this fix, larger scales contribute inappropriately large variances,
+        causing prediction intervals to be too wide and coverage to be poor.
+        """
+        # Use only scale=1 vs scale=4 to isolate the effect
+        config_s1 = AEGISConfig(scales=[1])
+        config_s4 = AEGISConfig(scales=[4])
+
+        manager_s1 = ScaleManager(config=config_s1, model_factory=simple_model_factory)
+        manager_s4 = ScaleManager(config=config_s4, model_factory=simple_model_factory)
+
+        # Feed identical white noise to both
+        rng = np.random.default_rng(42)
+        noise = rng.normal(0, 1, 200)
+
+        for y in noise:
+            manager_s1.observe(y)
+            manager_s4.observe(y)
+
+        # Get predictions at horizon=1
+        pred_s1 = manager_s1.predict(horizon=1)
+        pred_s4 = manager_s4.predict(horizon=1)
+
+        # For white noise, both should predict similar level change (near 0)
+        # But the variance should be comparable when properly scaled
+        # If scale-4 variance is NOT scaled, it will be ~4x larger than scale-1
+
+        # With proper scaling: pred_s4.variance ≈ pred_s1.variance (within 2x)
+        # Without scaling: pred_s4.variance ≈ 4 × pred_s1.variance
+
+        # This test asserts that variance is properly scaled (ratio < 2)
+        variance_ratio = pred_s4.variance / pred_s1.variance
+        assert variance_ratio < 2.0, (
+            f"Variance ratio {variance_ratio:.2f} too high. "
+            f"Scale-4 variance ({pred_s4.variance:.3f}) should be scaled to match "
+            f"scale-1 variance ({pred_s1.variance:.3f})."
+        )

@@ -249,3 +249,83 @@ class TestAccuracyRatios:
         assert ratio < max_ratio, (
             f"Random walk error growth ratio too high: {ratio:.1f}x > {max_ratio}x"
         )
+
+
+def compute_coverage(signal: np.ndarray, horizon: int, warmup: int = 100) -> float:
+    """Compute 95% interval coverage for a signal at a given horizon."""
+    n = len(signal)
+    config = AEGISConfig(use_quantile_calibration=True)
+    aegis = AEGIS(config=config)
+    aegis.add_stream("test")
+
+    in_interval = 0
+    total = 0
+
+    for t in range(n):
+        if t > warmup and t + horizon < n:
+            pred = aegis.predict("test", horizon=horizon)
+            actual = signal[t + horizon]
+
+            if pred.interval_lower is not None and pred.interval_upper is not None:
+                if pred.interval_lower <= actual <= pred.interval_upper:
+                    in_interval += 1
+                total += 1
+
+        aegis.observe("test", signal[t])
+        aegis.end_period()
+
+    return in_interval / total if total > 0 else 0.0
+
+
+class TestCoverageBaseline:
+    """Test that prediction interval coverage is reasonable.
+
+    Target coverage is 95%. We allow coverage to be between 85% and 100%
+    to account for:
+    - Calibration learning time
+    - Signal-specific variance patterns
+    - Small sample sizes
+
+    Coverage below 85% indicates intervals are too narrow.
+    Coverage at 100% might indicate intervals are too wide.
+    """
+
+    MIN_COVERAGE = 0.85  # Minimum acceptable coverage
+    TARGET_COVERAGE = 0.95
+
+    @pytest.fixture
+    def gen(self) -> SignalGenerator:
+        """Signal generator with fixed seed."""
+        return SignalGenerator(seed=42)
+
+    def test_white_noise_coverage_h1(self, gen: SignalGenerator) -> None:
+        """White noise h=1 coverage should be near 95%."""
+        signal = gen.white_noise(n=800)
+        coverage = compute_coverage(signal, horizon=1, warmup=200)
+        assert coverage >= self.MIN_COVERAGE, (
+            f"White noise h=1 coverage too low: {coverage:.1%} < {self.MIN_COVERAGE:.0%}"
+        )
+
+    def test_random_walk_coverage_h1(self, gen: SignalGenerator) -> None:
+        """Random walk h=1 coverage should be near 95%."""
+        signal = gen.random_walk(n=800)
+        coverage = compute_coverage(signal, horizon=1, warmup=200)
+        assert coverage >= self.MIN_COVERAGE, (
+            f"Random walk h=1 coverage too low: {coverage:.1%} < {self.MIN_COVERAGE:.0%}"
+        )
+
+    def test_ar1_coverage_h1(self, gen: SignalGenerator) -> None:
+        """AR(1) h=1 coverage should be near 95%."""
+        signal = gen.ar1(n=800, phi=0.8)
+        coverage = compute_coverage(signal, horizon=1, warmup=200)
+        assert coverage >= self.MIN_COVERAGE, (
+            f"AR(1) h=1 coverage too low: {coverage:.1%} < {self.MIN_COVERAGE:.0%}"
+        )
+
+    def test_trend_plus_noise_coverage_h1(self, gen: SignalGenerator) -> None:
+        """Trend + noise h=1 coverage should be near 95%."""
+        signal = gen.trend_plus_noise(n=800)
+        coverage = compute_coverage(signal, horizon=1, warmup=200)
+        assert coverage >= self.MIN_COVERAGE, (
+            f"Trend+noise h=1 coverage too low: {coverage:.1%} < {self.MIN_COVERAGE:.0%}"
+        )

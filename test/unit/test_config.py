@@ -57,6 +57,7 @@ class TestAEGISConfig:
         config = AEGISConfig()
         assert config.outlier_threshold == 5.0
         assert config.min_variance == 1e-10
+        assert config.max_variance == 1e10
 
     def test_config_phase2(self) -> None:
         """Test Phase 2 configuration."""

@@ -60,9 +60,10 @@ class RandomWalkModel(TemporalModel):
             Prediction with mean = horizon × last_y (cumulative),
             variance scales with horizon
         """
+        variance = np.clip(self.sigma_sq * horizon, 1e-10, 1e10)
         return Prediction(
             mean=horizon * self.last_y,
-            variance=self.sigma_sq * horizon,
+            variance=variance,
         )
 
     def log_likelihood(self, y: float) -> float:
@@ -153,9 +154,11 @@ class LocalLevelModel(TemporalModel):
             Prediction with mean = horizon × level (cumulative),
             variance increases with horizon
         """
+        raw_variance = self.sigma_sq * (1 + (horizon - 1) * self.alpha**2)
+        variance = np.clip(raw_variance, 1e-10, 1e10)
         return Prediction(
             mean=horizon * self.level,
-            variance=self.sigma_sq * (1 + (horizon - 1) * self.alpha**2),
+            variance=variance,
         )
 
     def log_likelihood(self, y: float) -> float:

@@ -115,7 +115,8 @@ class AR2Model(TemporalModel):
             y2 = y1
             y1 = y_new
 
-        return Prediction(mean=cumsum, variance=self.sigma_sq * horizon)
+        variance = np.clip(self.sigma_sq * horizon, 1e-10, 1e10)
+        return Prediction(mean=cumsum, variance=variance)
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.
@@ -223,7 +224,8 @@ class MA1Model(TemporalModel):
         # MA(1): E[y_{t+1}] = theta * last_error, E[y_{t+k}] = 0 for k > 1
         # Cumulative = theta * last_error + 0 + 0 + ... = theta * last_error
         mean = self.theta * self.last_error
-        variance = self.sigma_sq * (1 + (horizon - 1) * (1 + self.theta**2))
+        raw_variance = self.sigma_sq * (1 + (horizon - 1) * (1 + self.theta**2))
+        variance = np.clip(raw_variance, 1e-10, 1e10)
 
         return Prediction(mean=mean, variance=variance)
 

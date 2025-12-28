@@ -27,6 +27,7 @@ class AEGISConfig:
         use_quantile_calibration: Enable quantile-based interval calibration
         outlier_threshold: Standard deviations for outlier detection
         min_variance: Minimum variance floor to prevent numerical issues
+        max_variance: Maximum variance ceiling to prevent overflow
     """
 
     use_epistemic_value: bool = False
@@ -58,6 +59,7 @@ class AEGISConfig:
 
     outlier_threshold: float = 5.0
     min_variance: float = 1e-10
+    max_variance: float = 1e10
 
     def validate(self) -> None:
         """Validate configuration parameters.

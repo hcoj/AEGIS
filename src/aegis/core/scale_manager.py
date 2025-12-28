@@ -119,14 +119,21 @@ class ScaleManager:
         level_changes = np.array([p.mean / s for p, s in zip(predictions, active_scales)])
         level_variances = np.array([p.variance for p in predictions])
 
-        combined_level_change = np.sum(weights_arr * level_changes)
+        # Clamp level changes to prevent overflow when computing squared differences
+        max_level_change = 1e6
+        clamped_level_changes = np.clip(level_changes, -max_level_change, max_level_change)
+
+        combined_level_change = np.sum(weights_arr * clamped_level_changes)
         within_var = np.sum(weights_arr * level_variances)
-        between_var = np.sum(weights_arr * (level_changes - combined_level_change) ** 2)
+        between_var = np.sum(weights_arr * (clamped_level_changes - combined_level_change) ** 2)
 
         level_mean = self.history[-1] + combined_level_change
         level_var = within_var + between_var
 
-        return Prediction(mean=level_mean, variance=max(level_var, self.config.min_variance))
+        return Prediction(
+            mean=level_mean,
+            variance=np.clip(level_var, self.config.min_variance, self.config.max_variance),
+        )
 
     def predict_at_scale(self, scale: int, horizon: int) -> Prediction:
         """Get prediction from a specific scale.

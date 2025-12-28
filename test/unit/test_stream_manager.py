@@ -154,3 +154,121 @@ class TestStreamManager:
         diag = manager.get_diagnostics()
         assert "scale_weights" in diag
         assert len(diag["scale_weights"]) == 3
+
+    def test_stream_manager_quantile_tracker_uses_h1_only(self) -> None:
+        """Test quantile tracker only learns from h=1 predictions.
+
+        Bug: When predictions at multiple horizons are made before observe(),
+        the quantile tracker was incorrectly using the last prediction
+        (potentially h=64 or h=1024) to update, which compares the wrong
+        target value to the current observation.
+
+        The fix: Only update quantile tracker from h=1 predictions.
+        """
+        config = AEGISConfig(use_quantile_calibration=True, scales=[1, 2])
+        manager = StreamManager(name="test", config=config, model_factory=simple_model_factory)
+
+        rng = np.random.default_rng(42)
+        signal = rng.normal(0, 1, 200)
+
+        # Warm up
+        for i in range(50):
+            manager.predict(horizon=1)
+            manager.observe(signal[i])
+
+        # Now simulate multi-horizon prediction pattern (like acceptance tests)
+        for i in range(50, 150):
+            # Make predictions at multiple horizons before observing
+            manager.predict(horizon=1)
+            manager.predict(horizon=16)  # This SHOULD NOT affect quantile tracker
+            manager.predict(horizon=64)  # This SHOULD NOT affect quantile tracker
+            manager.observe(signal[i])
+
+        final_q_low, final_q_high = manager.quantile_tracker.get_quantiles(horizon=1)
+
+        # The quantile tracker should converge toward reasonable values
+        # For white noise with sigma=1, the z-scores should stay near ±1.96
+        # If wrongly updated with h=64 predictions, quantiles would diverge wildly
+
+        # Check that quantiles haven't diverged to extreme values
+        assert abs(final_q_low) < 5.0, (
+            f"q_low diverged to {final_q_low:.2f}, suggesting wrong horizon used"
+        )
+        assert abs(final_q_high) < 5.0, (
+            f"q_high diverged to {final_q_high:.2f}, suggesting wrong horizon used"
+        )
+
+        # The interval width should be reasonable (not exploded)
+        interval_width = final_q_high - final_q_low
+        assert interval_width < 10.0, (
+            f"Interval width {interval_width:.2f} too large, quantiles corrupted"
+        )
+
+    def test_stream_manager_stores_h1_prediction_for_quantile_tracking(self) -> None:
+        """Test that last_h1_prediction is stored separately for quantile tracking.
+
+        The StreamManager must store h=1 predictions separately from last_prediction
+        so that quantile tracker updates use the correct values even when predictions
+        at other horizons are made.
+        """
+        config = AEGISConfig(use_quantile_calibration=True, scales=[1, 2])
+        manager = StreamManager(name="test", config=config, model_factory=simple_model_factory)
+
+        # Warm up
+        for i in range(20):
+            manager.predict(horizon=1)
+            manager.observe(float(i))
+
+        # Make predictions at multiple horizons
+        pred_h1 = manager.predict(horizon=1)
+        pred_h64 = manager.predict(horizon=64)
+
+        # The last_prediction should be h=64, but last_h1_prediction should be h=1
+        assert manager.last_prediction.mean == pred_h64.mean
+        assert manager.last_prediction.variance == pred_h64.variance
+
+        # There should be a separate h=1 prediction stored
+        assert hasattr(manager, "last_h1_prediction"), (
+            "StreamManager should store last_h1_prediction for quantile tracking"
+        )
+        assert manager.last_h1_prediction is not None
+        assert manager.last_h1_prediction.mean == pred_h1.mean
+        assert manager.last_h1_prediction.variance == pred_h1.variance
+
+    def test_stream_manager_uses_horizon_aware_quantile_tracker(self) -> None:
+        """Test StreamManager uses HorizonAwareQuantileTracker for calibration."""
+        from aegis.core.quantile_tracker import HorizonAwareQuantileTracker
+
+        config = AEGISConfig(use_quantile_calibration=True, scales=[1, 2])
+        manager = StreamManager(name="test", config=config, model_factory=simple_model_factory)
+
+        # Should use horizon-aware tracker
+        assert isinstance(manager.quantile_tracker, HorizonAwareQuantileTracker)
+
+    def test_stream_manager_horizon_specific_intervals(self) -> None:
+        """Test predictions at different horizons get horizon-specific intervals."""
+        config = AEGISConfig(use_quantile_calibration=True, scales=[1, 2])
+        manager = StreamManager(name="test", config=config, model_factory=simple_model_factory)
+
+        # Warm up with h=1 predictions that are consistently too narrow
+        for i in range(100):
+            pred = manager.predict(horizon=1)
+            # Observation outside the interval forces quantile widening
+            manager.observe(pred.mean + 5.0 * np.sqrt(pred.variance))
+
+        # Now h=1 intervals should be wider than h=64 intervals
+        # (because h=1 has been trained to widen, h=64 hasn't)
+        pred_h1 = manager.predict(horizon=1)
+        pred_h64 = manager.predict(horizon=64)
+
+        # Get interval widths (in terms of std multipliers)
+        if pred_h1.interval_upper is not None and pred_h1.interval_lower is not None:
+            width_h1 = (pred_h1.interval_upper - pred_h1.interval_lower) / np.sqrt(pred_h1.variance)
+            width_h64 = (pred_h64.interval_upper - pred_h64.interval_lower) / np.sqrt(
+                pred_h64.variance
+            )
+
+            # h=1 should have learned wider intervals
+            assert width_h1 > width_h64, (
+                f"h=1 interval width ({width_h1:.2f}) should be > h=64 ({width_h64:.2f})"
+            )
