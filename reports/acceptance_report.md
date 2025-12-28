@@ -1,6 +1,6 @@
 # AEGIS Signal Taxonomy Acceptance Test Report
 
-**Generated:** 2025-12-28 01:39:21
+**Generated:** 2025-12-28 16:59:51
 **Total Tests:** 38
 **Horizons Tested:** 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024
 
@@ -12,19 +12,19 @@
 
 | Horizon | Mean MAE | Mean RMSE | Mean Coverage | MAE Ratio (vs h=1) |
 |---------|----------|-----------|---------------|-------------------|
-| 1 | 0.8471 | 1.1596 | 86.0% | 1.00x |
-| 2 | 0.9628 | 1.3172 | 88.8% | 1.14x |
-| 4 | 1.1582 | 1.5978 | 90.2% | 1.37x |
-| 8 | 1.4695 | 2.0680 | 90.6% | 1.73x |
-| 16 | 1.9875 | 2.9001 | 90.3% | 2.35x |
-| 32 | 2.9375 | 4.5171 | 89.3% | 3.47x |
-| 64 | 4.3502 | 7.3894 | 92.5% | 5.14x |
-| 128 | 7.4422 | 13.9892 | 92.3% | 8.79x |
-| 256 | 13.1876 | 27.8210 | 91.9% | 15.57x |
-| 512 | 25.2010 | 59.6751 | 91.4% | 29.75x |
-| 1024 | 48.6077 | 111.7162 | 92.6% | 57.38x |
+| 1 | 0.7933 | 1.1071 | 85.9% | 1.00x |
+| 2 | 0.9436 | 1.3201 | 89.2% | 1.19x |
+| 4 | 1.1693 | 1.6437 | 91.5% | 1.47x |
+| 8 | 1.5098 | 2.1466 | 92.3% | 1.90x |
+| 16 | 2.0264 | 2.9846 | 92.0% | 2.55x |
+| 32 | 2.9040 | 4.5049 | 92.9% | 3.66x |
+| 64 | 4.1111 | 6.9930 | 91.6% | 5.18x |
+| 128 | 6.9817 | 13.4854 | 91.4% | 8.80x |
+| 256 | 12.2310 | 27.3807 | 90.9% | 15.42x |
+| 512 | 22.9719 | 56.6284 | 90.2% | 28.96x |
+| 1024 | 43.4407 | 106.8099 | 90.8% | 54.76x |
 
-**Total Runtime:** 655.51s
+**Total Runtime:** 819.14s
 
 ---
 
@@ -36,42 +36,42 @@ How prediction error grows with forecast horizon:
 |--------|-----|-----|------|------|-------|--------|
 | Constant Value | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
 | Linear Trend | 0.10 | 0.10 | 0.10 | 0.10 | 0.10 | 0.12 |
-| Sinusoidal | 0.19 | 0.44 | 1.95 | 4.59 | 18.21 | 72.12 |
-| Square Wave | 0.15 | 0.42 | 1.50 | 1.81 | 6.97 | 25.83 |
+| Sinusoidal | 0.13 | 0.14 | 0.42 | 0.91 | 3.53 | 18.51 |
+| Square Wave | 0.06 | 0.15 | 0.39 | 0.06 | 0.06 | 0.06 |
 | Polynomial Trend | 0.37 | 0.37 | 0.38 | 0.40 | 0.56 | 3.05 |
-| White Noise | 1.12 | 1.11 | 1.12 | 1.11 | 1.25 | 2.05 |
-| Random Walk | 1.14 | 1.80 | 3.63 | 10.14 | 30.87 | 107.35 |
-| AR(1) phi=0.8 | 0.57 | 0.81 | 1.07 | 1.23 | 1.99 | 5.18 |
-| AR(1) phi=0.99 | 0.58 | 0.92 | 1.72 | 4.43 | 15.04 | 41.73 |
-| MA(1) | 1.33 | 1.29 | 1.34 | 1.36 | 1.65 | 3.12 |
-| ARMA(1,1) | 1.34 | 1.92 | 2.27 | 2.84 | 5.25 | 17.40 |
-| Ornstein-Uhlenbeck | 0.59 | 0.93 | 1.46 | 2.12 | 4.71 | 14.29 |
-| Trend + Noise | 1.09 | 1.08 | 1.07 | 1.19 | 2.13 | 7.94 |
-| Sine + Noise | 0.59 | 0.69 | 1.32 | 0.69 | 1.12 | 3.81 |
-| Trend + Seasonality + Noi | 0.58 | 0.70 | 1.36 | 0.91 | 2.50 | 11.61 |
-| Mean-Reversion + Oscillat | 0.37 | 0.57 | 1.38 | 1.98 | 6.82 | 25.59 |
-| Random Walk with Drift | 1.14 | 1.84 | 3.77 | 9.92 | 27.81 | 93.44 |
-| Variance Switching | 2.36 | 2.50 | 3.02 | 5.67 | 20.67 | 87.08 |
-| Mean Switching | 1.17 | 1.34 | 2.00 | 4.79 | 15.34 | 60.17 |
-| Threshold AR | 0.58 | 0.81 | 1.00 | 1.20 | 1.95 | 6.21 |
-| Structural Break | 1.10 | 1.10 | 1.12 | 1.29 | 2.30 | 11.54 |
-| Gradual Drift | 1.07 | 1.07 | 1.09 | 1.11 | 1.31 | 2.98 |
-| Student-t (df=4) | 1.58 | 2.14 | 2.84 | 4.80 | 14.97 | 53.61 |
-| Student-t (df=3) | 1.78 | 2.59 | 3.60 | 7.69 | 25.42 | 83.80 |
-| Occasional Jumps | 0.68 | 1.19 | 2.60 | 7.25 | 20.83 | 82.22 |
-| Power-Law Tails (alpha=2. | 1.08 | 2.11 | 5.10 | 15.02 | 51.81 | 187.81 |
-| fBM Persistent (H=0.7) | 0.44 | 0.84 | 2.13 | 6.78 | 22.22 | 77.41 |
-| fBM Antipersistent (H=0.3 | 0.94 | 1.55 | 3.32 | 8.57 | 25.11 | 89.03 |
-| Multi-Timescale Mean-Reve | 0.60 | 0.72 | 0.88 | 1.22 | 2.26 | 6.34 |
-| Trend + Momentum + Revers | 0.58 | 0.63 | 0.68 | 0.93 | 1.72 | 5.89 |
-| GARCH-like Volatility | 1.07 | 1.06 | 1.09 | 1.13 | 1.24 | 2.05 |
-| Perfectly Correlated | 1.13 | 1.84 | 3.87 | 9.37 | 26.70 | 99.55 |
-| Contemporaneous Relations | 1.06 | 1.60 | 3.01 | 6.79 | 16.94 | 54.29 |
-| Lead-Lag | 1.28 | 1.90 | 3.60 | 7.91 | 21.24 | 69.20 |
-| Cointegrated Pair | 1.28 | 1.98 | 3.92 | 10.72 | 31.13 | 105.05 |
-| Impulse | 0.01 | 0.01 | 0.03 | 0.11 | 0.45 | 2.56 |
-| Step Function | 0.02 | 0.07 | 0.28 | 1.09 | 4.65 | 9.88 |
-| Contaminated Data | 1.11 | 1.96 | 4.92 | 17.04 | 65.90 | 315.77 |
+| White Noise | 0.84 | 1.05 | 1.10 | 1.11 | 1.24 | 2.00 |
+| Random Walk | 1.14 | 1.83 | 3.99 | 10.14 | 30.87 | 107.35 |
+| AR(1) phi=0.8 | 0.55 | 0.81 | 1.12 | 1.23 | 1.99 | 5.21 |
+| AR(1) phi=0.99 | 0.58 | 0.94 | 1.93 | 4.44 | 15.07 | 41.88 |
+| MA(1) | 1.22 | 1.27 | 1.34 | 1.35 | 1.61 | 2.83 |
+| ARMA(1,1) | 1.32 | 1.88 | 2.39 | 2.81 | 5.12 | 16.66 |
+| Ornstein-Uhlenbeck | 0.58 | 0.93 | 1.60 | 2.11 | 4.71 | 14.27 |
+| Trend + Noise | 0.88 | 1.03 | 1.08 | 1.26 | 2.80 | 7.97 |
+| Sine + Noise | 0.57 | 0.64 | 1.04 | 0.70 | 1.12 | 3.81 |
+| Trend + Seasonality + Noi | 0.56 | 0.64 | 0.99 | 0.72 | 1.70 | 7.53 |
+| Mean-Reversion + Oscillat | 0.36 | 0.54 | 1.24 | 1.98 | 6.72 | 24.77 |
+| Random Walk with Drift | 1.14 | 1.84 | 4.20 | 9.92 | 27.81 | 93.43 |
+| Variance Switching | 2.01 | 2.55 | 3.15 | 5.68 | 20.83 | 79.76 |
+| Mean Switching | 1.06 | 1.37 | 2.19 | 5.22 | 17.18 | 72.84 |
+| Threshold AR | 0.57 | 0.81 | 1.04 | 1.18 | 1.83 | 5.49 |
+| Structural Break | 0.90 | 1.07 | 1.14 | 1.39 | 3.10 | 14.77 |
+| Gradual Drift | 0.84 | 1.02 | 1.08 | 1.16 | 1.77 | 3.27 |
+| Student-t (df=4) | 1.54 | 2.34 | 3.17 | 4.77 | 14.86 | 55.84 |
+| Student-t (df=3) | 1.78 | 3.00 | 4.43 | 7.82 | 26.03 | 78.84 |
+| Occasional Jumps | 0.68 | 1.28 | 2.94 | 7.26 | 20.86 | 82.33 |
+| Power-Law Tails (alpha=2. | 1.11 | 2.42 | 5.68 | 13.89 | 49.06 | 168.57 |
+| fBM Persistent (H=0.7) | 0.43 | 0.84 | 2.31 | 6.84 | 22.25 | 77.41 |
+| fBM Antipersistent (H=0.3 | 0.94 | 1.56 | 3.75 | 8.57 | 25.11 | 89.02 |
+| Multi-Timescale Mean-Reve | 0.57 | 0.72 | 0.89 | 1.24 | 2.37 | 6.35 |
+| Trend + Momentum + Revers | 0.52 | 0.62 | 0.68 | 0.94 | 1.78 | 6.35 |
+| GARCH-like Volatility | 0.81 | 1.00 | 1.08 | 1.13 | 1.27 | 2.41 |
+| Perfectly Correlated | 1.12 | 1.85 | 4.20 | 9.32 | 26.41 | 99.55 |
+| Contemporaneous Relations | 1.04 | 1.61 | 3.08 | 6.92 | 17.73 | 57.57 |
+| Lead-Lag | 1.26 | 1.94 | 3.83 | 8.01 | 21.47 | 69.16 |
+| Cointegrated Pair | 1.28 | 2.02 | 4.22 | 10.72 | 31.12 | 105.04 |
+| Impulse | 0.01 | 0.01 | 0.01 | 0.01 | 0.01 | 0.01 |
+| Step Function | 0.02 | 0.05 | 0.18 | 0.94 | 3.98 | 7.66 |
+| Contaminated Data | 1.26 | 2.18 | 4.65 | 13.98 | 50.73 | 219.03 |
 
 ---
 
@@ -83,42 +83,42 @@ How prediction error grows with forecast horizon:
 |--------|-----|-----|------|------|-------|--------|
 | Constant Value | 100% | 100% | 100% | 100% | 100% | 100% |
 | Linear Trend | 0% | 0% | 0% | 1% | 2% | 4% |
-| Sinusoidal | 38% | 36% | 23% | 40% | 45% | 93% |
-| Square Wave | 94% | 84% | 47% | 97% | 98% | 99% |
+| Sinusoidal | 7% | 84% | 83% | 4% | 5% | 22% |
+| Square Wave | 97% | 85% | 48% | 97% | 97% | 97% |
 | Polynomial Trend | 0% | 0% | 0% | 1% | 2% | 4% |
-| White Noise | 95% | 99% | 100% | 100% | 100% | 100% |
-| Random Walk | 89% | 97% | 100% | 100% | 100% | 100% |
-| AR(1) phi=0.8 | 89% | 97% | 100% | 100% | 100% | 100% |
-| AR(1) phi=0.99 | 88% | 95% | 100% | 100% | 100% | 100% |
-| MA(1) | 88% | 100% | 100% | 100% | 100% | 100% |
-| ARMA(1,1) | 86% | 98% | 100% | 100% | 100% | 100% |
-| Ornstein-Uhlenbeck | 88% | 96% | 100% | 100% | 100% | 100% |
-| Trend + Noise | 96% | 99% | 100% | 100% | 100% | 100% |
-| Sine + Noise | 94% | 97% | 99% | 100% | 100% | 100% |
-| Trend + Seasonality + Noi | 95% | 97% | 99% | 100% | 100% | 100% |
-| Mean-Reversion + Oscillat | 88% | 95% | 100% | 100% | 100% | 100% |
-| Random Walk with Drift | 89% | 97% | 99% | 100% | 100% | 100% |
-| Variance Switching | 94% | 96% | 97% | 98% | 100% | 100% |
-| Mean Switching | 96% | 97% | 99% | 100% | 100% | 100% |
-| Threshold AR | 91% | 98% | 100% | 100% | 100% | 100% |
-| Structural Break | 95% | 99% | 100% | 100% | 100% | 100% |
-| Gradual Drift | 95% | 99% | 100% | 100% | 100% | 100% |
-| Student-t (df=4) | 92% | 97% | 100% | 100% | 100% | 100% |
-| Student-t (df=3) | 93% | 98% | 100% | 100% | 100% | 100% |
+| White Noise | 98% | 99% | 100% | 100% | 100% | 100% |
+| Random Walk | 90% | 97% | 100% | 100% | 100% | 100% |
+| AR(1) phi=0.8 | 90% | 97% | 100% | 100% | 100% | 100% |
+| AR(1) phi=0.99 | 87% | 95% | 100% | 100% | 100% | 100% |
+| MA(1) | 91% | 100% | 100% | 100% | 100% | 100% |
+| ARMA(1,1) | 87% | 98% | 100% | 100% | 100% | 100% |
+| Ornstein-Uhlenbeck | 89% | 96% | 100% | 100% | 100% | 100% |
+| Trend + Noise | 97% | 99% | 100% | 100% | 100% | 100% |
+| Sine + Noise | 94% | 97% | 100% | 100% | 100% | 100% |
+| Trend + Seasonality + Noi | 95% | 96% | 100% | 100% | 100% | 100% |
+| Mean-Reversion + Oscillat | 88% | 96% | 100% | 100% | 100% | 100% |
+| Random Walk with Drift | 90% | 98% | 99% | 100% | 100% | 100% |
+| Variance Switching | 95% | 97% | 98% | 99% | 100% | 100% |
+| Mean Switching | 96% | 96% | 99% | 100% | 100% | 100% |
+| Threshold AR | 92% | 97% | 100% | 100% | 100% | 100% |
+| Structural Break | 97% | 99% | 100% | 100% | 100% | 100% |
+| Gradual Drift | 97% | 99% | 100% | 100% | 100% | 100% |
+| Student-t (df=4) | 93% | 97% | 100% | 100% | 100% | 100% |
+| Student-t (df=3) | 93% | 97% | 100% | 100% | 100% | 100% |
 | Occasional Jumps | 92% | 94% | 97% | 99% | 100% | 100% |
-| Power-Law Tails (alpha=2. | 91% | 94% | 96% | 98% | 99% | 98% |
-| fBM Persistent (H=0.7) | 83% | 85% | 83% | 95% | 99% | 100% |
-| fBM Antipersistent (H=0.3 | 90% | 96% | 99% | 100% | 100% | 100% |
+| Power-Law Tails (alpha=2. | 91% | 94% | 97% | 99% | 100% | 100% |
+| fBM Persistent (H=0.7) | 85% | 88% | 84% | 96% | 100% | 100% |
+| fBM Antipersistent (H=0.3 | 90% | 96% | 100% | 100% | 100% | 100% |
 | Multi-Timescale Mean-Reve | 92% | 98% | 100% | 100% | 100% | 100% |
-| Trend + Momentum + Revers | 93% | 99% | 100% | 100% | 100% | 100% |
-| GARCH-like Volatility | 96% | 99% | 100% | 100% | 100% | 100% |
-| Perfectly Correlated | 90% | 98% | 99% | 100% | 100% | 100% |
+| Trend + Momentum + Revers | 94% | 99% | 100% | 100% | 100% | 100% |
+| GARCH-like Volatility | 98% | 99% | 100% | 100% | 100% | 100% |
+| Perfectly Correlated | 90% | 98% | 100% | 100% | 100% | 100% |
 | Contemporaneous Relations | 93% | 99% | 100% | 100% | 100% | 100% |
-| Lead-Lag | 92% | 99% | 100% | 100% | 100% | 100% |
+| Lead-Lag | 93% | 99% | 100% | 100% | 100% | 100% |
 | Cointegrated Pair | 91% | 99% | 100% | 100% | 100% | 100% |
 | Impulse | 100% | 100% | 100% | 100% | 100% | 100% |
-| Step Function | 100% | 99% | 97% | 88% | 49% | 20% |
-| Contaminated Data | 93% | 95% | 97% | 96% | 97% | 99% |
+| Step Function | 100% | 99% | 97% | 88% | 49% | 22% |
+| Contaminated Data | 93% | 95% | 97% | 98% | 98% | 100% |
 
 ---
 
@@ -126,10 +126,10 @@ How prediction error grows with forecast horizon:
 
 | Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
 |--------|-----------|------------|--------------|----------------|----------|
-| Trend + Noise | 1.0861 | 1.1910 | 7.9351 | 95.7% | dynamic (36%) |
-| Sine + Noise | 0.5928 | 0.6949 | 3.8130 | 94.1% | periodic (65%) |
-| Trend + Seasonality + Noise | 0.5847 | 0.9123 | 11.6136 | 94.8% | periodic (60%) |
-| Mean-Reversion + Oscillation | 0.3664 | 1.9770 | 25.5903 | 88.0% | dynamic (45%) |
+| Trend + Noise | 0.8779 | 1.2619 | 7.9683 | 97.4% | dynamic (35%) |
+| Sine + Noise | 0.5727 | 0.6951 | 3.8122 | 94.2% | periodic (64%) |
+| Trend + Seasonality + Noise | 0.5649 | 0.7166 | 7.5320 | 94.7% | periodic (60%) |
+| Mean-Reversion + Oscillation | 0.3562 | 1.9759 | 24.7726 | 88.3% | reversion (39%) |
 
 ---
 
@@ -137,11 +137,11 @@ How prediction error grows with forecast horizon:
 
 | Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
 |--------|-----------|------------|--------------|----------------|----------|
-| Constant Value | 0.0000 | 0.0000 | 0.0000 | 100.0% | variance (100%) |
+| Constant Value | 0.0000 | 0.0000 | 0.0000 | 100.0% | reversion (96%) |
 | Linear Trend | 0.1000 | 0.1001 | 0.1165 | N/A | periodic (100%) |
-| Sinusoidal | 0.1892 | 4.5927 | 72.1182 | 37.6% | variance (73%) |
-| Square Wave | 0.1518 | 1.8094 | 25.8289 | 93.8% | reversion (39%) |
-| Polynomial Trend | 0.3703 | 0.3986 | 3.0476 | N/A | trend (100%) |
+| Sinusoidal | 0.1255 | 0.9123 | 18.5135 | 6.7% | periodic (88%) |
+| Square Wave | 0.0622 | 0.0622 | 0.0620 | 96.9% | periodic (86%) |
+| Polynomial Trend | 0.3700 | 0.3986 | 3.0481 | N/A | trend (100%) |
 
 ---
 
@@ -149,9 +149,9 @@ How prediction error grows with forecast horizon:
 
 | Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
 |--------|-----------|------------|--------------|----------------|----------|
-| Impulse | 0.0088 | 0.1113 | 2.5587 | 99.9% | variance (100%) |
-| Step Function | 0.0246 | 1.0947 | 9.8804 | 99.6% | variance (100%) |
-| Contaminated Data | 1.1089 | 17.0440 | 315.7723 | 92.6% | variance (98%) |
+| Impulse | 0.0069 | 0.0078 | 0.0086 | 99.9% | reversion (100%) |
+| Step Function | 0.0181 | 0.9369 | 7.6618 | 99.6% | variance (86%) |
+| Contaminated Data | 1.2619 | 13.9841 | 219.0300 | 92.8% | variance (98%) |
 
 ---
 
@@ -159,10 +159,10 @@ How prediction error grows with forecast horizon:
 
 | Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
 |--------|-----------|------------|--------------|----------------|----------|
-| Student-t (df=4) | 1.5808 | 4.7998 | 53.6063 | 91.8% | dynamic (37%) |
-| Student-t (df=3) | 1.7806 | 7.6923 | 83.8014 | 92.8% | reversion (53%) |
-| Occasional Jumps | 0.6849 | 7.2513 | 82.2240 | 92.0% | special (44%) |
-| Power-Law Tails (alpha=2.5) | 1.0825 | 15.0190 | 187.8075 | 90.6% | special (58%) |
+| Student-t (df=4) | 1.5429 | 4.7688 | 55.8363 | 92.7% | dynamic (36%) |
+| Student-t (df=3) | 1.7839 | 7.8239 | 78.8371 | 92.7% | reversion (54%) |
+| Occasional Jumps | 0.6836 | 7.2618 | 82.3329 | 92.3% | special (45%) |
+| Power-Law Tails (alpha=2.5) | 1.1063 | 13.8889 | 168.5707 | 90.8% | special (51%) |
 
 ---
 
@@ -170,11 +170,11 @@ How prediction error grows with forecast horizon:
 
 | Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
 |--------|-----------|------------|--------------|----------------|----------|
-| fBM Persistent (H=0.7) | 0.4378 | 6.7825 | 77.4135 | 83.4% | reversion (34%) |
-| fBM Antipersistent (H=0.3) | 0.9448 | 8.5691 | 89.0341 | 89.7% | dynamic (29%) |
-| Multi-Timescale Mean-Reversion | 0.6029 | 1.2216 | 6.3395 | 91.7% | dynamic (65%) |
-| Trend + Momentum + Reversion | 0.5797 | 0.9282 | 5.8935 | 93.1% | dynamic (64%) |
-| GARCH-like Volatility | 1.0655 | 1.1252 | 2.0528 | 95.7% | periodic (50%) |
+| fBM Persistent (H=0.7) | 0.4293 | 6.8407 | 77.4137 | 84.6% | reversion (39%) |
+| fBM Antipersistent (H=0.3) | 0.9402 | 8.5686 | 89.0232 | 89.7% | dynamic (29%) |
+| Multi-Timescale Mean-Reversion | 0.5684 | 1.2386 | 6.3501 | 92.0% | dynamic (65%) |
+| Trend + Momentum + Reversion | 0.5200 | 0.9396 | 6.3490 | 94.3% | dynamic (64%) |
+| GARCH-like Volatility | 0.8130 | 1.1310 | 2.4076 | 97.6% | periodic (46%) |
 
 ---
 
@@ -182,10 +182,10 @@ How prediction error grows with forecast horizon:
 
 | Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
 |--------|-----------|------------|--------------|----------------|----------|
-| Perfectly Correlated | 1.1261 | 9.3746 | 99.5546 | 90.2% | dynamic (36%) |
-| Contemporaneous Relationship | 1.0578 | 6.7865 | 54.2943 | 92.8% | dynamic (63%) |
-| Lead-Lag | 1.2783 | 7.9131 | 69.2035 | 92.3% | reversion (41%) |
-| Cointegrated Pair | 1.2844 | 10.7209 | 105.0457 | 91.1% | dynamic (31%) |
+| Perfectly Correlated | 1.1189 | 9.3234 | 99.5525 | 90.3% | dynamic (36%) |
+| Contemporaneous Relationship | 1.0381 | 6.9160 | 57.5745 | 93.4% | dynamic (73%) |
+| Lead-Lag | 1.2625 | 8.0054 | 69.1631 | 92.9% | reversion (41%) |
+| Cointegrated Pair | 1.2750 | 10.7207 | 105.0436 | 91.0% | reversion (32%) |
 
 ---
 
@@ -193,12 +193,12 @@ How prediction error grows with forecast horizon:
 
 | Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
 |--------|-----------|------------|--------------|----------------|----------|
-| Random Walk with Drift | 1.1442 | 9.9189 | 93.4365 | 89.2% | reversion (35%) |
-| Variance Switching | 2.3616 | 5.6720 | 87.0762 | 94.5% | periodic (51%) |
-| Mean Switching | 1.1716 | 4.7892 | 60.1727 | 95.7% | trend (29%) |
-| Threshold AR | 0.5844 | 1.2024 | 6.2073 | 91.1% | dynamic (56%) |
-| Structural Break | 1.0996 | 1.2856 | 11.5420 | 95.4% | periodic (49%) |
-| Gradual Drift | 1.0694 | 1.1106 | 2.9847 | 95.2% | periodic (51%) |
+| Random Walk with Drift | 1.1380 | 9.9189 | 93.4296 | 89.6% | reversion (36%) |
+| Variance Switching | 2.0118 | 5.6790 | 79.7649 | 95.4% | periodic (44%) |
+| Mean Switching | 1.0619 | 5.2233 | 72.8422 | 96.1% | trend (30%) |
+| Threshold AR | 0.5701 | 1.1816 | 5.4865 | 91.6% | dynamic (56%) |
+| Structural Break | 0.8977 | 1.3898 | 14.7661 | 96.7% | periodic (47%) |
+| Gradual Drift | 0.8350 | 1.1575 | 3.2688 | 97.4% | periodic (53%) |
 
 ---
 
@@ -206,13 +206,13 @@ How prediction error grows with forecast horizon:
 
 | Signal | MAE (h=1) | MAE (h=64) | MAE (h=1024) | Coverage (h=1) | Dominant |
 |--------|-----------|------------|--------------|----------------|----------|
-| White Noise | 1.1172 | 1.1123 | 2.0472 | 95.1% | periodic (38%) |
-| Random Walk | 1.1447 | 10.1378 | 107.3529 | 89.5% | reversion (36%) |
-| AR(1) phi=0.8 | 0.5670 | 1.2314 | 5.1849 | 89.3% | dynamic (47%) |
-| AR(1) phi=0.99 | 0.5791 | 4.4288 | 41.7343 | 87.7% | reversion (35%) |
-| MA(1) | 1.3282 | 1.3572 | 3.1185 | 87.8% | dynamic (99%) |
-| ARMA(1,1) | 1.3434 | 2.8357 | 17.4036 | 85.8% | reversion (49%) |
-| Ornstein-Uhlenbeck | 0.5915 | 2.1153 | 14.2850 | 88.2% | reversion (41%) |
+| White Noise | 0.8441 | 1.1116 | 2.0029 | 98.1% | periodic (37%) |
+| Random Walk | 1.1401 | 10.1376 | 107.3488 | 89.7% | reversion (36%) |
+| AR(1) phi=0.8 | 0.5546 | 1.2325 | 5.2099 | 89.7% | dynamic (47%) |
+| AR(1) phi=0.99 | 0.5779 | 4.4404 | 41.8840 | 87.4% | reversion (36%) |
+| MA(1) | 1.2151 | 1.3492 | 2.8273 | 91.3% | dynamic (99%) |
+| ARMA(1,1) | 1.3162 | 2.8062 | 16.6615 | 86.6% | reversion (49%) |
+| Ornstein-Uhlenbeck | 0.5830 | 2.1147 | 14.2728 | 88.6% | reversion (42%) |
 
 ---
 
@@ -267,17 +267,17 @@ How prediction error grows with forecast horizon:
 
 **Slowest Error Growth (best long-horizon performance):**
 - Constant Value (Deterministic): 0.0x increase from h=1 to h=1024
+- Square Wave (Deterministic): 1.0x increase from h=1 to h=1024
 - Linear Trend (Deterministic): 1.2x increase from h=1 to h=1024
-- White Noise (Stochastic): 1.8x increase from h=1 to h=1024
-- GARCH-like Volatility (Multi-Scale): 1.9x increase from h=1 to h=1024
+- Impulse (Edge Case): 1.3x increase from h=1 to h=1024
 - MA(1) (Stochastic): 2.3x increase from h=1 to h=1024
 
 **Fastest Error Growth (challenging for long-horizon):**
-- fBM Persistent (H=0.7) (Multi-Scale): 176.8x increase from h=1 to h=1024
-- Contaminated Data (Edge Case): 284.8x increase from h=1 to h=1024
-- Impulse (Edge Case): 291.8x increase from h=1 to h=1024
-- Sinusoidal (Deterministic): 381.2x increase from h=1 to h=1024
-- Step Function (Edge Case): 401.7x increase from h=1 to h=1024
+- Sinusoidal (Deterministic): 147.5x increase from h=1 to h=1024
+- Power-Law Tails (alpha=2.5) (Heavy-Tailed): 152.4x increase from h=1 to h=1024
+- Contaminated Data (Edge Case): 173.6x increase from h=1 to h=1024
+- fBM Persistent (H=0.7) (Multi-Scale): 180.3x increase from h=1 to h=1024
+- Step Function (Edge Case): 424.2x increase from h=1 to h=1024
 
 ---
 
