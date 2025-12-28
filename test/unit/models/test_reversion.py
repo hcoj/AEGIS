@@ -276,3 +276,104 @@ class TestThresholdARModel:
         model.update(1.0, t=0)
         pred = model.predict(horizon=1)
         assert isinstance(pred, Prediction)
+
+
+class TestLevelAwareMeanReversionModel:
+    """Tests for LevelAwareMeanReversionModel."""
+
+    def test_level_aware_tracks_level(self) -> None:
+        """Test that level is tracked as cumulative sum of inputs."""
+        from aegis.models.reversion import LevelAwareMeanReversionModel
+
+        model = LevelAwareMeanReversionModel()
+
+        model.update(1.0, 0)
+        assert model.level == 1.0
+
+        model.update(2.0, 1)
+        assert model.level == 3.0
+
+        model.update(-1.0, 2)
+        assert model.level == 2.0
+
+    def test_level_aware_predicts_reversion(self) -> None:
+        """Test prediction reverts toward mean level."""
+        from aegis.models.reversion import LevelAwareMeanReversionModel
+
+        model = LevelAwareMeanReversionModel(mu=0.0, phi=0.8)
+        model.level = 10.0
+
+        pred = model.predict(horizon=1)
+        # Deviation is 10.0, expected level is 0 + 0.8*10 = 8
+        # Return is 8 - 10 = -2
+        assert pred.mean < 0, "Should predict negative return to revert toward mu"
+
+    def test_level_aware_learns_from_ou_signal(self) -> None:
+        """Test model correctly identifies mean reversion in OU-like signal.
+
+        When given returns from a mean-reverting level process, the model
+        should learn that the level reverts, not the returns.
+        """
+        from aegis.models.reversion import LevelAwareMeanReversionModel
+
+        rng = np.random.default_rng(42)
+        model = LevelAwareMeanReversionModel(phi=0.5)
+
+        # Simulate OU process and feed returns
+        level = 0.0
+        mu = 0.0
+        true_phi = 0.9
+        sigma = 0.1
+
+        for t in range(500):
+            next_level = mu + true_phi * (level - mu) + rng.normal(0, sigma)
+            return_val = next_level - level
+            model.update(return_val, t)
+            level = next_level
+
+        # Model should have learned high phi (level persists, reversion is slow)
+        assert model.phi > 0.5, f"Should learn high phi for OU, got {model.phi}"
+
+    def test_level_aware_group(self) -> None:
+        """Test model group is 'reversion'."""
+        from aegis.models.reversion import LevelAwareMeanReversionModel
+
+        model = LevelAwareMeanReversionModel()
+        assert model.group == "reversion"
+
+    def test_level_aware_name(self) -> None:
+        """Test model name."""
+        from aegis.models.reversion import LevelAwareMeanReversionModel
+
+        model = LevelAwareMeanReversionModel()
+        assert model.name == "LevelAwareMeanReversionModel"
+
+    def test_level_aware_n_parameters(self) -> None:
+        """Test model has 3 parameters."""
+        from aegis.models.reversion import LevelAwareMeanReversionModel
+
+        model = LevelAwareMeanReversionModel()
+        assert model.n_parameters == 3
+
+    def test_level_aware_returns_prediction_type(self) -> None:
+        """Test that predict returns Prediction instance."""
+        from aegis.models.reversion import LevelAwareMeanReversionModel
+
+        model = LevelAwareMeanReversionModel()
+        model.update(1.0, t=0)
+        pred = model.predict(horizon=1)
+        assert isinstance(pred, Prediction)
+
+    def test_level_aware_reset(self) -> None:
+        """Test reset restores toward priors and resets level."""
+        from aegis.models.reversion import LevelAwareMeanReversionModel
+
+        model = LevelAwareMeanReversionModel(mu=0.0)
+
+        for t in range(100):
+            model.update(1.0, t)
+
+        assert model.level > 50
+
+        model.reset(partial=1.0)
+        assert model.level == pytest.approx(model.mu, abs=0.01)

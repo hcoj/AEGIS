@@ -484,3 +484,146 @@ class ThresholdARModel(TemporalModel):
     def group(self) -> str:
         """Model group."""
         return "reversion"
+
+
+class LevelAwareMeanReversionModel(TemporalModel):
+    """Mean reversion model that tracks levels internally.
+
+    Receives returns (differences) as input but maintains an internal
+    cumulative level estimate to detect mean reversion at the level.
+
+    This addresses the issue where standard mean reversion on returns
+    learns φ≈0 for true mean-reverting levels (like OU processes).
+
+    State:
+        level: Cumulative level estimate
+        mu: Estimated long-run mean level
+        phi: Autoregressive coefficient (reversion speed)
+        sigma_sq: Innovation variance
+    """
+
+    def __init__(
+        self,
+        mu: float = 0.0,
+        phi: float = 0.9,
+        sigma_sq: float = 1.0,
+        decay: float = 0.94,
+    ) -> None:
+        """Initialize LevelAwareMeanReversionModel.
+
+        Args:
+            mu: Initial mean level estimate
+            phi: Initial AR coefficient
+            sigma_sq: Initial variance estimate
+            decay: EWMA decay for parameter estimation
+        """
+        self.level: float = 0.0
+        self.mu: float = mu
+        self.phi: float = phi
+        self.sigma_sq: float = sigma_sq
+        self.decay: float = decay
+
+        self.prior_mu: float = mu
+        self.prior_phi: float = phi
+        self.prior_sigma_sq: float = sigma_sq
+
+        self._n_obs: int = 0
+        self._sum_xy: float = 0.0
+        self._sum_x_sq: float = 0.0
+
+    def update(self, y: float, t: int) -> None:
+        """Update model with new observation (a return/difference).
+
+        Args:
+            y: Observed return (y_t - y_{t-1})
+            t: Time index
+        """
+        self.level += y
+
+        deviation = self.level - self.mu
+
+        expected_next_level = self.mu + self.phi * deviation
+        expected_return = expected_next_level - self.level
+
+        error = y - expected_return
+        self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+        self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
+
+        self._sum_xy = self.decay * self._sum_xy + deviation * y
+        self._sum_x_sq = self.decay * self._sum_x_sq + deviation**2
+
+        if self._sum_x_sq > 1e-6:
+            phi_implied = self._sum_xy / self._sum_x_sq + 1.0
+            phi_new = np.clip(phi_implied, 0.0, 0.999)
+            self.phi = 0.9 * self.phi + 0.1 * phi_new
+
+        self.mu = self.decay * self.mu + (1 - self.decay) * self.level
+        self._n_obs += 1
+
+    def predict(self, horizon: int) -> Prediction:
+        """Predict cumulative return over horizon.
+
+        The level reverts toward mu, so we predict the sum of returns
+        needed to reach the expected level trajectory.
+
+        Args:
+            horizon: Steps ahead
+
+        Returns:
+            Cumulative return prediction
+        """
+        deviation = self.level - self.mu
+
+        if abs(self.phi) < 0.999:
+            expected_level_h = self.mu + (self.phi**horizon) * deviation
+            cumulative_return = expected_level_h - self.level
+            variance = self.sigma_sq * (1 - self.phi ** (2 * horizon)) / (1 - self.phi**2)
+        else:
+            cumulative_return = horizon * deviation * (1 - self.phi)
+            variance = self.sigma_sq * horizon
+
+        return Prediction(mean=cumulative_return, variance=max(variance, 1e-10))
+
+    def log_likelihood(self, y: float) -> float:
+        """Compute log-likelihood of return observation.
+
+        Args:
+            y: Observed return
+
+        Returns:
+            Log probability density
+        """
+        deviation = self.level - self.mu
+        expected_return = (self.phi - 1.0) * deviation
+
+        return (
+            -0.5 * np.log(2 * np.pi * self.sigma_sq)
+            - 0.5 * (y - expected_return) ** 2 / self.sigma_sq
+        )
+
+    def reset(self, partial: float = 1.0) -> None:
+        """Reset parameters toward priors.
+
+        Args:
+            partial: Interpolation weight (1.0 = full reset)
+        """
+        self.mu = partial * self.prior_mu + (1 - partial) * self.mu
+        self.phi = partial * self.prior_phi + (1 - partial) * self.phi
+        self.sigma_sq = partial * self.prior_sigma_sq + (1 - partial) * self.sigma_sq
+        if partial > 0.5:
+            self.level = self.mu
+
+    @property
+    def n_parameters(self) -> int:
+        """Number of learnable parameters."""
+        return 3
+
+    @property
+    def group(self) -> str:
+        """Model group."""
+        return "reversion"
+
+    @property
+    def name(self) -> str:
+        """Model name."""
+        return "LevelAwareMeanReversionModel"

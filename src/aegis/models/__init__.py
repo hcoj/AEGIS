@@ -11,6 +11,7 @@ from aegis.models.periodic import OscillatorBankModel, SeasonalDummyModel
 from aegis.models.persistence import LocalLevelModel, RandomWalkModel
 from aegis.models.reversion import (
     AsymmetricMeanReversionModel,
+    LevelAwareMeanReversionModel,
     MeanReversionModel,
     ThresholdARModel,
 )
@@ -28,6 +29,7 @@ __all__ = [
     "MeanReversionModel",
     "AsymmetricMeanReversionModel",
     "ThresholdARModel",
+    "LevelAwareMeanReversionModel",
     "OscillatorBankModel",
     "SeasonalDummyModel",
     "AR2Model",
@@ -64,6 +66,7 @@ def create_model_bank(config: AEGISConfig) -> list[TemporalModel]:
     models.append(MeanReversionModel())
     models.append(AsymmetricMeanReversionModel())
     models.append(ThresholdARModel())
+    models.append(LevelAwareMeanReversionModel())
 
     for period in config.oscillator_periods:
         models.append(OscillatorBankModel(periods=[period]))
