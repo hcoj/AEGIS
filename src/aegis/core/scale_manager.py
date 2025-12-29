@@ -127,7 +127,11 @@ class ScaleManager:
             return Prediction(mean=0.0, variance=1.0)
 
         # Compute mean using only horizon-appropriate scales
-        mean_weights_arr = np.array(mean_weights)
+        # Use inverse-variance weighting: scales with high uncertainty get less weight
+        mean_variances = np.array([p.variance for p in mean_predictions])
+        inv_var_weights = 1.0 / (mean_variances + 1e-10)
+        # Combine with scale_weights (based on historical h=1 accuracy)
+        mean_weights_arr = np.array(mean_weights) * inv_var_weights
         mean_weights_arr /= mean_weights_arr.sum()
 
         mean_level_changes = np.array([p.mean / s for p, s in zip(mean_predictions, mean_scales)])
