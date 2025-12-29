@@ -84,7 +84,7 @@ class ScaleManager:
 
         Uses horizon-aware filtering: only scales <= horizon contribute to the mean
         (to avoid interpolation errors), but all scales contribute to variance
-        (to preserve calibration).
+        (to preserve calibration). Scales with fewer observations are down-weighted.
 
         Args:
             horizon: Steps ahead to predict
@@ -113,14 +113,27 @@ class ScaleManager:
                 model_preds = [m.predict(horizon) for m in models]
                 scale_pred = combiner.combine_predictions(model_preds)
 
+                # Down-weight scales with fewer observations relative to their size
+                # Scale s needs more observations to make reliable predictions
+                n_obs = len(self.history) - scale
+                # Weight = (n_obs / (n_obs + scale))^2 - favors well-trained scales
+                obs_weight = (n_obs / (n_obs + scale)) ** 2
+
                 all_predictions.append(scale_pred)
-                all_weights.append(self.scale_weights[i])
+                all_weights.append(self.scale_weights[i] * obs_weight)
                 all_scales.append(scale)
 
                 # Only use scales <= horizon for mean (avoid interpolation errors)
-                if scale <= horizon:
+                # For long horizons (h >= 8), averaging across scales adds noise
+                # Use only short scales to maintain prediction accuracy
+                # For short horizons, include all scales up to horizon
+                if horizon >= 8:
+                    max_scale_for_mean = 2  # Only use scale 1 and 2 for long horizons
+                else:
+                    max_scale_for_mean = horizon
+                if scale <= max_scale_for_mean:
                     mean_predictions.append(scale_pred)
-                    mean_weights.append(self.scale_weights[i])
+                    mean_weights.append(obs_weight)  # Equal base, modulated by obs count
                     mean_scales.append(scale)
 
         if not mean_predictions:
