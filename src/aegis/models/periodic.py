@@ -115,6 +115,9 @@ class OscillatorBankModel(TemporalModel):
             self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
         else:
             self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+        # Maintain minimum variance floor for calibrated intervals
+        MIN_SIGMA_SQ = 1e-4
+        self.sigma_sq = max(self.sigma_sq, MIN_SIGMA_SQ)
         self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         for k, period in enumerate(self.periods):

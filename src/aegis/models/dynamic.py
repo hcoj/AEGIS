@@ -91,8 +91,18 @@ class AR2Model(TemporalModel):
             denom = self.forget + np.dot(x, Px)
             gain = Px / denom
 
-            self.theta = self.theta + gain * error
+            # Clip error to prevent overflow in parameter updates
+            MAX_ERROR = 1e6
+            clipped_error = np.clip(error, -MAX_ERROR, MAX_ERROR)
+            self.theta = self.theta + gain * clipped_error
             self.P = (self.P - np.outer(gain, Px)) / self.forget
+
+            # Bound all parameters to prevent overflow
+            MAX_CONSTANT = 1e6
+            MAX_PHI = 5.0
+            self.theta[0] = np.clip(self.theta[0], -MAX_CONSTANT, MAX_CONSTANT)
+            self.theta[1] = np.clip(self.theta[1], -MAX_PHI, MAX_PHI)
+            self.theta[2] = np.clip(self.theta[2], -MAX_PHI, MAX_PHI)
 
             self.c, self.phi1, self.phi2 = self.theta
 
@@ -102,13 +112,17 @@ class AR2Model(TemporalModel):
                 self.phi2 *= scale
                 self.theta[1:] = [self.phi1, self.phi2]
 
+            # Use clipped error for variance update to prevent overflow
+            error_sq = min(clipped_error**2, MAX_SIGMA_SQ)
             if self._use_robust:
                 from aegis.models.robust import robust_weight
 
-                weight = robust_weight(error, np.sqrt(self.sigma_sq), self._outlier_threshold)
-                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error**2
+                weight = robust_weight(
+                    clipped_error, np.sqrt(self.sigma_sq), self._outlier_threshold
+                )
+                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * weight * error_sq
             else:
-                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error**2
+                self.sigma_sq = self.decay * self.sigma_sq + (1 - self.decay) * error_sq
             self.sigma_sq = min(self.sigma_sq, MAX_SIGMA_SQ)
 
         self.y_lag2 = self.y_lag1

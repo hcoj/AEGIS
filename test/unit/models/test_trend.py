@@ -438,3 +438,91 @@ class TestNumericalStability:
             pred = model.predict(horizon=1)
             assert np.isfinite(pred.variance), f"Non-finite variance at t={i}"
             assert pred.variance < 1e20, f"Variance too large at t={i}: {pred.variance}"
+
+
+class TestTrendOverflowProtection:
+    """Test overflow protection for trend models with extreme inputs."""
+
+    def test_linear_trend_slope_var_bounded(self) -> None:
+        """LinearTrendModel slope_var should be bounded during update."""
+        from aegis.models.base import MAX_SIGMA_SQ
+
+        model = LinearTrendModel()
+        for t in range(10000):
+            y = 0.0001 * t**2 + 0.05 * t
+            model.update(y, t)
+        assert model.slope_var <= MAX_SIGMA_SQ, f"slope_var={model.slope_var} exceeds MAX_SIGMA_SQ"
+        assert np.isfinite(model.slope_var), "slope_var is not finite"
+
+    def test_local_trend_slope_var_bounded(self) -> None:
+        """LocalTrendModel slope_var should be bounded during update."""
+        from aegis.models.base import MAX_SIGMA_SQ
+
+        model = LocalTrendModel()
+        for t in range(10000):
+            y = 0.0001 * t**2 + 0.05 * t
+            model.update(y, t)
+        assert model.slope_var <= MAX_SIGMA_SQ, f"slope_var={model.slope_var} exceeds MAX_SIGMA_SQ"
+        assert np.isfinite(model.slope_var), "slope_var is not finite"
+
+    def test_damped_trend_slope_var_bounded(self) -> None:
+        """DampedTrendModel slope_var should be bounded during update."""
+        from aegis.models.base import MAX_SIGMA_SQ
+
+        model = DampedTrendModel()
+        for t in range(10000):
+            y = 0.0001 * t**2 + 0.05 * t
+            model.update(y, t)
+        assert model.slope_var <= MAX_SIGMA_SQ, f"slope_var={model.slope_var} exceeds MAX_SIGMA_SQ"
+        assert np.isfinite(model.slope_var), "slope_var is not finite"
+
+    def test_linear_trend_variance_bounded_at_extreme_horizon(self) -> None:
+        """LinearTrendModel variance should be bounded at h=1024."""
+        model = LinearTrendModel()
+        for t in range(1000):
+            y = 0.1 * t + 5.0
+            model.update(y, t)
+        pred = model.predict(horizon=1024)
+        assert np.isfinite(pred.variance), "variance is not finite"
+        assert pred.variance <= 1e10, f"variance={pred.variance} exceeds 1e10"
+
+    def test_local_trend_variance_bounded_at_extreme_horizon(self) -> None:
+        """LocalTrendModel variance should be bounded at h=1024."""
+        model = LocalTrendModel()
+        for t in range(1000):
+            y = 0.1 * t + 5.0
+            model.update(y, t)
+        pred = model.predict(horizon=1024)
+        assert np.isfinite(pred.variance), "variance is not finite"
+        assert pred.variance <= 1e10, f"variance={pred.variance} exceeds 1e10"
+
+    def test_damped_trend_variance_bounded_at_extreme_horizon(self) -> None:
+        """DampedTrendModel variance should be bounded at h=1024."""
+        model = DampedTrendModel()
+        for t in range(1000):
+            y = 0.1 * t + 5.0
+            model.update(y, t)
+        pred = model.predict(horizon=1024)
+        assert np.isfinite(pred.variance), "variance is not finite"
+        assert pred.variance <= 1e10, f"variance={pred.variance} exceeds 1e10"
+
+    def test_linear_trend_log_likelihood_finite_with_extreme_values(self) -> None:
+        """LinearTrendModel log_likelihood should be finite even with extreme inputs."""
+        model = LinearTrendModel()
+        for t in range(1000):
+            y = 0.0001 * t**2
+            model.update(y, t)
+        ll = model.log_likelihood(1e6)
+        assert np.isfinite(ll), f"log_likelihood returned {ll}"
+
+    def test_all_trend_models_handle_10k_polynomial_without_nan(self) -> None:
+        """All trend models should handle 10k polynomial observations without NaN."""
+        models = [LinearTrendModel(), LocalTrendModel(), DampedTrendModel()]
+        for model in models:
+            for t in range(10000):
+                y = 0.0001 * t**2 + 0.05 * t
+                model.update(y, t)
+            for h in [1, 64, 256, 1024]:
+                pred = model.predict(horizon=h)
+                assert np.isfinite(pred.mean), f"{model.name} NaN mean at h={h}"
+                assert np.isfinite(pred.variance), f"{model.name} NaN variance at h={h}"

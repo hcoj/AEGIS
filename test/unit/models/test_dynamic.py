@@ -105,6 +105,29 @@ class TestAR2Model:
         pred = model.predict(horizon=1)
         assert isinstance(pred, Prediction)
 
+    def test_ar2_constant_term_bounded_for_trending_signal(self) -> None:
+        """AR2Model constant term c stays bounded for trending signals."""
+        model = AR2Model()
+        # 10000 observations like comprehensive evaluation
+        for t in range(10000):
+            y = 0.0001 * t**2 + 0.05 * t  # Polynomial trend
+            model.update(y, t)
+
+        assert np.isfinite(model.c), "Constant term c overflowed to NaN/Inf"
+        assert abs(model.c) < 1e6, f"Constant term c unbounded: {model.c}"
+
+    def test_ar2_prediction_finite_for_trending_signal(self) -> None:
+        """AR2Model predictions stay finite for trending signals."""
+        model = AR2Model()
+        # 10000 observations like comprehensive evaluation
+        for t in range(10000):
+            y = 0.05 * t  # Linear trend
+            model.update(y, t)
+
+        pred = model.predict(horizon=1024)
+        assert np.isfinite(pred.mean), f"Prediction mean is NaN/Inf: {pred.mean}"
+        assert np.isfinite(pred.variance), f"Prediction variance is NaN/Inf: {pred.variance}"
+
 
 class TestMA1Model:
     """Tests for MA1Model."""
@@ -202,3 +225,19 @@ class TestMA1Model:
         model.update(1.0, t=0)
         pred = model.predict(horizon=1)
         assert isinstance(pred, Prediction)
+
+    def test_ma1_learns_near_zero_theta_for_white_noise(self) -> None:
+        """MA1Model should learn theta near 0 for white noise.
+
+        White noise has uncorrelated errors, so optimal MA(1) theta is 0.
+        This tests that MA1 doesn't incorrectly learn spurious patterns.
+        """
+        rng = np.random.default_rng(42)
+        model = MA1Model()
+
+        for t in range(1000):
+            y = rng.standard_normal()  # White noise
+            model.update(y, t)
+
+        # For white noise, optimal MA(1) theta should be near 0
+        assert abs(model.theta) < 0.3, f"MA1 learned theta={model.theta} for white noise"

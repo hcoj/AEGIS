@@ -112,6 +112,24 @@ class TestMeanReversionModel:
         pred = model.predict(horizon=1)
         assert isinstance(pred, Prediction)
 
+    def test_mean_reversion_learns_phi_for_ar1(self) -> None:
+        """MeanReversionModel learns correct phi for AR(1) signal.
+
+        For AR(1) process y_t = phi * y_{t-1} + epsilon, the model
+        should learn phi close to the true value.
+        """
+        rng = np.random.default_rng(42)
+        true_phi = 0.8
+        y = 0.0
+        model = MeanReversionModel()
+
+        for t in range(500):
+            y = true_phi * y + rng.standard_normal() * 0.3
+            model.update(y, t)
+
+        # After 500 observations, phi should be close to 0.8
+        assert model.phi > 0.6, f"MeanReversion learned phi={model.phi}, expected ~0.8"
+
 
 class TestAsymmetricMeanReversionModel:
     """Tests for AsymmetricMeanReversionModel."""

@@ -128,6 +128,25 @@ class TestOscillatorBankModel:
             f"h=64 var={pred_64.variance:.4f}"
         )
 
+    def test_oscillator_variance_has_reasonable_minimum(self, sine_wave_signal) -> None:
+        """OscillatorBank maintains minimum variance even for perfect sinusoids.
+
+        When fitting a clean sine wave, sigma_sq decays toward zero.
+        But we need a reasonable variance floor to maintain calibrated intervals.
+        """
+        # Clean sine wave (no noise by default)
+        signal = sine_wave_signal(n=500, period=16, amplitude=1.0)
+        model = OscillatorBankModel(periods=[16], lr=0.05)
+
+        for t, y in enumerate(signal):
+            model.update(y, t)
+
+        pred = model.predict(horizon=64)
+        # Variance should be at least 1e-4, not 1e-10
+        assert pred.variance >= 1e-4, (
+            f"Variance collapsed to {pred.variance:.2e}, need minimum 1e-4 for calibration"
+        )
+
 
 class TestSeasonalDummyModel:
     """Tests for SeasonalDummyModel."""
