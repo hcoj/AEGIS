@@ -13,8 +13,9 @@ class TestAEGISConfig:
         config = AEGISConfig()
         assert config.use_epistemic_value is False
         assert config.epistemic_weight == 1.0
-        assert config.likelihood_forget == 0.99
-        assert config.temperature == 1.0
+        assert config.likelihood_forget == 0.95  # Reduced for faster regime adaptation
+        assert config.temperature == 2.0  # Higher for ensemble diversity
+        assert config.complexity_penalty_weight == 0.5  # BIC-like penalty enabled
         assert config.scales == [1, 2, 4, 8, 16, 32, 64]
 
     def test_config_default_scales_length(self) -> None:
@@ -146,18 +147,18 @@ class TestAEGISConfig:
     def test_config_temperature_for_diversity(self) -> None:
         """Higher temperature promotes ensemble diversity.
 
-        temperature=1.0 is the default for standard softmax.
+        temperature=2.0 is the default for better ensemble behavior.
         temperature=1.5-2.0 gives more uniform weights, reducing winner-take-all.
         temperature<1.0 makes weights more concentrated (winner-take-all).
         """
-        # Default temperature is 1.0
+        # Default temperature is 2.0 for ensemble diversity
         config = AEGISConfig()
-        assert config.temperature == 1.0
+        assert config.temperature == 2.0
 
-        # Higher temperature is valid
-        config_high = AEGISConfig(temperature=2.0)
-        assert config_high.temperature == 2.0
-        config_high.validate()  # Should pass
+        # Custom temperature is valid
+        config_custom = AEGISConfig(temperature=1.0)
+        assert config_custom.temperature == 1.0
+        config_custom.validate()  # Should pass
 
         # Lower temperature is valid
         config_low = AEGISConfig(temperature=0.5)

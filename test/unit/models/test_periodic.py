@@ -138,9 +138,17 @@ class TestOscillatorBankModel:
         for t, y in enumerate(signal):
             model.update(y, t)
 
-        # Predict cumulative sum over one full period - should be ~0 for sine
-        pred_16 = model.predict(horizon=16)
-        assert abs(pred_16.mean) < 0.5, f"Full period cumsum should be ~0, got {pred_16.mean}"
+        # Predict point value at various horizons - should match sine wave pattern
+        # At h=16 (one full period), we expect ~sin(2*pi*(t+16)/16) ≈ sin(2*pi*t/16)
+        # which should be close to the current point in the cycle
+        pred_h1 = model.predict(horizon=1)
+        pred_h16 = model.predict(horizon=16)
+
+        # Predictions at h=1 and h=16 should be similar (one period apart)
+        assert abs(pred_h1.mean - pred_h16.mean) < 0.5, (
+            f"h=1 and h=16 should be similar for period=16: "
+            f"h=1={pred_h1.mean:.3f}, h=16={pred_h16.mean:.3f}"
+        )
 
     def test_oscillator_variance_has_reasonable_minimum(self, sine_wave_signal) -> None:
         """OscillatorBank maintains minimum variance even for perfect sinusoids.
@@ -178,7 +186,7 @@ class TestSeasonalDummyModel:
             assert model.means[i] == pytest.approx(expected, abs=2.0)
 
     def test_seasonal_dummy_predicts_correctly(self, seasonal_signal) -> None:
-        """Test cumulative prediction matches learned pattern sum."""
+        """Test point prediction matches learned pattern value at correct phase."""
         pattern = [1, 2, 3, 4]
         signal = seasonal_signal(n=200, period=4, pattern=pattern, noise_sigma=0.1)
         model = SeasonalDummyModel(period=4)
@@ -186,10 +194,14 @@ class TestSeasonalDummyModel:
         for t, y in enumerate(signal):
             model.update(y, t)
 
-        # Cumulative prediction for h steps sums over the next h pattern values
+        # Point prediction at horizon h gives the seasonal mean for phase at t+h
+        # After 200 observations, t=199 (phase 3 since 199 % 4 = 3)
+        # h=1 -> phase (199+1) % 4 = 0 -> pattern[0] ≈ 1
+        # h=4 -> phase (199+4) % 4 = 3 -> pattern[3] ≈ 4
+        pred_1 = model.predict(horizon=1)
         pred_4 = model.predict(horizon=4)
-        expected_cycle_sum = sum(pattern)  # 1+2+3+4 = 10
-        assert pred_4.mean == pytest.approx(expected_cycle_sum, abs=2.0)
+        assert pred_1.mean == pytest.approx(pattern[0], abs=0.5)
+        assert pred_4.mean == pytest.approx(pattern[3], abs=0.5)
 
     def test_seasonal_dummy_group(self) -> None:
         """Test model group is 'periodic'."""
@@ -250,19 +262,22 @@ class TestSeasonalDummyModel:
         assert isinstance(pred, Prediction)
 
     def test_seasonal_dummy_period_wrapping(self) -> None:
-        """Test cumulative prediction sums correctly over multiple periods."""
+        """Test point prediction correctly wraps around period."""
         model = SeasonalDummyModel(period=4)
         model.means = np.array([1.0, 2.0, 3.0, 4.0])
         model.t = 10
 
-        # t=10, so next positions are 11,12,13,14,... which mod 4 = 3,0,1,2,...
+        # t=10, so phase at t+h is (10+h) % 4
+        # h=1: (10+1) % 4 = 3 -> means[3] = 4.0
+        # h=4: (10+4) % 4 = 2 -> means[2] = 3.0
+        # h=8: (10+8) % 4 = 2 -> means[2] = 3.0
+        pred_1 = model.predict(horizon=1)
         pred_4 = model.predict(horizon=4)
         pred_8 = model.predict(horizon=8)
 
-        # Full period sum = 1+2+3+4 = 10
-        cycle_sum = sum(model.means)
-        assert pred_4.mean == pytest.approx(cycle_sum, abs=0.01)
-        assert pred_8.mean == pytest.approx(2 * cycle_sum, abs=0.01)
+        assert pred_1.mean == pytest.approx(4.0, abs=0.01)
+        assert pred_4.mean == pytest.approx(3.0, abs=0.01)
+        assert pred_8.mean == pytest.approx(3.0, abs=0.01)  # Same phase as h=4
 
     def test_seasonal_dummy_variance_grows_with_horizon(self, seasonal_signal) -> None:
         """Test that variance grows with horizon due to phase uncertainty."""

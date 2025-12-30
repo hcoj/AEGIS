@@ -86,15 +86,15 @@ class VolatilityTrackerModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Cumulative prediction with current volatility scaling
+            Point prediction (random walk) with current volatility scaling
         """
-        return Prediction(mean=horizon * self.last_y, variance=max(self.sigma_sq * horizon, 1e-10))
+        return Prediction(mean=self.last_y, variance=max(self.sigma_sq * horizon, 1e-10))
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.
@@ -185,17 +185,17 @@ class LevelDependentVolModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Cumulative prediction with level-scaled variance
+            Point prediction (random walk) with level-scaled variance
         """
         level_factor = max(abs(self.last_y), 0.01) ** self.gamma
         variance = self.sigma_sq_base * level_factor**2 * horizon
-        return Prediction(mean=horizon * self.last_y, variance=max(variance, 1e-10))
+        return Prediction(mean=self.last_y, variance=max(variance, 1e-10))
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.

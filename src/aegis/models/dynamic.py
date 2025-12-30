@@ -130,25 +130,23 @@ class AR2Model(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Cumulative prediction with AR(2) extrapolation
+            Point prediction with AR(2) extrapolation
         """
         y1, y2 = self.y_lag1, self.y_lag2
-        cumsum = 0.0
 
         for _ in range(horizon):
             y_new = self.c + self.phi1 * y1 + self.phi2 * y2
-            cumsum += y_new
             y2 = y1
             y1 = y_new
 
         variance = np.clip(self.sigma_sq * horizon, 1e-10, 1e10)
-        return Prediction(mean=cumsum, variance=variance)
+        return Prediction(mean=y1, variance=variance)
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.
@@ -256,17 +254,19 @@ class MA1Model(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Cumulative prediction. Only first step has non-zero mean (MA(1)).
+            Point prediction. At h=1 uses MA(1) term, h>1 predicts 0.
         """
         # MA(1): E[y_{t+1}] = theta * last_error, E[y_{t+k}] = 0 for k > 1
-        # Cumulative = theta * last_error + 0 + 0 + ... = theta * last_error
-        mean = self.theta * self.last_error
+        if horizon == 1:
+            mean = self.theta * self.last_error
+        else:
+            mean = 0.0  # MA(1) has no predictive power beyond 1 step
         raw_variance = self.sigma_sq * (1 + (horizon - 1) * (1 + self.theta**2))
         variance = np.clip(raw_variance, 1e-10, 1e10)
 

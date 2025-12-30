@@ -230,24 +230,20 @@ class OscillatorBankModel(TemporalModel):
         ] * scale * np.sin(omega * center_t)
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Cumulative prediction with oscillator extrapolation.
+            Point prediction with oscillator extrapolation.
             Variance is constant (learned noise level) - for well-learned
             periodic signals, we know the pattern so uncertainty doesn't grow.
         """
-        # O(1) closed-form cumulative sum using Dirichlet kernel
-        cumsum = 0.0
-        for k, period in enumerate(self.periods):
-            omega = 2 * np.pi / period
-            cumsum += self._unlocked_cumsum(k, horizon, omega)
+        mean = self._compute_prediction(self.t + horizon)
 
         # Constant variance - we know the pattern, uncertainty doesn't grow
-        return Prediction(mean=cumsum, variance=max(self.sigma_sq, 1e-10))
+        return Prediction(mean=mean, variance=max(self.sigma_sq, 1e-10))
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.
@@ -359,36 +355,22 @@ class SeasonalDummyModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Cumulative prediction with seasonal means.
+            Point prediction using seasonal mean for phase at t+horizon.
             Variance grows with horizon due to phase uncertainty.
         """
-        # Sum seasonal means over the horizon
-        # Each complete cycle contributes sum(means)
-        # Plus partial cycle at the end
-        full_cycles = horizon // self.period
-        remainder = horizon % self.period
-
-        # Sum of one complete cycle
-        cycle_sum = np.sum(self.means)
-
-        # Cumulative = full_cycles * cycle_sum + partial cycle
-        cumsum = full_cycles * cycle_sum
-
-        # Add partial cycle (positions t+1 to t+remainder)
-        for k in range(1, remainder + 1):
-            s = (self.t + k) % self.period
-            cumsum += self.means[s]
+        s = (self.t + horizon) % self.period
+        mean = self.means[s]
 
         # Phase uncertainty grows linearly with horizon
         phase_uncertainty = 0.01 * horizon
         variance = self.sigma_sq * (1 + phase_uncertainty)
-        return Prediction(mean=cumsum, variance=max(variance, 1e-10))
+        return Prediction(mean=mean, variance=max(variance, 1e-10))
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.

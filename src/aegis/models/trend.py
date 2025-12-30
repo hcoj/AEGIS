@@ -123,20 +123,16 @@ class LinearTrendModel(TemporalModel):
                         self.slope_var = max(self.slope_var, regression_slope_var)
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Prediction with mean = sum of (intercept + slope * (t+k)) for k=1..h
-            This equals h * (intercept + slope * (t + (h+1)/2)).
+            Prediction with mean = intercept + slope * (t + horizon) (point forecast).
             Variance grows quadratically with horizon due to slope uncertainty.
         """
-        # Cumulative sum of arithmetic sequence: sum_{k=1}^{h} (intercept + slope * (t + k))
-        # = h * intercept + slope * (h*t + h*(h+1)/2)
-        # = h * (intercept + slope * (t + (h+1)/2))
-        mean = horizon * (self.intercept + self.slope * (self._last_t + (horizon + 1) / 2))
+        mean = self.intercept + self.slope * (self._last_t + horizon)
         slope_uncertainty = max(self.slope_var, 1e-6)
         variance = self.sigma_sq + (horizon**2) * slope_uncertainty
         return Prediction(mean=mean, variance=max(variance, 1e-10))
@@ -257,18 +253,16 @@ class LocalTrendModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Prediction with mean = sum of (level + slope * k) for k=1..h
-            This equals h * level + slope * h*(h+1)/2.
+            Prediction with mean = level + slope * horizon (point forecast).
             Variance grows quadratically with horizon due to slope uncertainty.
         """
-        # Cumulative: sum_{k=1}^{h} (level + slope * k) = h * level + slope * h*(h+1)/2
-        mean = horizon * self.level + self.slope * horizon * (horizon + 1) / 2
+        mean = self.level + self.slope * horizon
         slope_uncertainty = max(self.slope_var, self.sigma_sq * self.beta**2)
         variance = self.sigma_sq + (horizon**2) * slope_uncertainty
         return Prediction(mean=mean, variance=max(variance, 1e-10))
@@ -431,17 +425,16 @@ class DampedTrendModel(TemporalModel):
         return phi / (1 - phi) * horizon - phi / (1 - phi) * geometric_sum
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Prediction with cumulative damped trend.
+            Prediction with damped trend extrapolation (point forecast).
             Variance grows quadratically with horizon due to slope uncertainty.
         """
-        # Cumulative: sum_{k=1}^{h} (level + slope * damped_sum(k))
-        mean = horizon * self.level + self.slope * self._cumulative_damped_sum(horizon)
+        mean = self.level + self.slope * self._damped_sum(horizon)
         slope_uncertainty = max(self.slope_var, self.sigma_sq * self.beta**2)
         variance = self.sigma_sq + (horizon**2) * slope_uncertainty
         return Prediction(mean=mean, variance=max(variance, 1e-10))

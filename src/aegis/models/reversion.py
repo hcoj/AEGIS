@@ -113,25 +113,22 @@ class MeanReversionModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Cumulative prediction reverting toward mu.
-            Sum of (mu + phi^k * (y - mu)) for k=1..h.
+            Point prediction: mu + phi^h * (last_y - mu).
+            Variance accounts for mean-reversion dynamics.
         """
         x = self._last_y - self.mu
 
-        # Cumulative: sum_{k=1}^{h} (mu + phi^k * x)
-        # = h * mu + x * phi * (1 - phi^h) / (1 - phi)
         if abs(self.phi) < 0.999:
-            geometric_sum = self.phi * (1 - self.phi**horizon) / (1 - self.phi)
-            mean = horizon * self.mu + x * geometric_sum
+            mean = self.mu + x * (self.phi**horizon)
             variance = self.sigma_sq * (1 - self.phi ** (2 * horizon)) / (1 - self.phi**2)
         else:
-            mean = horizon * self.mu + x * horizon  # phi ≈ 1, acts like random walk
+            mean = self._last_y  # phi ≈ 1, acts like random walk
             variance = self.sigma_sq * horizon
 
         return Prediction(mean=mean, variance=max(variance, 1e-10))
@@ -287,24 +284,22 @@ class AsymmetricMeanReversionModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Cumulative prediction using appropriate phi.
+            Point prediction using appropriate phi.
         """
         x = self._last_y - self.mu
         phi = self.phi_up if self._last_y > self.mu else self.phi_down
 
-        # Cumulative: sum_{k=1}^{h} (mu + phi^k * x)
         if abs(phi) < 0.999:
-            geometric_sum = phi * (1 - phi**horizon) / (1 - phi)
-            mean = horizon * self.mu + x * geometric_sum
+            mean = self.mu + x * (phi**horizon)
             variance = self.sigma_sq * (1 - phi ** (2 * horizon)) / (1 - phi**2)
         else:
-            mean = horizon * self.mu + x * horizon
+            mean = self._last_y
             variance = self.sigma_sq * horizon
 
         return Prediction(mean=mean, variance=max(variance, 1e-10))
@@ -446,23 +441,21 @@ class ThresholdARModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Cumulative prediction using appropriate phi.
+            Point prediction using appropriate phi.
         """
         phi = self.phi_low if self._last_y < self.tau else self.phi_high
 
-        # Cumulative: sum_{k=1}^{h} phi^k * y = y * phi * (1 - phi^h) / (1 - phi)
         if abs(phi) < 0.999:
-            geometric_sum = phi * (1 - phi**horizon) / (1 - phi)
-            mean = self._last_y * geometric_sum
+            mean = self._last_y * (phi**horizon)
             variance = self.sigma_sq * (1 - phi ** (2 * horizon)) / (1 - phi**2)
         else:
-            mean = self._last_y * horizon
+            mean = self._last_y
             variance = self.sigma_sq * horizon
 
         return Prediction(mean=mean, variance=max(variance, 1e-10))
@@ -608,28 +601,25 @@ class LevelAwareMeanReversionModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative return over horizon.
-
-        The level reverts toward mu, so we predict the sum of returns
-        needed to reach the expected level trajectory.
+        """Predict expected return at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Cumulative return prediction
+            Expected return at time t+horizon.
         """
         deviation = self.level - self.mu
 
         if abs(self.phi) < 0.999:
-            expected_level_h = self.mu + (self.phi**horizon) * deviation
-            cumulative_return = expected_level_h - self.level
+            # Expected return at horizon h is proportional to phi^(h-1)
+            expected_return = (self.phi - 1.0) * deviation * (self.phi ** (horizon - 1))
             variance = self.sigma_sq * (1 - self.phi ** (2 * horizon)) / (1 - self.phi**2)
         else:
-            cumulative_return = horizon * deviation * (1 - self.phi)
+            expected_return = 0.0  # phi ≈ 1 means no expected return
             variance = self.sigma_sq * horizon
 
-        return Prediction(mean=cumulative_return, variance=max(variance, 1e-10))
+        return Prediction(mean=expected_return, variance=max(variance, 1e-10))
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of return observation.

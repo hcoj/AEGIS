@@ -165,12 +165,16 @@ class HorizonAwareQuantileTracker:
         self.learning_rate: float = learning_rate
 
         alpha = 1 - target_coverage
-        initial_q_low = stats.norm.ppf(alpha / 2)
-        initial_q_high = stats.norm.ppf(1 - alpha / 2)
+        initial_q_low = stats.norm.ppf(alpha / 2)  # ~-1.96 for 95%
+        initial_q_high = stats.norm.ppf(1 - alpha / 2)  # ~1.96 for 95%
 
         self._anchor_quantiles: dict[int, tuple[float, float]] = {}
         for anchor in self.ANCHOR_HORIZONS:
-            self._anchor_quantiles[anchor] = (initial_q_low, initial_q_high)
+            if anchor == 1:
+                # Wider initial bounds at h=1 to address under-coverage
+                self._anchor_quantiles[anchor] = (-2.5, 2.5)
+            else:
+                self._anchor_quantiles[anchor] = (initial_q_low, initial_q_high)
 
         self._anchor_stats: dict[int, dict] = {}
         for anchor in self.ANCHOR_HORIZONS:
@@ -266,17 +270,21 @@ class HorizonAwareQuantileTracker:
 
         # Compute adaptive learning rate
         base_lr = self.learning_rate
+
+        # Horizon-specific multiplier: faster learning at h=1 to address under-coverage
+        horizon_lr_mult = 2.0 if horizon <= 1 else 1.0
+
         if self._n_updates < 100:
             # Warm-up: 5x faster learning for first 100 observations
-            adaptive_lr = base_lr * 5.0
+            adaptive_lr = base_lr * 5.0 * horizon_lr_mult
         else:
             # Coverage-based: increase LR when under-covering
             coverage_gap = self.target_coverage - self._recent_coverage
             if coverage_gap > 0:
                 # Up to 2x at 10% gap
-                adaptive_lr = base_lr * (1 + 10 * coverage_gap)
+                adaptive_lr = base_lr * (1 + 10 * coverage_gap) * horizon_lr_mult
             else:
-                adaptive_lr = base_lr
+                adaptive_lr = base_lr * horizon_lr_mult
 
         for anchor, weight in weights:
             self._anchor_stats[anchor]["n_obs"] += weight
@@ -319,13 +327,17 @@ class HorizonAwareQuantileTracker:
         )
 
     def reset(self) -> None:
-        """Reset all anchor quantiles to Gaussian values."""
+        """Reset all anchor quantiles to initial values."""
         alpha = 1 - self.target_coverage
         initial_q_low = stats.norm.ppf(alpha / 2)
         initial_q_high = stats.norm.ppf(1 - alpha / 2)
 
         for anchor in self.ANCHOR_HORIZONS:
-            self._anchor_quantiles[anchor] = (initial_q_low, initial_q_high)
+            if anchor == 1:
+                # Wider initial bounds at h=1 to address under-coverage
+                self._anchor_quantiles[anchor] = (-2.5, 2.5)
+            else:
+                self._anchor_quantiles[anchor] = (initial_q_low, initial_q_high)
             self._anchor_stats[anchor] = {"n_obs": 0, "n_in_interval": 0}
 
         # Reset adaptive learning rate state

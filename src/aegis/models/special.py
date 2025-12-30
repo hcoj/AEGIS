@@ -112,18 +112,17 @@ class JumpDiffusionModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Cumulative prediction including jump risk
+            Point prediction including expected jump contributions
         """
         lam = self.lambda_mean()
-        # Cumulative: h × (expected return per step)
-        # Expected return per step = last_y (persistence) + lam * mu_jump (expected jumps)
-        mean = horizon * (self.last_y + lam * self.mu_jump)
+        # Expected level at t+h = last_y + expected jump contributions
+        mean = self.last_y + horizon * lam * self.mu_jump
 
         var_per_step = self.sigma_sq_diff + lam * (self.mu_jump**2 + self.sigma_sq_jump)
         variance = var_per_step * horizon
@@ -272,16 +271,16 @@ class ChangePointModel(TemporalModel):
         self._n_obs += 1
 
     def predict(self, horizon: int) -> Prediction:
-        """Predict cumulative change over horizon.
+        """Predict value at horizon steps ahead.
 
         Args:
             horizon: Steps ahead
 
         Returns:
-            Cumulative prediction with change risk in variance
+            Point prediction with change risk in variance
         """
-        # Cumulative: h × regime mean
-        mean = horizon * self.mu
+        # Point prediction is current regime mean
+        mean = self.mu
         variance = self.sigma_sq * (1 + horizon * self.hazard_rate)
         return Prediction(mean=mean, variance=max(variance, 1e-10))
 

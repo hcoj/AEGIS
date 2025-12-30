@@ -18,10 +18,10 @@ class TestLocalTrendModel:
             model.update(2.0 * t, t)
 
         pred = model.predict(horizon=10)
-        # Cumulative: sum of predicted values from t=100 to t=109
-        # = 200 + 202 + 204 + ... + 218 = 10 * 209 = 2090
-        expected_cumulative = 10 * (2.0 * 100 + 2.0 * 109) / 2  # Arithmetic sum
-        assert pred.mean == pytest.approx(expected_cumulative, rel=0.15)
+        # Point prediction at t+10: expect level + 10 * slope
+        # Level ≈ 198, slope ≈ 2, so prediction ≈ 198 + 10*2 = 218
+        expected_point = 2.0 * (99 + 10)  # y at t=109
+        assert pred.mean == pytest.approx(expected_point, rel=0.15)
 
     def test_local_trend_extrapolates(self) -> None:
         """Test that prediction extrapolates trend."""
@@ -172,8 +172,9 @@ class TestDampedTrendModel:
         pred_1 = model.predict(horizon=1)
         pred_10 = model.predict(horizon=10)
 
-        # With cumulative predictions, h=10 should be 10x h=1 for flat predictions
-        assert pred_10.mean == pytest.approx(10 * pred_1.mean, rel=0.05)
+        # With point predictions and phi=0, prediction is just level (no trend)
+        # So h=1 and h=10 should give same mean (level)
+        assert pred_10.mean == pytest.approx(pred_1.mean, rel=0.05)
 
     def test_damped_trend_group(self) -> None:
         """Test model group is 'trend'."""
@@ -223,21 +224,23 @@ class TestDampedTrendModel:
         assert model.slope != initial_slope
 
     def test_damped_trend_convergence(self) -> None:
-        """Test damped trend per-step average converges to asymptotic value."""
+        """Test damped trend converges to level as horizon increases."""
         model = DampedTrendModel(phi=0.8)
         for t in range(100):
             model.update(float(t), t)
 
+        pred_10 = model.predict(horizon=10)
         pred_100 = model.predict(horizon=100)
         pred_1000 = model.predict(horizon=1000)
 
-        # Per-step average converges to level + slope * phi / (1 - phi)
+        # As horizon increases, damped trend converges to:
+        # level + slope * phi * (1 - phi^h) / (1 - phi)
+        # which approaches level + slope * phi / (1 - phi) as h -> inf
         asymptote = model.level + model.slope * model.phi / (1 - model.phi)
-        avg_100 = pred_100.mean / 100
-        avg_1000 = pred_1000.mean / 1000
 
-        # avg_1000 should be closer to asymptote than avg_100
-        assert abs(avg_1000 - asymptote) < abs(avg_100 - asymptote)
+        # Predictions should get closer to asymptote with larger horizon
+        assert abs(pred_1000.mean - asymptote) < abs(pred_100.mean - asymptote)
+        assert abs(pred_100.mean - asymptote) < abs(pred_10.mean - asymptote)
 
     def test_damped_trend_returns_prediction_type(self) -> None:
         """Test that predict returns Prediction instance."""
@@ -268,16 +271,14 @@ class TestLinearTrendModel:
     """Tests for LinearTrendModel (pure regression-based)."""
 
     def test_linear_trend_captures_slope(self) -> None:
-        """Test that model captures linear slope from regression with cumulative predictions."""
+        """Test that model captures linear slope from regression with point predictions."""
         model = LinearTrendModel()
         for i in range(100):
             model.update(2.0 * i + 5.0, t=i)  # y = 2x + 5
 
         pred = model.predict(horizon=10)
-        # Cumulative: sum of y at t=100, 101, ..., 109
-        # = sum(2*t + 5) for t=100..109 = 2*sum(100..109) + 10*5
-        # = 2 * (100+109)*10/2 + 50 = 2*1045 + 50 = 2140
-        expected = 2.0 * (100 + 109) * 10 / 2 + 5.0 * 10
+        # Point prediction at t=99+10=109: y = 2*109 + 5 = 223
+        expected = 2.0 * 109 + 5.0
         assert pred.mean == pytest.approx(expected, rel=0.05)
 
     def test_linear_trend_captures_intercept(self) -> None:
@@ -359,7 +360,7 @@ class TestLinearTrendModel:
         assert pred.mean == pytest.approx(10.0, abs=1.0)
 
     def test_linear_trend_with_noise(self) -> None:
-        """Test model handles noisy linear data with cumulative predictions."""
+        """Test model handles noisy linear data with point predictions."""
         np.random.seed(123)
         model = LinearTrendModel()
         for i in range(200):
@@ -367,10 +368,8 @@ class TestLinearTrendModel:
             model.update(y, t=i)
 
         pred = model.predict(horizon=10)
-        # Cumulative: sum of y at t=200, 201, ..., 209
-        # = sum(1.5*t + 20) for t=200..209 = 1.5*sum(200..209) + 10*20
-        # = 1.5 * (200+209)*10/2 + 200 = 1.5*2045 + 200 = 3267.5
-        expected = 1.5 * (200 + 209) * 10 / 2 + 20.0 * 10
+        # Point prediction at t=199+10=209: y = 1.5*209 + 20 = 333.5
+        expected = 1.5 * 209 + 20.0
         assert pred.mean == pytest.approx(expected, rel=0.1)
 
 

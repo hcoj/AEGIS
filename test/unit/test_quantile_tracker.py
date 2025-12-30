@@ -124,13 +124,22 @@ class TestHorizonAwareQuantileTracker:
         assert tracker is not None
 
     def test_horizon_aware_tracker_initial_quantiles(self) -> None:
-        """Test tracker starts with Gaussian quantiles at all horizons."""
+        """Test tracker starts with appropriate quantiles at each horizon.
+
+        h=1 uses wider quantiles (-2.5, 2.5) to address under-coverage.
+        Other horizons use standard Gaussian quantiles (-1.96, 1.96).
+        """
         from aegis.core.quantile_tracker import HorizonAwareQuantileTracker
 
         tracker = HorizonAwareQuantileTracker(target_coverage=0.95)
 
-        # All horizons should start the same
-        for h in [1, 16, 64, 256, 1024]:
+        # h=1 should have wider initial quantiles
+        q1_low, q1_high = tracker.get_quantiles(horizon=1)
+        assert q1_low == pytest.approx(-2.5, abs=0.01)
+        assert q1_high == pytest.approx(2.5, abs=0.01)
+
+        # Other horizons should start with Gaussian quantiles
+        for h in [16, 64, 256, 1024]:
             q_low, q_high = tracker.get_quantiles(horizon=h)
             assert q_low == pytest.approx(-1.96, abs=0.01)
             assert q_high == pytest.approx(1.96, abs=0.01)
@@ -208,8 +217,9 @@ class TestHorizonAwareQuantileTracker:
         interval_h1 = tracker.get_interval(pred_mean=0.0, pred_std=1.0, horizon=1)
         interval_h64 = tracker.get_interval(pred_mean=0.0, pred_std=1.0, horizon=64)
 
-        # Initially both should be the same
-        assert interval_h1[0] == pytest.approx(interval_h64[0], abs=0.01)
+        # h=1 should have wider intervals than h=64 due to wider initial quantiles
+        assert interval_h1[0] < interval_h64[0], "h=1 should have wider lower bound"
+        assert interval_h1[1] > interval_h64[1], "h=1 should have wider upper bound"
 
     def test_horizon_aware_tracker_calibrate_prediction(self) -> None:
         """Test calibrating a prediction with horizon."""
@@ -280,16 +290,17 @@ class TestHorizonAwareQuantileTracker:
 
         tracker = HorizonAwareQuantileTracker(target_coverage=0.95)
 
-        # Feed observations that are always within interval
+        # Feed observations that are always within interval at h=64 (standard quantiles)
         for _ in range(100):
-            tracker.update(y=0.5, pred_mean=0.0, pred_std=1.0, horizon=1)
+            tracker.update(y=0.5, pred_mean=0.0, pred_std=1.0, horizon=64)
 
         # EMA coverage should be high (near 1.0)
         assert tracker._recent_coverage > 0.8
 
         # Now feed observations that are always outside interval
+        # Use very extreme value that stays outside even as quantiles adapt
         for _ in range(100):
-            tracker.update(y=10.0, pred_mean=0.0, pred_std=1.0, horizon=1)
+            tracker.update(y=50.0, pred_mean=0.0, pred_std=1.0, horizon=64)
 
         # EMA coverage should have dropped
         assert tracker._recent_coverage < 0.5

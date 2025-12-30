@@ -43,9 +43,11 @@ class AEGISConfig:
 
     seasonal_periods: list[int] = field(default_factory=lambda: [7, 12])
 
-    likelihood_forget: float = 0.99
-    temperature: float = 1.0
-    complexity_penalty_weight: float = 0.0
+    scoring_horizons: list[int] = field(default_factory=lambda: [1, 4, 16])
+
+    likelihood_forget: float = 0.95
+    temperature: float = 2.0
+    complexity_penalty_weight: float = 0.5
     entropy_penalty_weight: float = 0.0
     use_adaptive_forgetting: bool = False
     min_forget: float = 0.8

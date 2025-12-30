@@ -156,17 +156,17 @@ class TestMA1Model:
         pred = model.predict(horizon=1)
         assert pred.mean == pytest.approx(1.0, abs=0.01)
 
-    def test_ma1_cumulative_equals_h1(self) -> None:
-        """Test MA(1) cumulative is same for all h (only step 1 contributes)."""
+    def test_ma1_point_prediction_decays(self) -> None:
+        """Test MA(1) point prediction at h>1 is zero (no predictive power)."""
         model = MA1Model()
         model.theta = 0.5
         model.last_error = 2.0
 
-        # MA(1) only has impact at h=1, so cumulative for any h equals h=1 value
+        # MA(1) only has impact at h=1, h>1 predicts 0
         pred_1 = model.predict(horizon=1)
         pred_5 = model.predict(horizon=5)
-        assert pred_5.mean == pytest.approx(pred_1.mean, abs=0.01)
-        assert pred_5.mean == pytest.approx(1.0, abs=0.01)  # theta * last_error
+        assert pred_1.mean == pytest.approx(1.0, abs=0.01)  # theta * last_error
+        assert pred_5.mean == pytest.approx(0.0, abs=0.01)  # No predictive power at h>1
 
     def test_ma1_group(self) -> None:
         """Test model group is 'dynamic'."""
