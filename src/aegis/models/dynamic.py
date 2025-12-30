@@ -275,14 +275,16 @@ class MA1Model(TemporalModel):
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.
 
+        Uses predict(1) for consistency with other models.
+
         Args:
             y: Observed value
 
         Returns:
             Log probability density
         """
-        pred = self.theta * self.last_error
-        return -0.5 * np.log(2 * np.pi * self.sigma_sq) - 0.5 * (y - pred) ** 2 / self.sigma_sq
+        pred = self.predict(horizon=1)
+        return -0.5 * np.log(2 * np.pi * pred.variance) - 0.5 * (y - pred.mean) ** 2 / pred.variance
 
     def reset(self, partial: float = 1.0) -> None:
         """Reset parameters toward priors.

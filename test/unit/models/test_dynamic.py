@@ -241,3 +241,23 @@ class TestMA1Model:
 
         # For white noise, optimal MA(1) theta should be near 0
         assert abs(model.theta) < 0.3, f"MA1 learned theta={model.theta} for white noise"
+
+    def test_ma1_log_likelihood_consistent_with_predict(self) -> None:
+        """MA1Model log_likelihood should use same variance as predict(1)."""
+        model = MA1Model()
+        rng = np.random.default_rng(42)
+
+        for t in range(100):
+            model.update(rng.normal(0, 1), t)
+
+        y_test = 0.5
+        pred = model.predict(horizon=1)
+
+        # Compute expected log-likelihood from predict()
+        expected_ll = (
+            -0.5 * np.log(2 * np.pi * pred.variance)
+            - 0.5 * (y_test - pred.mean) ** 2 / pred.variance
+        )
+        actual_ll = model.log_likelihood(y_test)
+
+        assert np.isclose(actual_ll, expected_ll)

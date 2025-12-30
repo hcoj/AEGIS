@@ -45,22 +45,21 @@ class OscillatorBankModel(TemporalModel):
             periods: List of oscillator periods (default: [4, 8, 16, 32, 64, 128, 256])
             lr: Learning rate for coefficient updates
             decay: EWMA decay for variance estimation
-            phase_lock_threshold: Stability threshold for phase locking (0-1)
+            phase_lock_threshold: Deprecated, kept for backwards compatibility
             config: Optional AEGIS configuration for robust estimation
         """
         self.periods: list[int] = periods or [4, 8, 16, 32, 64, 128, 256]
         self.n_freqs: int = len(self.periods)
         self.lr: float = lr
         self.decay: float = decay
-        self.phase_lock_threshold: float = phase_lock_threshold
+        self.phase_lock_threshold: float = phase_lock_threshold  # Kept for backwards compat
 
         self.a: np.ndarray = np.zeros(self.n_freqs)
         self.b: np.ndarray = np.zeros(self.n_freqs)
 
+        # Phase stability tracking (kept for backwards compatibility, not used in predict)
         self.phase_stability: np.ndarray = np.zeros(self.n_freqs)
         self._last_phase: np.ndarray = np.zeros(self.n_freqs)
-        self._locked_phase: np.ndarray = np.zeros(self.n_freqs)
-        self._locked_amplitude: np.ndarray = np.zeros(self.n_freqs)
 
         self.sigma_sq: float = 1.0
         self.prior_sigma_sq: float = 1.0
@@ -85,13 +84,14 @@ class OscillatorBankModel(TemporalModel):
         return pred
 
     def _is_phase_locked(self, freq_idx: int) -> bool:
-        """Check if frequency has stable phase for locking.
+        """Check if frequency has stable phase (deprecated).
 
         Args:
             freq_idx: Index into self.periods
 
         Returns:
-            True if phase stability exceeds threshold and amplitude is significant
+            True if phase stability exceeds threshold and amplitude is significant.
+            Kept for backwards compatibility but no longer used in predict().
         """
         amplitude = np.sqrt(self.a[freq_idx] ** 2 + self.b[freq_idx] ** 2)
         return self.phase_stability[freq_idx] >= self.phase_lock_threshold and amplitude > 1e-4
@@ -128,6 +128,7 @@ class OscillatorBankModel(TemporalModel):
             self.a[k] += self.lr * error * cos_term
             self.b[k] += self.lr * error * sin_term
 
+            # Track phase stability for diagnostics (not used in predict)
             amplitude = np.sqrt(self.a[k] ** 2 + self.b[k] ** 2)
             if amplitude > 1e-6:
                 current_phase = np.arctan2(self.b[k], self.a[k])
@@ -141,10 +142,6 @@ class OscillatorBankModel(TemporalModel):
                     + (1 - stability_decay) * phase_consistency
                 )
                 self._last_phase[k] = current_phase
-
-                if self._is_phase_locked(k):
-                    self._locked_phase[k] = current_phase
-                    self._locked_amplitude[k] = amplitude
 
         self._n_obs += 1
 
@@ -240,24 +237,17 @@ class OscillatorBankModel(TemporalModel):
 
         Returns:
             Cumulative prediction with oscillator extrapolation.
-            Variance grows with horizon, reduced when phase is stable.
+            Variance is constant (learned noise level) - for well-learned
+            periodic signals, we know the pattern so uncertainty doesn't grow.
         """
-        mean = self._cumulative_prediction(horizon)
+        # O(1) closed-form cumulative sum using Dirichlet kernel
+        cumsum = 0.0
+        for k, period in enumerate(self.periods):
+            omega = 2 * np.pi / period
+            cumsum += self._unlocked_cumsum(k, horizon, omega)
 
-        n_locked = sum(1 for k in range(self.n_freqs) if self._is_phase_locked(k))
-        lock_fraction = n_locked / self.n_freqs if self.n_freqs > 0 else 0.0
-
-        if lock_fraction > 0.9:
-            phase_uncertainty = 0.001 * horizon
-        elif lock_fraction > 0.5:
-            phase_uncertainty = 0.005 * horizon
-        else:
-            avg_stability = np.mean(self.phase_stability)
-            stability_factor = 1.0 - 0.8 * avg_stability
-            phase_uncertainty = 0.01 * horizon * stability_factor
-
-        variance = self.sigma_sq * (1 + phase_uncertainty)
-        return Prediction(mean=mean, variance=max(variance, 1e-10))
+        # Constant variance - we know the pattern, uncertainty doesn't grow
+        return Prediction(mean=cumsum, variance=max(self.sigma_sq, 1e-10))
 
     def log_likelihood(self, y: float) -> float:
         """Compute log-likelihood of observation.
@@ -281,7 +271,6 @@ class OscillatorBankModel(TemporalModel):
         self.b *= 1 - partial
         self.sigma_sq = partial * self.prior_sigma_sq + (1 - partial) * self.sigma_sq
         self.phase_stability *= 1 - partial
-        self._locked_amplitude *= 1 - partial
 
     @property
     def n_parameters(self) -> int:
